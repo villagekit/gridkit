@@ -58,6 +58,20 @@ export { CSSReset } from '@chakra-ui/react'
 // @chakra-ui/focus-lock
 
 // @chakra-ui/form-control
+export type {
+  FormLabelProps,
+  FormControlProps,
+  FormControlOptions,
+  FormHelperTextProps,
+  FormErrorMessageProps,
+} from '@chakra-ui/react'
+export {
+  FormLabel,
+  FormControl,
+  FormErrorIcon,
+  FormHelperText,
+  FormErrorMessage,
+} from '@chakra-ui/react'
 
 // @chakra-ui/hooks
 export type {
