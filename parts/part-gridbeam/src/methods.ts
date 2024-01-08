@@ -84,14 +84,6 @@ export function calculateSummaryKey(summary: GridBeamSummaryValue): string {
   return `${type}::${variant.id}::${lengthInGrids}`
 }
 
-export function calculateEstimatedPrice(state: GridBeamState): number {
-  const { lengthInGrids } = state
-
-  const COST_PER_GRID_BEAM_UNIT = 50
-
-  return lengthInGrids * COST_PER_GRID_BEAM_UNIT
-}
-
 const fasteningAxesByAxisId: Record<AxisId, Array<AxisId>> = {
   [AxisId.X]: [AxisId.Y, AxisId['-Y'], AxisId.Z, AxisId['-Z']],
   [AxisId['-X']]: [AxisId.Y, AxisId['-Y'], AxisId.Z, AxisId['-Z']],

@@ -1,6 +1,5 @@
 import { BasePartSummaryValue, PartsGlProps, PartsSummaryProps } from '@villagekit/part-base'
 import { AxisId, Location } from '@villagekit/util-math'
-import type { Dnum } from 'dnum'
 import { ReactElement } from 'react'
 import { Box3 } from 'three'
 import { $Values } from 'utility-types'
@@ -53,7 +52,6 @@ export type CalculatePartGlValue<State, GlValue> = (state: State) => GlValue
 export type CalculatePartBoundingBox<Value> = (value: Value) => Box3
 export type CalculatePartSummaryValue<State, SummaryValue> = (state: State) => SummaryValue
 export type CalculatePartSummaryKey<SummaryValue> = (state: SummaryValue) => string
-export type CalculatePartEstimatedPrice<State> = (state: State) => number
 export type CalculatePartFasteningPoints<State> = (state: State) => Array<FasteningPoint>
 export type CalculateNumFastenersToFasten<State> = (state: State) => number
 
@@ -82,7 +80,6 @@ export interface PartModule<
     calculateBoundingBox: CalculatePartBoundingBox<GlValue>
     calculateSummaryValue: CalculatePartSummaryValue<State, SummaryValue>
     calculateSummaryKey: CalculatePartSummaryKey<SummaryValue>
-    calculateEstimatedPrice: CalculatePartEstimatedPrice<State>
     calculateFasteningPoints: CalculatePartFasteningPoints<State>
     calculateNumFastenersToFasten: CalculateNumFastenersToFasten<State>
   }
@@ -97,12 +94,6 @@ export type PartModulesByType = {
     VK.EveryPartSummaryValue[PT],
     VK.EveryPartVariants[PT]
   >
-}
-
-export type PartEstimatedPriceByType = {
-  [PT in PartState['type']]: Dnum
-} & {
-  total: Dnum
 }
 
 export type PartVariantsByType = {

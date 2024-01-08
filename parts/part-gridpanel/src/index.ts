@@ -4,7 +4,6 @@ import { calculateState, GridPanelCreator } from './creators'
 import { PartsGl } from './gl'
 import {
   calculateBoundingBox,
-  calculateEstimatedPrice,
   calculateFasteningPoints,
   calculateGlValue,
   calculateNumFastenersToFasten,
@@ -12,11 +11,7 @@ import {
   calculateSummaryValue,
 } from './methods'
 import { PartsSummary } from './summary'
-import {
-  GridPanelGlValue,
-  GridPanelState,
-  GridPanelSummaryValue,
-} from './types'
+import { GridPanelGlValue, GridPanelState, GridPanelSummaryValue } from './types'
 import { variants } from './variants'
 
 export * from './svg'
@@ -52,7 +47,6 @@ registerPartModule({
   id: 'gridpanel' as const,
   methods: {
     calculateBoundingBox,
-    calculateEstimatedPrice,
     calculateFasteningPoints,
     calculateGlValue,
     calculateNumFastenersToFasten,

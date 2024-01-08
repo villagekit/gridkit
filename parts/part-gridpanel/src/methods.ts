@@ -115,16 +115,6 @@ export function calculateSummaryKey(summary: GridPanelSummaryValue): string {
   }
 }
 
-export function calculateEstimatedPrice(state: GridPanelState): number {
-  const { mainLength, crossLength } = state
-
-  const COST_PER_GRID_PANEL_UNIT = 25
-
-  const area = mainLength * crossLength
-
-  return area * COST_PER_GRID_PANEL_UNIT
-}
-
 export function calculateFasteningPoints(state: GridPanelState): Array<FasteningPoint> {
   const {
     fit,

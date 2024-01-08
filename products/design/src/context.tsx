@@ -1,24 +1,16 @@
 import { ParametersOptions } from '@villagekit/parameters'
 import {
   calculateBoundingBoxForAll,
-  calculateEstimatedPriceForAll,
   calculateGlValueForAll,
   calculateStateForAll,
   getPartVariants,
   PartCreator,
-  PartEstimatedPriceByType,
   PartGlValue,
   PartState,
 } from '@villagekit/part'
 import { map, uniq } from 'lodash-es'
 import pDebounce from 'p-debounce'
-import React, {
-  createContext,
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
-} from 'react'
+import React, { createContext, useContext, useEffect, useMemo, useState } from 'react'
 import { Box3 } from 'three'
 
 import {
@@ -30,12 +22,13 @@ import {
 } from './'
 
 type DesignContextPropsStatic = Omit<DesignInstanceStatic, 'type'>
-type DesignContextPropsParameterized<ParamsOptions extends ParametersOptions> =
-  Omit<DesignInstanceParameterized<ParamsOptions>, 'type'>
+type DesignContextPropsParameterized<ParamsOptions extends ParametersOptions> = Omit<
+  DesignInstanceParameterized<ParamsOptions>,
+  'type'
+>
 
 type DesignContextTypeBase = {
   boundingBox: Box3
-  estimatedPrice: PartEstimatedPriceByType
   isLoading: boolean
   partValues: Array<PartGlValue>
   parts: Array<PartState>
@@ -45,13 +38,9 @@ type DesignContextTypeStatic = DesignContextTypeBase & DesignInstanceStatic
 type DesignContextTypeParameterized<ParamsOptions extends ParametersOptions> =
   DesignContextTypeBase & DesignInstanceParameterized<ParamsOptions>
 
-export type DesignContextType =
-  | DesignContextTypeStatic
-  | DesignContextTypeParameterized<any>
+export type DesignContextType = DesignContextTypeStatic | DesignContextTypeParameterized<any>
 
-function useAssemblyStatic(
-  props: DesignContextPropsStatic,
-): DesignContextTypeStatic {
+function useAssemblyStatic(props: DesignContextPropsStatic): DesignContextTypeStatic {
   const { assembly, meta } = props
   const { type } = assembly
 
@@ -68,12 +57,10 @@ function useAssemblyStatic(
 
   const partValues = usePartValues(parts)
   const boundingBox = useBoundingBox(partValues)
-  const estimatedPrice = useEstimatedPrice(parts)
 
   return {
     assembly,
     boundingBox,
-    estimatedPrice,
     isLoading,
     meta,
     partValues,
@@ -102,12 +89,10 @@ function useAssemblyParameterized<ParamsOptions extends ParametersOptions>(
 
   const partValues = usePartValues(parts)
   const boundingBox = useBoundingBox(partValues)
-  const estimatedPrice = useEstimatedPrice(parts)
 
   return {
     assembly,
     boundingBox,
-    estimatedPrice,
     isLoading,
     meta,
     parameterValues,
@@ -134,24 +119,17 @@ export function DesignContextProviderStatic(
 
   const value = useAssemblyStatic(rest)
 
-  return (
-    <DesignContext.Provider value={value}>{children}</DesignContext.Provider>
-  )
+  return <DesignContext.Provider value={value}>{children}</DesignContext.Provider>
 }
 
-export function DesignContextProviderParameterized<
-  ParamsOptions extends ParametersOptions,
->(
-  props: DesignContextProviderProps &
-    DesignContextPropsParameterized<ParamsOptions>,
+export function DesignContextProviderParameterized<ParamsOptions extends ParametersOptions,>(
+  props: DesignContextProviderProps & DesignContextPropsParameterized<ParamsOptions>,
 ) {
   const { children, ...rest } = props
 
   const value = useAssemblyParameterized(rest)
 
-  return (
-    <DesignContext.Provider value={value}>{children}</DesignContext.Provider>
-  )
+  return <DesignContext.Provider value={value}>{children}</DesignContext.Provider>
 }
 
 export function useDesignContext(): DesignContextType {
@@ -168,8 +146,7 @@ function useParts(options: UsePartsOptions): UsePartsValue {
       case 'static':
         return options.assembly.parts
       case 'parameterized': {
-        const parameterValues =
-          options.parameterValues != null ? options.parameterValues : []
+        const parameterValues = options.parameterValues != null ? options.parameterValues : []
         return options.assembly.createParts(parameterValues, partVariants)
       }
     }
@@ -220,9 +197,7 @@ function useParts(options: UsePartsOptions): UsePartsValue {
       )
 
       if (duplicatePartIds.length > 0) {
-        throw new Error(
-          `Parts with duplicate ids found: ${duplicatePartIds.join(', ')}`,
-        )
+        throw new Error(`Parts with duplicate ids found: ${duplicatePartIds.join(', ')}`)
       }
     }
   }, [partStates])
@@ -240,12 +215,4 @@ function useBoundingBox(partGlValues: Array<PartGlValue>): Box3 {
   return useMemo(() => {
     return calculateBoundingBoxForAll(partGlValues)
   }, [partGlValues])
-}
-
-function useEstimatedPrice(
-  partStates: Array<PartState>,
-): PartEstimatedPriceByType {
-  return useMemo(() => {
-    return calculateEstimatedPriceForAll(partStates)
-  }, [partStates])
 }

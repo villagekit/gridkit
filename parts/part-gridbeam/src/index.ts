@@ -4,7 +4,6 @@ import { calculateState, GridBeamCreator } from './creators'
 import { PartsGl } from './gl'
 import {
   calculateBoundingBox,
-  calculateEstimatedPrice,
   calculateFasteningPoints,
   calculateGlValue,
   calculateNumFastenersToFasten,
@@ -48,7 +47,6 @@ registerPartModule({
   id: 'gridbeam' as const,
   methods: {
     calculateBoundingBox,
-    calculateEstimatedPrice,
     calculateFasteningPoints,
     calculateGlValue,
     calculateNumFastenersToFasten,
