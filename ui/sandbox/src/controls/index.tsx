@@ -103,7 +103,9 @@ export function SandboxControls(props: SandboxControlsProps) {
     if (screenfull.element !== containerRef.current) {
       void screenfull.request(containerRef.current).then(() => {
         // No screen orientation API on Safari so cannot auto-rotate screen
-        if (screen.orientation !== undefined) {
+        // @ts-ignore
+        if (screen.orientation !== undefined && typeof screen.orientation.lock === 'function') {
+          // @ts-ignore
           void screen.orientation.lock('landscape').catch(() => {})
         }
       })

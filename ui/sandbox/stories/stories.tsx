@@ -1,13 +1,11 @@
 import '@villagekit/part-gridbeam'
 import '@villagekit/part-gridpanel'
 
-import { Meta } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react'
 import { Design, DesignPart, DesignWrapper } from '@villagekit/design'
 import React from 'react'
 
-import { Sandbox } from './'
-
-/* eslint-disable sort-keys-fix/sort-keys-fix */
+import { Sandbox, SandboxProps } from '../src'
 
 const decorator = (Story: React.FC) => (
   <React.Suspense fallback={null}>
@@ -15,11 +13,15 @@ const decorator = (Story: React.FC) => (
   </React.Suspense>
 )
 
-export default {
+const meta: Meta<SandboxProps> = {
   component: Sandbox,
   decorators: [decorator],
   title: 'Sandbox',
-} as Meta
+}
+
+export default meta
+
+type Story = StoryObj<typeof Sandbox>
 
 interface StoryExample {
   id: string
@@ -45,7 +47,9 @@ function createStory(example: StoryExample) {
 }
 
 const emptyExample: StoryExample = { id: 'empty', parts: [] }
-export const empty = createStory(emptyExample)
+export const empty: Story = {
+  render: createStory(emptyExample),
+}
 
 const oneBeamUpExample: StoryExample = {
   id: 'one-beam-up',
@@ -59,7 +63,9 @@ const oneBeamUpExample: StoryExample = {
     },
   ],
 }
-export const oneBeamUp = createStory(oneBeamUpExample)
+export const oneBeamUp: Story = {
+  render: createStory(oneBeamUpExample),
+}
 
 const threeBeamsExample: StoryExample = {
   id: 'three-beams',
@@ -87,7 +93,9 @@ const threeBeamsExample: StoryExample = {
     },
   ],
 }
-export const threeBeams = createStory(threeBeamsExample)
+export const threeBeams: Story = {
+  render: createStory(threeBeamsExample),
+}
 
 const onePanelXYDownExample: StoryExample = {
   id: 'one-panel-xy-down',
@@ -102,7 +110,9 @@ const onePanelXYDownExample: StoryExample = {
     },
   ],
 }
-export const onePanelXYDown = createStory(onePanelXYDownExample)
+export const onePanelXYDown: Story = {
+  render: createStory(onePanelXYDownExample),
+}
 
 const onePanelXYUpExample: StoryExample = {
   id: 'one-panel-xy-up',
@@ -117,7 +127,9 @@ const onePanelXYUpExample: StoryExample = {
     },
   ],
 }
-export const onePanelXYUp = createStory(onePanelXYUpExample)
+export const onePanelXYUp: Story = {
+  render: createStory(onePanelXYUpExample),
+}
 
 const onePanelXYUnholyExample: StoryExample = {
   id: 'one-panel-xy-unholy',
@@ -132,7 +144,9 @@ const onePanelXYUnholyExample: StoryExample = {
     },
   ],
 }
-export const onePanelXYUnholy = createStory(onePanelXYUnholyExample)
+export const onePanelXYUnholy: Story = {
+  render: createStory(onePanelXYUnholyExample),
+}
 
 const onePanelXYSpecificHolesExample: StoryExample = {
   id: 'one-panel-xy-specific-holes',
@@ -152,9 +166,9 @@ const onePanelXYSpecificHolesExample: StoryExample = {
     },
   ],
 }
-export const onePanelXYSpecificHoles = createStory(
-  onePanelXYSpecificHolesExample,
-)
+export const onePanelXYSpecificHoles: Story = {
+  render: createStory(onePanelXYSpecificHolesExample),
+}
 
 const onePanelYZUpExample: StoryExample = {
   id: 'one-panel-yz-up',
@@ -168,7 +182,7 @@ const onePanelYZUpExample: StoryExample = {
     },
   ],
 }
-export const onePanelYZUp = createStory(onePanelYZUpExample)
+export const onePanelYZUp: Story = { render: createStory(onePanelYZUpExample) }
 
 const onePanelXZUpExample: StoryExample = {
   id: 'one-panel-xz-up',
@@ -182,4 +196,4 @@ const onePanelXZUpExample: StoryExample = {
     },
   ],
 }
-export const onePanelXZUp = createStory(onePanelXZUpExample)
+export const onePanelXZUp: Story = { render: createStory(onePanelXZUpExample) }
