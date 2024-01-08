@@ -1,5 +1,3 @@
-import React from 'react'
-
 import { GridPanelHoles } from '../types'
 import { PanelSvg } from './panel-svg'
 
@@ -17,6 +15,8 @@ export function GridPanelSvg(props: GridPanelSvgProps) {
   const panelWidth = GRID_SPACING * sizeInGridsX
   const panelHeight = GRID_SPACING * sizeInGridsY
 
+  const label = `${sizeInGridsX} by ${sizeInGridsY} unit grid panel`
+
   return (
     <svg
       width={`${panelWidth}mm`}
@@ -24,6 +24,7 @@ export function GridPanelSvg(props: GridPanelSvgProps) {
       viewBox={`0 0 ${panelWidth} ${panelHeight}`}
       xmlns="http://www.w3.org/2000/svg"
     >
+      <title>{label}</title>
       <PanelSvg sizeInGrids={sizeInGrids} holes={holes} />
     </svg>
   )

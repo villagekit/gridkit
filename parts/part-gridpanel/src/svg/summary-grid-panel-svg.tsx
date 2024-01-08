@@ -1,6 +1,6 @@
 import { SvgContextProvider } from '@villagekit/part-base-grid'
 import { Box } from '@villagekit/ui'
-import React, { useMemo } from 'react'
+import { useMemo } from 'react'
 
 import { GridPanelHoles } from '../types'
 import { PanelSvg } from './panel-svg'
@@ -24,9 +24,7 @@ export function SummaryGridPanelSvg(props: SummaryGridPanelSvgProps) {
     () =>
       displayUnit === 'gu'
         ? `${sizeInGridsX} by ${sizeInGridsY} unit grid panel`
-        : `${sizeInGridsX * GRID_SPACING} by ${
-            sizeInGridsY * GRID_SPACING
-          } mm grid panel`,
+        : `${sizeInGridsX * GRID_SPACING} by ${sizeInGridsY * GRID_SPACING} mm grid panel`,
     [displayUnit, sizeInGridsX, sizeInGridsY],
   )
 
@@ -37,18 +35,11 @@ export function SummaryGridPanelSvg(props: SummaryGridPanelSvgProps) {
           role="img"
           aria-label={label}
           width="100%"
-          viewBox={`-4 0 ${maxPanelWidth + GRID_SPACING * 2} ${
-            panelHeight + GRID_SPACING
-          }`}
+          viewBox={`-4 0 ${maxPanelWidth + GRID_SPACING * 2} ${panelHeight + GRID_SPACING}`}
           xmlns="http://www.w3.org/2000/svg"
         >
           <title>{label}</title>
-          <PanelSvg
-            sizeInGrids={sizeInGrids}
-            holes={holes}
-            showSizeMarker
-            showShadow
-          />
+          <PanelSvg sizeInGrids={sizeInGrids} holes={holes} showSizeMarker showShadow />
         </svg>
       </Box>
     </SvgContextProvider>

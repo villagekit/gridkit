@@ -10,11 +10,7 @@ import { convert, meter } from '@villagekit/util-units'
 import generateKey, { sorted as generateKeySorted } from 'deadbeef'
 import { Box3, Vector3 } from 'three'
 
-import {
-  GridPanelGlValue,
-  GridPanelState,
-  GridPanelSummaryValue,
-} from './types'
+import { GridPanelGlValue, GridPanelState, GridPanelSummaryValue } from './types'
 
 export function calculateGlValue(state: GridPanelState): GridPanelGlValue {
   const {
@@ -83,9 +79,7 @@ export function calculateBoundingBox(value: GridPanelGlValue): Box3 {
   ])
 }
 
-export function calculateSummaryValue(
-  state: GridPanelState,
-): GridPanelSummaryValue {
+export function calculateSummaryValue(state: GridPanelState): GridPanelSummaryValue {
   const { type, variant, mainLength, crossLength } = state
 
   let sizeInGrids: [number, number] = [mainLength, crossLength]
@@ -131,9 +125,7 @@ export function calculateEstimatedPrice(state: GridPanelState): number {
   return area * COST_PER_GRID_PANEL_UNIT
 }
 
-export function calculateFasteningPoints(
-  state: GridPanelState,
-): Array<FasteningPoint> {
+export function calculateFasteningPoints(state: GridPanelState): Array<FasteningPoint> {
   const {
     fit,
     crossAxis,
@@ -169,9 +161,7 @@ export function calculateFasteningPoints(
   const holesMap = holes === true ? true : getHolesMap(holes)
 
   const fasteningPoints: Array<FasteningPoint> =
-    holes === true
-      ? new Array(mainLength * crossLength)
-      : new Array(holes.length)
+    holes === true ? new Array(mainLength * crossLength) : new Array(holes.length)
 
   let holeIndex = 0
   for (let crossIndex = 0; crossIndex < crossLength; crossIndex++) {
@@ -180,32 +170,18 @@ export function calculateFasteningPoints(
     }
 
     const crossIndexHalved =
-      crossIndex >= crossLength / 2
-        ? Math.abs(crossIndex - crossLength + 1)
-        : crossIndex
-    const crossIndexGradient = mapRange(
-      crossIndexHalved,
-      0,
-      Math.floor(crossLength / 2),
-      1,
-      0.5,
-    )
+      crossIndex >= crossLength / 2 ? Math.abs(crossIndex - crossLength + 1) : crossIndex
+    const crossIndexGradient = mapRange(crossIndexHalved, 0, Math.floor(crossLength / 2), 1, 0.5)
 
     for (let mainIndex = 0; mainIndex < mainLength; mainIndex++) {
-      if (holesMap !== true && holesMap[crossIndex][mainIndex] === undefined) {
+      if (holesMap !== true && holesMap?.[crossIndex]?.[mainIndex] === undefined) {
         continue
       }
 
       const point = [
-        start[0] +
-          crossAxisDirection[0] * crossIndex +
-          mainAxisDirection[0] * mainIndex,
-        start[1] +
-          crossAxisDirection[1] * crossIndex +
-          mainAxisDirection[1] * mainIndex,
-        start[2] +
-          crossAxisDirection[2] * crossIndex +
-          mainAxisDirection[2] * mainIndex,
+        start[0] + crossAxisDirection[0] * crossIndex + mainAxisDirection[0] * mainIndex,
+        start[1] + crossAxisDirection[1] * crossIndex + mainAxisDirection[1] * mainIndex,
+        start[2] + crossAxisDirection[2] * crossIndex + mainAxisDirection[2] * mainIndex,
       ] as const
 
       const facePosition = [
@@ -215,24 +191,10 @@ export function calculateFasteningPoints(
       ] as const
 
       const mainIndexHalved =
-        mainIndex >= mainLength / 2
-          ? Math.abs(mainIndex - mainLength + 1)
-          : mainIndex
-      const mainIndexGradient = mapRange(
-        mainIndexHalved,
-        0,
-        Math.floor(mainLength / 2),
-        1,
-        0.5,
-      )
+        mainIndex >= mainLength / 2 ? Math.abs(mainIndex - mainLength + 1) : mainIndex
+      const mainIndexGradient = mapRange(mainIndexHalved, 0, Math.floor(mainLength / 2), 1, 0.5)
 
-      const gradient = mapRange(
-        crossIndexGradient * mainIndexGradient,
-        0.25,
-        1,
-        0,
-        1,
-      )
+      const gradient = mapRange(crossIndexGradient * mainIndexGradient, 0.25, 1, 0, 1)
 
       fasteningPoints[holeIndex++] = {
         axis,
@@ -247,14 +209,15 @@ export function calculateFasteningPoints(
   return fasteningPoints
 }
 
-function getHolesMap(
-  holes: Array<[number, number]>,
-): Record<number, Record<number, true>> {
+function getHolesMap(holes: Array<[number, number]>): Record<number, Record<number, true>> {
   const holesMap: Record<number, Record<number, true>> = {}
   for (let index = 0; index < holes.length; index++) {
     const hole = holes[index]
-    holesMap[hole[0]] = holesMap[hole[0]] ?? {}
-    holesMap[hole[0]][hole[1]] = true
+    if (hole === undefined) continue
+    const [hole0, hole1] = hole
+    const nextHoles = holesMap[hole0] ?? {}
+    nextHoles[hole1] = true
+    holesMap[hole0] = nextHoles
   }
   return holesMap
 }

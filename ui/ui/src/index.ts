@@ -179,7 +179,7 @@ export { Select } from './components/Select.js'
 
 // @chakra-ui/slider
 export type { SliderProps } from './components/Slider.js'
-export { Slider } from './components/Slider.js'
+export { Slider, SliderTrack, SliderFilledTrack, SliderThumb } from './components/Slider.js'
 
 // @chakra-ui/spinner
 export type { SpinnerProps } from './components/Spinner.js'

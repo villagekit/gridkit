@@ -26,10 +26,7 @@ export function calculateGlValue(state: GridBeamState): GridBeamGlValue {
 
   const direction = axisIdToDirection(axis)
   const directionVector = axisIdToDirectionVector(axis)
-  const quaternion = new Quaternion().setFromUnitVectors(
-    X_AXIS,
-    directionVector,
-  )
+  const quaternion = new Quaternion().setFromUnitVectors(X_AXIS, directionVector)
 
   const locationInMeters = [
     locationInGrids[0] * gridLengthInMeters,
@@ -75,9 +72,7 @@ export function calculateBoundingBox(value: GridBeamGlValue): Box3 {
   ])
 }
 
-export function calculateSummaryValue(
-  state: GridBeamState,
-): GridBeamSummaryValue {
+export function calculateSummaryValue(state: GridBeamState): GridBeamSummaryValue {
   const { type, variant, lengthInGrids } = state
 
   return { lengthInGrids, type, variant }
@@ -106,9 +101,7 @@ const fasteningAxesByAxisId: Record<AxisId, Array<AxisId>> = {
   [AxisId['-Z']]: [AxisId.X, AxisId['-X'], AxisId.Y, AxisId['-Y']],
 }
 
-export function calculateFasteningPoints(
-  state: GridBeamState,
-): Array<FasteningPoint> {
+export function calculateFasteningPoints(state: GridBeamState): Array<FasteningPoint> {
   const { locationInGrids, lengthInGrids, axis } = state
 
   const direction = axisIdToDirection(axis)
@@ -123,9 +116,7 @@ export function calculateFasteningPoints(
   }
 
   const fasteningAxes = fasteningAxesByAxisId[axis]
-  const fasteningPoints: Array<FasteningPoint> = new Array(
-    lengthInGrids * fasteningAxes.length,
-  )
+  const fasteningPoints: Array<FasteningPoint> = new Array(lengthInGrids * fasteningAxes.length)
   let fasteningPointIndex = 0
   for (
     let fasteningAxisIndex = 0;
@@ -133,10 +124,12 @@ export function calculateFasteningPoints(
     fasteningAxisIndex++
   ) {
     const fasteningAxis = fasteningAxes[fasteningAxisIndex]
+    if (fasteningAxis === undefined) throw new Error('unexpected: fasteningAxis is undefined')
     const offset = axisIdToDirection(fasteningAxis)
 
     for (let pointIndex = 0; pointIndex < points.length; pointIndex++) {
       const point = points[pointIndex]
+      if (point === undefined) throw new Error('unexpected: point is undefined')
       const facePosition = [
         point[0] + offset[0] * 0.5,
         point[1] + offset[1] * 0.5,
@@ -144,9 +137,7 @@ export function calculateFasteningPoints(
       ] as [number, number, number]
 
       const iHalved =
-        pointIndex >= lengthInGrids / 2
-          ? Math.abs(pointIndex - lengthInGrids + 1)
-          : pointIndex
+        pointIndex >= lengthInGrids / 2 ? Math.abs(pointIndex - lengthInGrids + 1) : pointIndex
       const gradient = mapRange(iHalved, 0, Math.floor(lengthInGrids / 2), 1, 0)
 
       fasteningPoints[fasteningPointIndex++] = {

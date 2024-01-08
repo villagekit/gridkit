@@ -1,5 +1,6 @@
-import { PartMaterials, PartsGlProps, useTexture } from '@villagekit/part-base'
-import React, { memo, useMemo } from 'react'
+import '@react-three/fiber'
+import { PartMaterial, PartsGlProps, useTexture } from '@villagekit/part-base'
+import React, { useMemo } from 'react'
 import {
   BoxGeometry,
   BufferAttribute,
@@ -11,9 +12,7 @@ import {
 
 import { GridBeamGlValue } from './types'
 
-export const PartsGl = memo(function PartsGl(
-  props: PartsGlProps<GridBeamGlValue>,
-) {
+export function PartsGl(props: PartsGlProps<GridBeamGlValue>) {
   const { parts, ...restProps } = props
 
   return (
@@ -23,13 +22,13 @@ export const PartsGl = memo(function PartsGl(
       ))}
     </group>
   )
-})
+}
 
 type PartGlProps = Omit<PartsGlProps<GridBeamGlValue>, 'parts'> & {
   part: GridBeamGlValue
 }
 
-export const PartGl = memo(function PartGl(props: PartGlProps) {
+export function PartGl(props: PartGlProps) {
   const {
     part: {
       id,
@@ -39,22 +38,23 @@ export const PartGl = memo(function PartGl(props: PartGlProps) {
       holeDiameterInMeters,
       position,
       quaternion,
-      variant: { materials },
+      variant: { id: variantId, materials },
     },
   } = props
 
+  const beamMaterial = materials.beam
+  if (beamMaterial === undefined) {
+    throw new Error(`gridbeam variant ${variantId} missing materials.beam`)
+  }
+
   return (
-    <group
-      name={`gridbeam-container-${id}`}
-      position={position}
-      quaternion={quaternion}
-    >
+    <group name={`gridbeam-container-${id}`} position={position} quaternion={quaternion}>
       <Beam
         id={id}
         gridLengthInMeters={gridLengthInMeters}
         lengthInGrids={lengthInGrids}
         lengthInMeters={lengthInMeters}
-        materials={materials}
+        material={beamMaterial}
       >
         <Holes
           sizeInGrids={lengthInGrids}
@@ -64,36 +64,33 @@ export const PartGl = memo(function PartGl(props: PartGlProps) {
       </Beam>
     </group>
   )
-})
+}
 
 interface BeamProps {
   id: string
   gridLengthInMeters: number
   lengthInGrids: number
   lengthInMeters: number
-  materials: PartMaterials
+  material: PartMaterial
   children: React.ReactNode | Array<React.ReactNode>
 }
 
 // TODO move to texture descriptor in part type
 const TEXTURE_SIZE = 0.4
 
-const Beam = memo(function Beam(props: BeamProps) {
-  const {
-    id,
-    gridLengthInMeters,
-    lengthInGrids,
-    lengthInMeters,
-    materials,
-    children,
-  } = props
+function Beam(props: BeamProps) {
+  const { id, gridLengthInMeters, lengthInGrids, lengthInMeters, material, children } = props
 
   const uniqueNumericId = useMemo(() => {
-    return [...id].reduce((sofar, _, i) => (sofar += id.charCodeAt(i)), 0)
+    return [...id].reduce((sofar, _, i) => sofar + id.charCodeAt(i), 0)
   }, [id])
 
   const geometry = useMemo(() => {
-    const boxSize = [lengthInMeters, gridLengthInMeters, gridLengthInMeters]
+    const boxSize = [lengthInMeters, gridLengthInMeters, gridLengthInMeters] as [
+      number,
+      number,
+      number,
+    ]
     const boxGeometry = new BoxGeometry(...boxSize)
 
     // translate beam so first hole is at (0, 0, 0).
@@ -162,24 +159,20 @@ const Beam = memo(function Beam(props: BeamProps) {
 
     return boxGeometry
   }, [gridLengthInMeters, lengthInGrids, lengthInMeters, uniqueNumericId])
-  const texture = useTexture(materials.beam)
+
+  const texture = useTexture(material)
 
   return (
     <group name={`gridbeam-beam-${id}`}>
       <group name="gridbeam-beam-material">
-        <mesh
-          name="gridbeam-beam-texture"
-          geometry={geometry}
-          castShadow
-          receiveShadow
-        >
+        <mesh name="gridbeam-beam-texture" geometry={geometry} castShadow receiveShadow>
           <meshLambertMaterial map={texture} />
         </mesh>
       </group>
       {children}
     </group>
   )
-})
+}
 
 const HOLE_SEGMENTS = 8
 
@@ -189,7 +182,7 @@ interface HolesProps {
   holeDiameterInMeters: number
 }
 
-const Holes = memo(function Holes(props: HolesProps) {
+function Holes(props: HolesProps) {
   const { sizeInGrids, gridLengthInMeters, holeDiameterInMeters } = props
   const holeRadius = holeDiameterInMeters / 2
 
@@ -210,41 +203,25 @@ const Holes = memo(function Holes(props: HolesProps) {
 
       // top
       dummy.rotation.x = 0
-      dummy.position.set(
-        index * gridLengthInMeters,
-        0,
-        1e-4 + (1 / 2) * gridLengthInMeters,
-      )
+      dummy.position.set(index * gridLengthInMeters, 0, 1e-4 + (1 / 2) * gridLengthInMeters)
       dummy.updateMatrix()
       m.setMatrixAt(mIndex, dummy.matrix)
 
       // bottom
       dummy.rotation.x = Math.PI
-      dummy.position.set(
-        index * gridLengthInMeters,
-        0,
-        -1e-4 - (1 / 2) * gridLengthInMeters,
-      )
+      dummy.position.set(index * gridLengthInMeters, 0, -1e-4 - (1 / 2) * gridLengthInMeters)
       dummy.updateMatrix()
       m.setMatrixAt(mIndex + 1, dummy.matrix)
 
       // left
       dummy.rotation.x = (3 / 2) * Math.PI
-      dummy.position.set(
-        index * gridLengthInMeters,
-        1e-4 + (1 / 2) * gridLengthInMeters,
-        0,
-      )
+      dummy.position.set(index * gridLengthInMeters, 1e-4 + (1 / 2) * gridLengthInMeters, 0)
       dummy.updateMatrix()
       m.setMatrixAt(mIndex + 2, dummy.matrix)
 
       // top
       dummy.rotation.x = (1 / 2) * Math.PI
-      dummy.position.set(
-        index * gridLengthInMeters,
-        -1e-4 - (1 / 2) * gridLengthInMeters,
-        0,
-      )
+      dummy.position.set(index * gridLengthInMeters, -1e-4 - (1 / 2) * gridLengthInMeters, 0)
       dummy.updateMatrix()
       m.setMatrixAt(mIndex + 3, dummy.matrix)
     }
@@ -253,4 +230,4 @@ const Holes = memo(function Holes(props: HolesProps) {
   }, [sizeInGrids, gridLengthInMeters, material, geometry])
 
   return <primitive name="gridbeam-holes" object={mesh} />
-})
+}

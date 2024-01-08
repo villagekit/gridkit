@@ -1,6 +1,6 @@
 import { LabelX, SvgContextProvider } from '@villagekit/part-base-grid'
 import { Box, useTheme } from '@villagekit/ui'
-import React, { useMemo } from 'react'
+import { useMemo } from 'react'
 
 import { BeamSvg } from './beam-svg'
 import { CutMarker } from './cut-marker'
@@ -59,9 +59,8 @@ export function CutGridBeamSvg(props: CutGridBeamSvgProps) {
 
           {cuts.map((cut, index) => (
             <BeamSvg
-              key={index}
               sizeInGrids={cut}
-              x={absoluteCuts[index - 1] * GRID_SPACING || 0}
+              x={(absoluteCuts[index - 1] || 0) * GRID_SPACING}
               showSizeMarker
               showShadow
               minHolesForSizeMarker={4}
@@ -86,11 +85,7 @@ export function CutGridBeamSvg(props: CutGridBeamSvgProps) {
           ))}
 
           <g transform={`translate(0, ${GRID_SPACING})`}>
-            <LabelX
-              value={sizeInGrids}
-              color={colors.gray[400]}
-              x={beamWidth}
-            />
+            <LabelX value={sizeInGrids} color={colors.gray[400]} x={beamWidth} />
           </g>
         </svg>
       </Box>
@@ -102,7 +97,5 @@ function joinAnd(strs: Array<string | number>): string {
   if (strs.length === 0) return ''
   else if (strs.length === 1) return `${strs[0]}`
   else if (strs.length === 2) return `${strs[0]} and ${strs[1]}`
-  return (
-    strs.slice(0, strs.length - 1).join(', ') + ', and ' + String(strs.at(-1))
-  )
+  return strs.slice(0, strs.length - 1).join(', ') + ', and ' + String(strs.at(-1))
 }

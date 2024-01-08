@@ -1,11 +1,7 @@
-import { PartMaterials, PartsGlProps, useTexture } from '@villagekit/part-base'
-import {
-  AxisId,
-  axisIdToDirection,
-  AxisValues,
-  axisValuesToVector,
-} from '@villagekit/util-math'
-import React, { memo, useMemo } from 'react'
+import '@react-three/fiber'
+import { PartMaterial, PartsGlProps, useTexture } from '@villagekit/part-base'
+import { AxisId, axisIdToDirection, AxisValues, axisValuesToVector } from '@villagekit/util-math'
+import React, { useMemo } from 'react'
 import {
   BoxGeometry,
   BufferAttribute,
@@ -20,9 +16,7 @@ import {
 import { getEveryHolePosition } from './helpers'
 import { GridPanelGlValue } from './types'
 
-export const PartsGl = memo(function PartsGl(
-  props: PartsGlProps<GridPanelGlValue>,
-) {
+export function PartsGl(props: PartsGlProps<GridPanelGlValue>) {
   const { parts, ...restProps } = props
 
   return (
@@ -32,13 +26,13 @@ export const PartsGl = memo(function PartsGl(
       ))}
     </group>
   )
-})
+}
 
 type PartGlProps = Omit<PartsGlProps<GridPanelGlValue>, 'parts'> & {
   part: GridPanelGlValue
 }
 
-export const PartGl = memo(function PartGl(props: PartGlProps) {
+export function PartGl(props: PartGlProps) {
   const {
     part: {
       id,
@@ -53,16 +47,21 @@ export const PartGl = memo(function PartGl(props: PartGlProps) {
       locationInMeters,
       sizeInMeters,
       holes = true,
-      variant: { materials },
+      variant: { id: variantId, materials },
     },
   } = props
+
+  const panelMaterial = materials.panel
+  if (panelMaterial === undefined) {
+    throw new Error(`gridpanel variant ${variantId} missing materials.panel`)
+  }
 
   return (
     <group
       name={`gridpanel-container-${id}`}
       position={locationInMeters as [number, number, number]}
     >
-      <Panel id={id} sizeInMeters={sizeInMeters} materials={materials}>
+      <Panel id={id} sizeInMeters={sizeInMeters} material={panelMaterial}>
         {holes && (
           <Holes
             mainAxis={mainAxis}
@@ -79,41 +78,33 @@ export const PartGl = memo(function PartGl(props: PartGlProps) {
       </Panel>
     </group>
   )
-})
+}
 
 interface PanelProps {
   id: string
   sizeInMeters: [number, number, number]
-  materials: PartMaterials
+  material: PartMaterial
   children: React.ReactNode | Array<React.ReactNode>
 }
 
 // TODO move to texture descriptor in part type
 const TEXTURE_SIZE = 0.4
 
-const Panel = memo(function Panel(props: PanelProps) {
-  const { id, sizeInMeters, materials, children } = props
+function Panel(props: PanelProps) {
+  const { id, sizeInMeters, material, children } = props
 
   const uniqueNumericId = useMemo(() => {
-    return [...id].reduce((sofar, _, i) => (sofar += id.charCodeAt(i)), 0)
+    return [...id].reduce((sofar, _, i) => sofar + id.charCodeAt(i), 0)
   }, [id])
 
   const geometry = useMemo(() => {
-    const geometry = new BoxGeometry(
-      sizeInMeters[0],
-      sizeInMeters[1],
-      sizeInMeters[2],
-    )
+    const geometry = new BoxGeometry(sizeInMeters[0], sizeInMeters[1], sizeInMeters[2])
 
     const panelScale = 0.995
     geometry.scale(panelScale, panelScale, panelScale)
 
     // translate geometry so position starts at (0, 0, 0)
-    geometry.translate(
-      sizeInMeters[0] / 2,
-      sizeInMeters[1] / 2,
-      sizeInMeters[2] / 2,
-    )
+    geometry.translate(sizeInMeters[0] / 2, sizeInMeters[1] / 2, sizeInMeters[2] / 2)
 
     // set uvs such that texture maps to world units
 
@@ -179,25 +170,20 @@ const Panel = memo(function Panel(props: PanelProps) {
     return geometry
   }, [sizeInMeters, uniqueNumericId])
 
-  const texture = useTexture(materials.panel)
+  const texture = useTexture(material)
   if (texture == null) return null
 
   return (
     <group name={`gridpanel-${id}`}>
       <group name="gridpanel-panel">
-        <mesh
-          name="gridpanel-panel-texture"
-          geometry={geometry}
-          castShadow
-          receiveShadow
-        >
+        <mesh name="gridpanel-panel-texture" geometry={geometry} castShadow receiveShadow>
           <meshLambertMaterial map={texture} />
         </mesh>
       </group>
       {children}
     </group>
   )
-})
+}
 
 const HOLE_SEGMENTS = 8
 
@@ -213,7 +199,7 @@ interface HolesProps {
   holes: true | Array<[number, number]>
 }
 
-const Holes = memo(function Holes(props: HolesProps) {
+function Holes(props: HolesProps) {
   const {
     mainAxis,
     mainLength,
@@ -250,18 +236,15 @@ const Holes = memo(function Holes(props: HolesProps) {
   }, [thicknessAxis])
 
   const mesh = useMemo(() => {
-    const holePositions =
-      holes === true ? getEveryHolePosition([mainLength, crossLength]) : holes
+    const holePositions = holes === true ? getEveryHolePosition([mainLength, crossLength]) : holes
 
     const m = new InstancedMesh(geometry, material, 2 * holePositions.length)
     const dummy = new Object3D()
 
-    for (
-      let holePositionIndex = 0;
-      holePositionIndex < holePositions.length;
-      holePositionIndex++
-    ) {
-      const [mainIndex, crossIndex] = holePositions[holePositionIndex]
+    for (let holePositionIndex = 0; holePositionIndex < holePositions.length; holePositionIndex++) {
+      const holePosition = holePositions[holePositionIndex]
+      if (holePosition === undefined) throw new Error('unexpected: holePosition is undefined')
+      const [mainIndex, crossIndex] = holePosition
       const mIndex = 2 * holePositionIndex
 
       // up
@@ -306,4 +289,4 @@ const Holes = memo(function Holes(props: HolesProps) {
   ])
 
   return <primitive name="gridpanel-holes" object={mesh} />
-})
+}

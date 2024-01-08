@@ -1,12 +1,6 @@
 import { BasePartSummaryValue } from '@villagekit/part-base'
 
-import {
-  PartCreator,
-  PartModule,
-  PartModulesByType,
-  PartState,
-  PartVariantsByType,
-} from './types'
+import { PartCreator, PartModule, PartModulesByType, PartState, PartVariantsByType } from './types'
 
 // @ts-ignore
 export const partModules: PartModulesByType = {}
@@ -23,9 +17,7 @@ export function registerPartModule<
   partModules[partModule.id] = partModule
 }
 
-export function getPartModule<Id extends PartState['type']>(
-  id: Id,
-): PartModulesByType[Id] {
+export function getPartModule<Id extends PartState['type']>(id: Id): PartModulesByType[Id] {
   const partModule = partModules[id]
 
   if (process.env.NODE_ENV !== 'production') {
@@ -35,6 +27,10 @@ export function getPartModule<Id extends PartState['type']>(
   }
 
   return partModule
+}
+
+export function getPartModules(): PartModulesByType {
+  return partModules
 }
 
 export function getPartVariants(): PartVariantsByType {

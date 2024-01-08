@@ -1,5 +1,5 @@
-import { Meta } from '@storybook/react'
-import React, { useState } from 'react'
+import type { Meta, StoryObj } from '@storybook/react'
+import { useState } from 'react'
 
 import {
   ParameterControls,
@@ -8,12 +8,16 @@ import {
   ParameterValueControls,
   PresetControls,
   Presets,
-} from './'
+} from '../src'
 
-export default {
+const meta: Meta = {
   component: ParameterValueControls,
   title: 'Parameters',
-} as Meta
+}
+
+export default meta
+
+type Story = StoryObj
 
 const simpleParameters = ParametersOptions({
   select: {
@@ -66,11 +70,7 @@ export function SimpleValueControls() {
   const [values, setValues] = useState(simplePresets[0].values)
 
   return (
-    <ParameterValueControls
-      parameters={simpleParameters}
-      values={values}
-      onChange={setValues}
-    />
+    <ParameterValueControls parameters={simpleParameters} values={values} onChange={setValues} />
   )
 }
 
@@ -88,10 +88,7 @@ export function SimplePresetControls() {
 
 export function SimpleParameterControls() {
   return (
-    <ParameterControlsContextProvider
-      parameters={simpleParameters}
-      presets={simplePresets}
-    >
+    <ParameterControlsContextProvider parameters={simpleParameters} presets={simplePresets}>
       <ParameterControls />
     </ParameterControlsContextProvider>
   )

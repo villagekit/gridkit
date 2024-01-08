@@ -1,6 +1,5 @@
 import { SizeMarkerX, SizeMarkerY } from '@villagekit/part-base-grid'
 import { useTheme } from '@villagekit/ui'
-import React from 'react'
 
 import { getEveryHolePosition } from '../helpers'
 import { GridPanelHoles } from '../types'
@@ -30,8 +29,7 @@ export function PanelSvg(props: PanelSvgProps) {
 
   const { colors } = useTheme()
 
-  const holePositions =
-    holes === true ? getEveryHolePosition(sizeInGrids) : holes
+  const holePositions = holes === true ? getEveryHolePosition(sizeInGrids) : holes
 
   return (
     <>
@@ -40,9 +38,7 @@ export function PanelSvg(props: PanelSvgProps) {
         height={panelHeight}
         style={{
           fill: colors.wood.light,
-          filter: showShadow
-            ? 'drop-shadow(0 2px 2px rgba(0, 0, 0, 0.5))'
-            : undefined,
+          filter: showShadow ? 'drop-shadow(0 2px 2px rgba(0, 0, 0, 0.5))' : undefined,
         }}
       />
       {holePositions !== false &&

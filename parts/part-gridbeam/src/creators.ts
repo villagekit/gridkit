@@ -21,11 +21,14 @@ interface GridBeamX extends BaseOptions {
 }
 
 function calculateXState(creator: GridBeamX): GridBeamState {
-  const { id, x, y, z, variant = getDefaultVariantId() } = creator
+  const { id, x, y, z, variant: variantId = getDefaultVariantId() } = creator
 
   const axis = AxisId.X
   const locationInGrids: Location = [Math.min(x[0], x[1]), y, z]
   const lengthInGrids = Math.abs(x[0] - x[1])
+  const variant = variants[variantId]
+
+  if (variant === undefined) throw new Error(`invalid gridbeam variant: ${variantId}`)
 
   return {
     axis,
@@ -33,7 +36,7 @@ function calculateXState(creator: GridBeamX): GridBeamState {
     lengthInGrids,
     locationInGrids,
     type: 'gridbeam',
-    variant: variants[variant],
+    variant,
   }
 }
 
@@ -44,11 +47,14 @@ interface GridBeamY extends BaseOptions {
   z: number
 }
 function calculateYState(creator: GridBeamY): GridBeamState {
-  const { id, x, y, z, variant = getDefaultVariantId() } = creator
+  const { id, x, y, z, variant: variantId = getDefaultVariantId() } = creator
 
   const axis = AxisId.Y
   const locationInGrids: Location = [x, Math.min(y[0], y[1]), z]
   const lengthInGrids = Math.abs(y[0] - y[1])
+  const variant = variants[variantId]
+
+  if (variant === undefined) throw new Error(`invalid gridbeam variant: ${variantId}`)
 
   return {
     axis,
@@ -56,7 +62,7 @@ function calculateYState(creator: GridBeamY): GridBeamState {
     lengthInGrids,
     locationInGrids,
     type: 'gridbeam',
-    variant: variants[variant],
+    variant,
   }
 }
 
@@ -67,11 +73,14 @@ interface GridBeamZ extends BaseOptions {
   z: [number, number]
 }
 function calculateZState(creator: GridBeamZ): GridBeamState {
-  const { id, x, y, z, variant = getDefaultVariantId() } = creator
+  const { id, x, y, z, variant: variantId = getDefaultVariantId() } = creator
 
   const axis = AxisId.Z
   const locationInGrids: Location = [x, y, Math.min(z[0], z[1])]
   const lengthInGrids = Math.abs(z[0] - z[1])
+  const variant = variants[variantId]
+
+  if (variant === undefined) throw new Error(`invalid gridbeam variant: ${variantId}`)
 
   return {
     axis,
@@ -79,7 +88,7 @@ function calculateZState(creator: GridBeamZ): GridBeamState {
     lengthInGrids,
     locationInGrids,
     type: 'gridbeam',
-    variant: variants[variant],
+    variant,
   }
 }
 

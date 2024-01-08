@@ -1,6 +1,5 @@
 import { SvgContextProvider } from '@villagekit/part-base-grid'
 import { Box } from '@villagekit/ui'
-import React from 'react'
 
 import { BeamSvg } from './beam-svg'
 
@@ -26,9 +25,7 @@ export function SummaryGridBeamSvg(props: SummaryGridBeamSvgProps) {
           role="img"
           aria-label={label}
           width="100%"
-          viewBox={`-4 0 ${maxBeamWidth + GRID_SPACING * 2} ${
-            beamHeight + GRID_SPACING
-          }`}
+          viewBox={`-4 0 ${maxBeamWidth + GRID_SPACING * 2} ${beamHeight + GRID_SPACING}`}
           xmlns={'http://www.w3.org/2000/svg'}
         >
           <title>{label}</title>

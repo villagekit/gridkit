@@ -1,8 +1,4 @@
-import {
-  BasePartSummaryValue,
-  PartsGlProps,
-  PartsSummaryProps,
-} from '@villagekit/part-base'
+import { BasePartSummaryValue, PartsGlProps, PartsSummaryProps } from '@villagekit/part-base'
 import { AxisId, Location } from '@villagekit/util-math'
 import type { Dnum } from 'dnum'
 import { ReactElement } from 'react'
@@ -12,12 +8,21 @@ import { $Values } from 'utility-types'
 declare global {
   // eslint-disable-next-line @typescript-eslint/no-namespace
   namespace VK {
-    export interface EveryPartCreator {}
-    export interface EveryPartVariants {}
-    export interface EveryPartState {}
-    export interface EveryPartGlValue {}
-    export interface EveryPartSummaryValue {}
-    export interface EveryPartEstimatedPrice {}
+    export interface EveryPartCreator {
+      noop: { type: 'noop' }
+    }
+    export interface EveryPartVariants {
+      noop: { noop: null }
+    }
+    export interface EveryPartState {
+      noop: { type: 'noop' }
+    }
+    export interface EveryPartGlValue {
+      noop: { type: 'noop' }
+    }
+    export interface EveryPartSummaryValue {
+      noop: { type: 'noop' }
+    }
   }
 }
 
@@ -46,21 +51,13 @@ export type FasteningPoint = {
 export type CalculatePartState<Creator, State> = (creator: Creator) => State
 export type CalculatePartGlValue<State, GlValue> = (state: State) => GlValue
 export type CalculatePartBoundingBox<Value> = (value: Value) => Box3
-export type CalculatePartSummaryValue<State, SummaryValue> = (
-  state: State,
-) => SummaryValue
-export type CalculatePartSummaryKey<SummaryValue> = (
-  state: SummaryValue,
-) => string
+export type CalculatePartSummaryValue<State, SummaryValue> = (state: State) => SummaryValue
+export type CalculatePartSummaryKey<SummaryValue> = (state: SummaryValue) => string
 export type CalculatePartEstimatedPrice<State> = (state: State) => number
-export type CalculatePartFasteningPoints<State> = (
-  state: State,
-) => Array<FasteningPoint>
+export type CalculatePartFasteningPoints<State> = (state: State) => Array<FasteningPoint>
 export type CalculateNumFastenersToFasten<State> = (state: State) => number
 
-export type PartsGl<GlValue> = (
-  props: PartsGlProps<GlValue>,
-) => ReactElement | null
+export type PartsGl<GlValue> = (props: PartsGlProps<GlValue>) => ReactElement | null
 export type PartsSummary<SummaryValue extends BasePartSummaryValue> = (
   props: PartsSummaryProps<SummaryValue>,
 ) => ReactElement | null

@@ -7,15 +7,13 @@ import {
   useSummaryContext,
 } from '@villagekit/part-base'
 import { HStack, Text, VStack } from '@villagekit/ui'
-import React, { memo, useMemo } from 'react'
+import { useMemo } from 'react'
 
 import { GridBeamSummaryValue } from './'
 import { calculateSummaryKey } from './methods'
 import { SummaryGridBeamSvg } from './svg/summary-grid-beam-svg'
 
-export const PartsSummary = memo(function PartsSummary(
-  props: PartsSummaryProps<GridBeamSummaryValue>,
-) {
+export function PartsSummary(props: PartsSummaryProps<GridBeamSummaryValue>) {
   const { parts, ...restProps } = props
 
   const { groupParts } = useSummaryContext()
@@ -31,8 +29,7 @@ export const PartsSummary = memo(function PartsSummary(
     const partQuotas = partsToPartQuotas(partQuotaType, partEntries)
 
     return partQuotas.sort(
-      ({ part: partA }, { part: partB }) =>
-        partB.lengthInGrids - partA.lengthInGrids,
+      ({ part: partA }, { part: partB }) => partB.lengthInGrids - partA.lengthInGrids,
     )
   }, [parts, groupParts])
 
@@ -48,22 +45,19 @@ export const PartsSummary = memo(function PartsSummary(
       </Text>
 
       <VStack role="list" width="full">
-        {partQuotas.map((quota, index) => (
-          <PartSummary key={index} quota={quota} {...restProps} />
+        {partQuotas.map((quota) => (
+          <PartSummary quota={quota} {...restProps} />
         ))}
       </VStack>
     </VStack>
   )
-})
+}
 
-type PartSummaryProps = Omit<
-  PartsSummaryProps<GridBeamSummaryValue>,
-  'parts'
-> & {
+type PartSummaryProps = Omit<PartsSummaryProps<GridBeamSummaryValue>, 'parts'> & {
   quota: PartSummaryQuota<GridBeamSummaryValue>
 }
 
-const PartSummary = memo(function PartSummary(props: PartSummaryProps) {
+function PartSummary(props: PartSummaryProps) {
   const { quota } = props
   const {
     part: { lengthInGrids },
@@ -72,18 +66,10 @@ const PartSummary = memo(function PartSummary(props: PartSummaryProps) {
   const { displayUnit } = useSummaryContext()
 
   return (
-    <HStack
-      role="listitem"
-      alignItems="flex-start"
-      spacing="4"
-      sx={{ width: '100%' }}
-    >
+    <HStack role="listitem" alignItems="flex-start" spacing="4" sx={{ width: '100%' }}>
       {quota.type === 'grouped' && <PartCount count={quota.count} />}
 
-      <SummaryGridBeamSvg
-        sizeInGrids={lengthInGrids}
-        displayUnit={displayUnit}
-      />
+      <SummaryGridBeamSvg sizeInGrids={lengthInGrids} displayUnit={displayUnit} />
     </HStack>
   )
-})
+}

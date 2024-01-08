@@ -1,6 +1,5 @@
 import { LabelX } from '@villagekit/part-base-grid'
 import { useTheme } from '@villagekit/ui'
-import React from 'react'
 
 const GRID_SPACING = 40
 

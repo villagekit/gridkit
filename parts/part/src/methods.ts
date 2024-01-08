@@ -1,8 +1,9 @@
 import type { Dnum } from 'dnum'
 import * as dnum from 'dnum'
 import { Box3 } from 'three'
+import { mapValues } from 'lodash-es'
 
-import { getPartModule } from './modules'
+import { getPartModule, getPartModules } from './modules'
 import {
   FasteningPoint,
   PartCreator,
@@ -15,9 +16,7 @@ import {
 
 export function calculateState(partCreator: PartCreator): PartState {
   const { type } = partCreator
-  const partModuleType = (
-    type.includes(':') ? type.split(':')[0] : type
-  ) as keyof PartModulesByType
+  const partModuleType = (type.includes(':') ? type.split(':')[0] : type) as keyof PartModulesByType
   const partModule = getPartModule(partModuleType)
   // @ts-ignore
   return partModule.methods.calculateState(partCreator)
@@ -31,9 +30,7 @@ export function calculateGlValue(partState: PartState): PartGlValue {
   // @ts-ignore
   return partModule.methods.calculateGlValue(partState)
 }
-export function calculateGlValueForAll(
-  partStates: Array<PartState>,
-): Array<PartGlValue> {
+export function calculateGlValueForAll(partStates: Array<PartState>): Array<PartGlValue> {
   return partStates.map(calculateGlValue)
 }
 
@@ -56,16 +53,12 @@ export function calculateSummaryValue(partState: PartState): PartSummaryValue {
   // @ts-ignore
   return partModule.methods.calculateSummaryValue(partState)
 }
-export function calculateSummaryKey(
-  partSummaryValue: PartSummaryValue,
-): string {
+export function calculateSummaryKey(partSummaryValue: PartSummaryValue): string {
   const partModule = getPartModule(partSummaryValue.type)
   // @ts-ignore
   return partModule.methods.calculateSummaryKey(partState)
 }
-export function calculateSummaryValueForAll(
-  partStates: Array<PartState>,
-): Array<PartSummaryValue> {
+export function calculateSummaryValueForAll(partStates: Array<PartState>): Array<PartSummaryValue> {
   return partStates.map(calculateSummaryValue)
 }
 
@@ -79,26 +72,19 @@ export function calculateEstimatedPrice(partState: PartState): Dnum {
 export function calculateEstimatedPriceForAll(
   partStates: Array<PartState>,
 ): PartEstimatedPriceByType {
-  const estimatedPriceBreakdown = {
-    fastener: dnum.from(0),
-    gridbeam: dnum.from(0),
-    gridpanel: dnum.from(0),
-    jscad: dnum.from(0),
-  }
+  const partModules = getPartModules()
+  const estimatedPriceBreakdown = mapValues(partModules, () => dnum.from(0))
 
-  partStates.forEach((partState: PartState) => {
+  for (const partState of partStates) {
     const partPrice: Dnum = calculateEstimatedPrice(partState)
 
     estimatedPriceBreakdown[partState.type] = dnum.add(
       estimatedPriceBreakdown[partState.type],
       partPrice,
     )
-  })
+  }
 
-  const total = Object.values(estimatedPriceBreakdown).reduce<Dnum>(
-    dnum.add,
-    dnum.from(0),
-  )
+  const total = Object.values(estimatedPriceBreakdown).reduce<Dnum>(dnum.add, dnum.from(0))
 
   return {
     ...estimatedPriceBreakdown,
@@ -106,9 +92,7 @@ export function calculateEstimatedPriceForAll(
   }
 }
 
-export function calculateFasteningPoints(
-  partState: PartState,
-): Array<FasteningPoint> {
+export function calculateFasteningPoints(partState: PartState): Array<FasteningPoint> {
   const partModule = getPartModule(partState.type)
   // @ts-ignore
   return partModule.methods.calculateFasteningPoints(partState)

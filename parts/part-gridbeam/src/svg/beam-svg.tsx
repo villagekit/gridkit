@@ -1,6 +1,6 @@
 import { SizeMarkerX } from '@villagekit/part-base-grid'
 import { useTheme } from '@villagekit/ui'
-import React, { memo, useMemo } from 'react'
+import React, { useMemo } from 'react'
 
 const GRID_SPACING = 40
 
@@ -14,7 +14,7 @@ interface BeamSvgProps {
   isGrayscale?: boolean
 }
 
-export const BeamSvg = memo(function BeamSvg(props: BeamSvgProps) {
+export function BeamSvg(props: BeamSvgProps) {
   const {
     sizeInGrids,
     x = 0,
@@ -30,10 +30,7 @@ export const BeamSvg = memo(function BeamSvg(props: BeamSvgProps) {
 
   const { colors } = useTheme()
 
-  const sizeInGrids2d = useMemo<[number, number]>(
-    () => [sizeInGrids, 1],
-    [sizeInGrids],
-  )
+  const sizeInGrids2d = useMemo<[number, number]>(() => [sizeInGrids, 1], [sizeInGrids])
 
   const holes: Array<React.ReactElement> = new Array(sizeInGrids)
   for (let holeIndex = 0; holeIndex < sizeInGrids; holeIndex++) {
@@ -55,9 +52,7 @@ export const BeamSvg = memo(function BeamSvg(props: BeamSvgProps) {
         height={beamHeight}
         style={{
           fill: isGrayscale ? colors.gray[200] : colors.wood.light,
-          filter: showShadow
-            ? 'drop-shadow(0 2px 2px rgba(0, 0, 0, 0.5))'
-            : undefined,
+          filter: showShadow ? 'drop-shadow(0 2px 2px rgba(0, 0, 0, 0.5))' : undefined,
         }}
       />
 
@@ -72,4 +67,4 @@ export const BeamSvg = memo(function BeamSvg(props: BeamSvgProps) {
       )}
     </g>
   )
-})
+}

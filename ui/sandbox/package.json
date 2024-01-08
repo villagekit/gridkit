@@ -23,7 +23,6 @@
   "dependencies": {
     "@juggle/resize-observer": "^3.4.0",
     "@react-three/drei": "^9.57.3",
-    "@storybook/react": "^7.6.3",
     "@types/lodash-es": "^4.17.12",
     "@types/react": "^18.2.0",
     "@types/three": "^0.150.1",
@@ -49,8 +48,11 @@
     "xstate": "^4.33.6"
   },
   "devDependencies": {
+    "@storybook/react": "^7.6.3",
+    "@villagekit/tsconfig": "workspace:*",
     "@villagekit/part-gridbeam": "workspace:*",
     "@villagekit/part-gridpanel": "workspace:*",
-    "react-test-renderer": "^18.2.0"
+    "tsup": "^8.0.1",
+    "typescript": "^5.2.2"
   }
 }

@@ -1,5 +1,4 @@
 import { useTheme } from '@villagekit/ui'
-import React from 'react'
 
 import { useSvgContext } from './context'
 

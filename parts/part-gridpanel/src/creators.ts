@@ -6,8 +6,7 @@ import { variants } from './variants'
 
 export type GridPanelCreator = GridPanelXY | GridPanelYZ | GridPanelXZ
 
-const getDefaultVariantId = (): keyof typeof variants =>
-  '40mm:8mm:12mm:douglas-fir'
+const getDefaultVariantId = (): keyof typeof variants => '40mm:8mm:12mm:douglas-fir'
 
 interface BaseGridPanelOptions extends BasePartCreator {
   id: string
@@ -24,7 +23,7 @@ interface GridPanelXY extends BaseGridPanelOptions {
 }
 
 function calculateXYState(creator: GridPanelXY): GridPanelState {
-  const { id, x, y, z, variant = getDefaultVariantId(), fit, holes } = creator
+  const { id, x, y, z, variant: variantId = getDefaultVariantId(), fit, holes } = creator
 
   const mainAxis = AxisId.X
   const mainStart = Math.min(x[0], x[1])
@@ -34,6 +33,9 @@ function calculateXYState(creator: GridPanelXY): GridPanelState {
   const crossLength = Math.abs(y[0] - y[1])
   const thicknessAxis = AxisId.Z
   const thicknessStart = z
+  const variant = variants[variantId]
+
+  if (variant === undefined) throw new Error(`invalid gridpanel variant: ${variantId}`)
 
   return {
     crossAxis,
@@ -48,7 +50,7 @@ function calculateXYState(creator: GridPanelXY): GridPanelState {
     thicknessAxis,
     thicknessStart,
     type: 'gridpanel',
-    variant: variants[variant],
+    variant,
   }
 }
 
@@ -60,7 +62,7 @@ interface GridPanelYZ extends BaseGridPanelOptions {
 }
 
 function calculateYZState(creator: GridPanelYZ): GridPanelState {
-  const { id, x, y, z, variant = getDefaultVariantId(), fit, holes } = creator
+  const { id, x, y, z, variant: variantId = getDefaultVariantId(), fit, holes } = creator
 
   const mainAxis = AxisId.Y
   const mainStart = Math.min(y[0], y[1])
@@ -70,6 +72,9 @@ function calculateYZState(creator: GridPanelYZ): GridPanelState {
   const crossLength = Math.abs(z[0] - z[1])
   const thicknessAxis = AxisId.X
   const thicknessStart = x
+  const variant = variants[variantId]
+
+  if (variant === undefined) throw new Error(`invalid gridpanel variant: ${variantId}`)
 
   return {
     crossAxis,
@@ -84,7 +89,7 @@ function calculateYZState(creator: GridPanelYZ): GridPanelState {
     thicknessAxis,
     thicknessStart,
     type: 'gridpanel',
-    variant: variants[variant],
+    variant,
   }
 }
 
@@ -96,7 +101,7 @@ interface GridPanelXZ extends BaseGridPanelOptions {
 }
 
 function calculateXZState(creator: GridPanelXZ): GridPanelState {
-  const { id, x, y, z, variant = getDefaultVariantId(), fit, holes } = creator
+  const { id, x, y, z, variant: variantId = getDefaultVariantId(), fit, holes } = creator
 
   const mainAxis = AxisId.X
   const mainStart = Math.min(x[0], x[1])
@@ -106,6 +111,9 @@ function calculateXZState(creator: GridPanelXZ): GridPanelState {
   const crossLength = Math.abs(z[0] - z[1])
   const thicknessAxis = AxisId.Y
   const thicknessStart = y
+  const variant = variants[variantId]
+
+  if (variant === undefined) throw new Error(`invalid gridpanel variant: ${variantId}`)
 
   return {
     crossAxis,
@@ -120,7 +128,7 @@ function calculateXZState(creator: GridPanelXZ): GridPanelState {
     thicknessAxis,
     thicknessStart,
     type: 'gridpanel',
-    variant: variants[variant],
+    variant,
   }
 }
 
