@@ -1,4 +1,4 @@
-import React, { Fragment, memo, useMemo } from 'react'
+import { Fragment, memo, useMemo } from 'react'
 import { Color } from 'three'
 
 export interface LightsProps {

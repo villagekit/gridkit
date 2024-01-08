@@ -29,6 +29,18 @@ importers:
       '@fontsource/fredoka-one':
         specifier: ^5.0.5
         version: 5.0.5
+      '@villagekit/parameters':
+        specifier: workspace:*
+        version: link:../../ui/parameters
+      '@villagekit/part-gridbeam':
+        specifier: workspace:*
+        version: link:../../parts/part-gridbeam
+      '@villagekit/part-gridpanel':
+        specifier: workspace:*
+        version: link:../../parts/part-gridpanel
+      '@villagekit/sandbox':
+        specifier: workspace:*
+        version: link:../../ui/sandbox
       '@villagekit/tsconfig':
         specifier: workspace:*
         version: link:../../dev/tsconfig
@@ -262,6 +274,18 @@ importers:
 
   products/design:
     dependencies:
+      '@types/lodash-es':
+        specifier: ^4.17.12
+        version: 4.17.12
+      '@types/node':
+        specifier: ^20.5.2
+        version: 20.5.2
+      '@types/react':
+        specifier: ^18.2.0
+        version: 18.2.38
+      '@types/three':
+        specifier: ^0.150.1
+        version: 0.150.2
       '@villagekit/parameters':
         specifier: workspace:*
         version: link:../../ui/parameters
@@ -344,6 +368,9 @@ importers:
       '@types/lodash-es':
         specifier: ^4.17.12
         version: 4.17.12
+      '@types/node':
+        specifier: ^20.5.2
+        version: 20.5.2
       '@types/react':
         specifier: ^18.2.0
         version: 18.2.38

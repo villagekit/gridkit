@@ -66,10 +66,7 @@ export function SandboxControls(props: SandboxControlsProps) {
     cameraControlsRef.current?.reset()
   }, [cameraControlsRef])
 
-  const orientationMediaQuery = useMemo(
-    () => window.matchMedia('(orientation: landscape)'),
-    [],
-  )
+  const orientationMediaQuery = useMemo(() => window.matchMedia('(orientation: landscape)'), [])
 
   const [isFullscreen, setFullscreen] = useState(false)
   const [isLandscape, setLandscape] = useState(orientationMediaQuery.matches)
@@ -94,10 +91,7 @@ export function SandboxControls(props: SandboxControlsProps) {
         screenfull.off('change', handleFullscreenChange)
       }
 
-      orientationMediaQuery.removeEventListener(
-        'change',
-        handleOrientationChange,
-      )
+      orientationMediaQuery.removeEventListener('change', handleOrientationChange)
     }
   }, [containerRef, orientationMediaQuery])
 
@@ -123,11 +117,9 @@ export function SandboxControls(props: SandboxControlsProps) {
     md: true,
   })
 
-  const shouldShowFullscreenControls =
-    isFullscreen || alwaysShowFullscreenControls
+  const shouldShowFullscreenControls = isFullscreen || alwaysShowFullscreenControls
 
-  const canShowFullscreenControls =
-    isLandscape || isMediumScreen || alwaysShowFullscreenControls
+  const canShowFullscreenControls = isLandscape || isMediumScreen || alwaysShowFullscreenControls
 
   const controlMargin = shouldShowFullscreenControls && isMediumScreen ? 4 : 2
 
@@ -140,14 +132,10 @@ export function SandboxControls(props: SandboxControlsProps) {
   })
   /* eslint-enable sort-keys-fix/sort-keys-fix */
 
-  const { onPointerEnterTooltip, onPointerLeaveTooltip, showTooltip } =
-    useMobileFriendlyTooltip()
+  const { onPointerEnterTooltip, onPointerLeaveTooltip, showTooltip } = useMobileFriendlyTooltip()
 
   return (
-    <ControlsContextProvider
-      controlMargin={controlMargin}
-      controlScale={controlScale || 1}
-    >
+    <ControlsContextProvider controlMargin={controlMargin} controlScale={controlScale || 1}>
       <Control left top>
         <VStack spacing="2">
           <IconButton
@@ -198,13 +186,11 @@ export function SandboxControls(props: SandboxControlsProps) {
         </HStack>
       </Control>
 
-      {shouldShowFullscreenControls &&
-        canShowFullscreenControls &&
-        shouldRenderAssemblyInfo && (
-          <Control bottom sx={{ minWidth: 'md' }}>
-            <AssemblyInfo containerRef={containerRef} />
-          </Control>
-        )}
+      {shouldShowFullscreenControls && canShowFullscreenControls && shouldRenderAssemblyInfo && (
+        <Control bottom sx={{ minWidth: 'md' }}>
+          <AssemblyInfo containerRef={containerRef} />
+        </Control>
+      )}
 
       {showParameterControls && (
         <>
@@ -212,10 +198,7 @@ export function SandboxControls(props: SandboxControlsProps) {
             right
             top
             sx={{
-              display:
-                shouldShowFullscreenControls && canShowFullscreenControls
-                  ? 'block'
-                  : 'none',
+              display: shouldShowFullscreenControls && canShowFullscreenControls ? 'block' : 'none',
               minWidth: 'xs',
               padding: 4,
             }}
@@ -230,10 +213,7 @@ export function SandboxControls(props: SandboxControlsProps) {
                 isOpen={showTooltip}
                 portalProps={{ containerRef: containerRef }}
               >
-                <Box
-                  onPointerEnter={onPointerEnterTooltip}
-                  onPointerLeave={onPointerLeaveTooltip}
-                >
+                <Box onPointerEnter={onPointerEnterTooltip} onPointerLeave={onPointerLeaveTooltip}>
                   <IconButton
                     title="Design controls placeholder"
                     icon={<Icon as={FaSlidersH} boxSize="4" />}
@@ -251,12 +231,7 @@ export function SandboxControls(props: SandboxControlsProps) {
         <Control bottom right>
           <HStack spacing="2">
             <IconButton
-              icon={
-                <Icon
-                  as={isFullscreen ? FaCompressAlt : FaExpandAlt}
-                  boxSize="4"
-                />
-              }
+              icon={<Icon as={isFullscreen ? FaCompressAlt : FaExpandAlt} boxSize="4" />}
               variant="toolbar"
               size="sm"
               title={`${isFullscreen ? 'Exit' : 'Enter'} full screen`}

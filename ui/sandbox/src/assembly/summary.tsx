@@ -7,16 +7,14 @@ import {
 } from '@villagekit/part'
 import { SummaryContextProvider } from '@villagekit/part-base'
 import { debounce } from 'lodash-es'
-import React, { memo, useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 
 interface AssemblySummaryProps {
   displayUnit: 'gu' | 'mm'
   groupParts: boolean
 }
 
-export const AssemblySummary = memo(function AssemblySummary(
-  props: AssemblySummaryProps,
-) {
+export function AssemblySummary(props: AssemblySummaryProps) {
   const { displayUnit, groupParts } = props
 
   const { parts } = useDesignContext()
@@ -25,13 +23,9 @@ export const AssemblySummary = memo(function AssemblySummary(
 
   const setPartsDebounced = useMemo(
     () =>
-      debounce(
-        (latestParts: Array<PartState>) => setLocalParts(latestParts),
-        500,
-        {
-          leading: false,
-        },
-      ),
+      debounce((latestParts: Array<PartState>) => setLocalParts(latestParts), 500, {
+        leading: false,
+      }),
     [],
   )
 
@@ -48,4 +42,4 @@ export const AssemblySummary = memo(function AssemblySummary(
       <PartsSummaryForAll partSummaryValues={partSummaryValues} />
     </SummaryContextProvider>
   )
-})
+}

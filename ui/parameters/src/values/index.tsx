@@ -1,28 +1,12 @@
 import { Box, VStack } from '@villagekit/ui'
 import { map } from 'lodash-es'
-import React, { memo, useCallback } from 'react'
+import { memo, useCallback } from 'react'
 
-import {
-  Boolean,
-  BooleanId,
-  BooleanOptions,
-  BooleanQueryParam,
-  BooleanValue,
-} from './boolean'
-import {
-  Choice,
-  ChoiceId,
-  ChoiceOptions,
-  ChoiceQueryParam,
-  ChoiceValue,
-} from './choice'
-import {
-  Number,
-  NumberId,
-  NumberOptions,
-  NumberQueryParam,
-  NumberValue,
-} from './number'
+// biome-ignore lint/suspicious/noShadowRestrictedNames:
+import { Boolean, BooleanId, BooleanOptions, BooleanQueryParam, BooleanValue } from './boolean'
+import { Choice, ChoiceId, ChoiceOptions, ChoiceQueryParam, ChoiceValue } from './choice'
+// biome-ignore lint/suspicious/noShadowRestrictedNames:
+import { Number, NumberId, NumberOptions, NumberQueryParam, NumberValue } from './number'
 
 export type ParameterOptions = ChoiceOptions | NumberOptions | BooleanOptions
 
@@ -48,16 +32,11 @@ export function ParametersOptions<ParamsOptions extends ParametersOptions>(
   return parameters
 }
 
-export type ExtractValueFromParameterOptions<
-  ParamOptions extends ParameterOptions,
-> = ParameterValuesByType[ParamOptions['type']]
+export type ExtractValueFromParameterOptions<ParamOptions extends ParameterOptions,> =
+  ParameterValuesByType[ParamOptions['type']]
 
-export type ExtractValuesFromParametersOptions<
-  ParamsOptions extends ParametersOptions,
-> = {
-  [Key in keyof ParamsOptions]: ExtractValueFromParameterOptions<
-    ParamsOptions[Key]
-  >
+export type ExtractValuesFromParametersOptions<ParamsOptions extends ParametersOptions,> = {
+  [Key in keyof ParamsOptions]: ExtractValueFromParameterOptions<ParamsOptions[Key]>
 }
 
 export interface ParameterValueControlsProps<Params extends ParametersOptions> {

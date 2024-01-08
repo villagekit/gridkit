@@ -24,15 +24,9 @@ import {
 import { useDebouncedCallback } from 'use-debounce'
 
 import { Presets } from './presets'
-import {
-  ExtractValuesFromParametersOptions,
-  ParameterOptions,
-  ParametersOptions,
-} from './values'
+import { ExtractValuesFromParametersOptions, ParameterOptions, ParametersOptions } from './values'
 
-export interface ParameterControlsContextProps<
-  ParamsOptions extends ParametersOptions,
-> {
+export interface ParameterControlsContextProps<ParamsOptions extends ParametersOptions,> {
   parameters: ParamsOptions
   presets: Presets<ParamsOptions>
   onChange?: (
@@ -49,9 +43,7 @@ interface ParameterControlsContextType<ParamsOptions extends ParametersOptions>
   showControls: boolean
   handleSetShowControls: (ev: ChangeEvent<HTMLInputElement>) => void
   handlePresetChange: (presetId: string) => void
-  handleCustomValuesChange: (
-    values: ExtractValuesFromParametersOptions<ParamsOptions>,
-  ) => void
+  handleCustomValuesChange: (values: ExtractValuesFromParametersOptions<ParamsOptions>) => void
   updateStateFromQueryParams: () => void
 }
 
@@ -79,12 +71,9 @@ function useParameters<ParamsOptions extends ParametersOptions>(
     return currentPreset?.values || null
   }, [currentPresetId, currentPreset, customValues])
 
-  const handleSetShowControls = useCallback(
-    (ev: ChangeEvent<HTMLInputElement>) => {
-      setShowControls(ev.target.checked)
-    },
-    [],
-  )
+  const handleSetShowControls = useCallback((ev: ChangeEvent<HTMLInputElement>) => {
+    setShowControls(ev.target.checked)
+  }, [])
 
   const handlePresetChange = useCallback(
     (presetId: string) => {
@@ -100,13 +89,10 @@ function useParameters<ParamsOptions extends ParametersOptions>(
     [customValues, currentPreset],
   )
 
-  const handleCustomValuesChange = useCallback(
-    (values: CustomValues) => {
-      setCustomValues(values)
-      setCurrentPresetId('custom')
-    },
-    [setCurrentPresetId, setCustomValues],
-  )
+  const handleCustomValuesChange = useCallback((values: CustomValues) => {
+    setCustomValues(values)
+    setCurrentPresetId('custom')
+  }, [])
 
   // Update parent state
   useEffect(() => {
@@ -121,39 +107,31 @@ function useParameters<ParamsOptions extends ParametersOptions>(
       preset: withDefault(StringParam, defaultPreset.id),
     }
 
-    const queryParamConfigForParameter = (
-      parameterKey: string,
-      parameter: ParameterOptions,
-    ) => {
+    const queryParamConfigForParameter = (parameterKey: string, parameter: ParameterOptions) => {
       switch (parameter.type) {
         case 'boolean':
-          return withDefault(
-            BooleanParam,
-            defaultPreset.values[parameterKey] as boolean,
-          )
+          return withDefault(BooleanParam, defaultPreset.values[parameterKey] as boolean)
         case 'choice':
-          return withDefault(
-            StringParam,
-            defaultPreset.values[parameterKey] as string,
-          )
+          return withDefault(StringParam, defaultPreset.values[parameterKey] as string)
         case 'number':
-          return withDefault(
-            NumberParam,
-            defaultPreset.values[parameterKey] as number,
-          )
+          return withDefault(NumberParam, defaultPreset.values[parameterKey] as number)
       }
     }
 
-    const queryParamsConfig = Object.keys(
-      parameters,
-    ).reduce<QueryParamConfigMap>((sofar, parameterKey) => {
-      const parameter = parameters[parameterKey]
+    const queryParamsConfig = Object.keys(parameters).reduce<QueryParamConfigMap>(
+      (sofar, parameterKey) => {
+        const parameter = parameters[parameterKey]
+        if (parameter === undefined) throw new Error('parameter is undefined')
 
-      sofar[parameter.queryParamId || parameterKey] =
-        queryParamConfigForParameter(parameterKey, parameter)
+        sofar[parameter.queryParamId || parameterKey] = queryParamConfigForParameter(
+          parameterKey,
+          parameter,
+        )
 
-      return sofar
-    }, {})
+        return sofar
+      },
+      {},
+    )
 
     return {
       ...queryPresetConfig,
@@ -163,28 +141,32 @@ function useParameters<ParamsOptions extends ParametersOptions>(
 
   const mapValuesToQueryValueMap = useCallback(
     (values: CustomValues) => {
-      return Object.keys(parameters).reduce<
-        DecodedValueMap<QueryParamConfigMap>
-      >((sofar, parameterKey) => {
-        const parameter = parameters[parameterKey]
+      return Object.keys(parameters).reduce<DecodedValueMap<QueryParamConfigMap>>(
+        (sofar, parameterKey) => {
+          const parameter = parameters[parameterKey]
+          if (parameter === undefined) throw new Error('parameter is undefined')
 
-        sofar[parameter.queryParamId || parameterKey] = values[parameterKey]
-        return sofar
-      }, {})
+          sofar[parameter.queryParamId || parameterKey] = values[parameterKey]
+          return sofar
+        },
+        {},
+      )
     },
     [parameters],
   )
 
   const mapQueryValueMapToValues = useCallback(
     (values: DecodedValueMap<QueryParamConfigMap>) => {
-      return Object.keys(parameters).reduce<
-        DecodedValueMap<QueryParamConfigMap>
-      >((sofar, parameterKey) => {
-        const parameter = parameters[parameterKey]
+      return Object.keys(parameters).reduce<DecodedValueMap<QueryParamConfigMap>>(
+        (sofar, parameterKey) => {
+          const parameter = parameters[parameterKey]
+          if (parameter === undefined) throw new Error('parameter is undefined')
 
-        sofar[parameterKey] = values[parameter.queryParamId || parameterKey]
-        return sofar
-      }, {}) as CustomValues
+          sofar[parameterKey] = values[parameter.queryParamId || parameterKey]
+          return sofar
+        },
+        {},
+      ) as CustomValues
     },
     [parameters],
   )
@@ -215,50 +197,65 @@ function useParameters<ParamsOptions extends ParametersOptions>(
     hasLoadedInitialQueryParams.current = true
   }, [updateStateFromQueryParams])
 
-  const updateQueryParamsFromState = useCallback(() => {
-    if (hasLoadedInitialQueryParams.current === false) return
-
-    if (customValues === null || onLocationUpdate == null) return
-
-    const urlParams = encodeQueryParams(queryParameterDefinitions, {
-      preset: currentPresetId,
-      ...(currentPresetId === 'custom'
-        ? mapValuesToQueryValueMap(customValues)
-        : {}),
-    })
-
-    const { presetId: currentQueryPresetId, values: currentQueryValues } =
-      getQueryParamsValues()
-
-    if (
-      currentPresetId !== currentQueryPresetId ||
-      !isEqual(customValues, currentQueryValues)
-    ) {
-      const nextLocation = updateLocation(urlParams, location)
-      onLocationUpdate(nextLocation)
-    }
-  }, [
-    customValues,
-    queryParameterDefinitions,
-    currentPresetId,
-    mapValuesToQueryValueMap,
-    getQueryParamsValues,
-    onLocationUpdate,
-  ])
-
+  type UpdateQueryParamsState = {
+    hasLoadedInitialQueryParams: typeof hasLoadedInitialQueryParams.current
+    customValues: typeof customValues
+    queryParameterDefinitions: typeof queryParameterDefinitions
+    currentPresetId: typeof currentPresetId
+    mapValuesToQueryValueMap: typeof mapValuesToQueryValueMap
+    getQueryParamsValues: typeof getQueryParamsValues
+    onLocationUpdate: typeof onLocationUpdate
+  }
   const updateQueryParamsFromStateDebounced = useDebouncedCallback(
-    updateQueryParamsFromState,
+    ({
+      hasLoadedInitialQueryParams,
+      customValues,
+      queryParameterDefinitions,
+      currentPresetId,
+      mapValuesToQueryValueMap,
+      getQueryParamsValues,
+      onLocationUpdate,
+    }: UpdateQueryParamsState) => {
+      if (hasLoadedInitialQueryParams === false) return
+
+      if (customValues === null || onLocationUpdate == null) return
+
+      const urlParams = encodeQueryParams(queryParameterDefinitions, {
+        preset: currentPresetId,
+        ...(currentPresetId === 'custom' ? mapValuesToQueryValueMap(customValues) : {}),
+      })
+
+      const { presetId: currentQueryPresetId, values: currentQueryValues } = getQueryParamsValues()
+
+      if (currentPresetId !== currentQueryPresetId || !isEqual(customValues, currentQueryValues)) {
+        const nextLocation = updateLocation(urlParams, location)
+        onLocationUpdate(nextLocation)
+      }
+    },
     1000,
     {
       leading: false,
       trailing: true,
     },
   )
-
-  useEffect(updateQueryParamsFromStateDebounced, [
-    currentPresetId,
-    customValues,
+  useEffect(() => {
+    updateQueryParamsFromStateDebounced({
+      hasLoadedInitialQueryParams: hasLoadedInitialQueryParams.current,
+      customValues,
+      queryParameterDefinitions,
+      currentPresetId,
+      mapValuesToQueryValueMap,
+      getQueryParamsValues,
+      onLocationUpdate,
+    })
+  }, [
     updateQueryParamsFromStateDebounced,
+    customValues,
+    queryParameterDefinitions,
+    currentPresetId,
+    mapValuesToQueryValueMap,
+    getQueryParamsValues,
+    onLocationUpdate,
   ])
 
   return {
@@ -280,23 +277,20 @@ function useParameters<ParamsOptions extends ParametersOptions>(
 // Ref: https://fettblog.eu/typescript-react-generic-forward-refs/
 export const ParameterControlsContext = createContext<any>(null)
 
-interface ParameterControlsContextProviderProps<
-  ParamsOptions extends ParametersOptions,
-> extends ParameterControlsContextProps<ParamsOptions> {
+interface ParameterControlsContextProviderProps<ParamsOptions extends ParametersOptions,>
+  extends ParameterControlsContextProps<ParamsOptions> {
   children: React.ReactNode | Array<React.ReactNode>
 }
 
-export function ParameterControlsContextProvider<
-  ParamsOptions extends ParametersOptions,
->(props: ParameterControlsContextProviderProps<ParamsOptions>) {
+export function ParameterControlsContextProvider<ParamsOptions extends ParametersOptions,>(
+  props: ParameterControlsContextProviderProps<ParamsOptions>,
+) {
   const { children, ...rest } = props
 
   const value = useParameters(rest)
 
   return (
-    <ParameterControlsContext.Provider value={value}>
-      {children}
-    </ParameterControlsContext.Provider>
+    <ParameterControlsContext.Provider value={value}>{children}</ParameterControlsContext.Provider>
   )
 }
 

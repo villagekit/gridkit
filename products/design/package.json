@@ -21,6 +21,10 @@
     "lint": "biome lint ."
   },
   "dependencies": {
+    "@types/lodash-es": "^4.17.12",
+    "@types/node": "^20.5.2",
+    "@types/react": "^18.2.0",
+    "@types/three": "^0.150.1",
     "@villagekit/parameters": "workspace:*",
     "@villagekit/part": "workspace:*",
     "p-debounce": "^4.0.0",

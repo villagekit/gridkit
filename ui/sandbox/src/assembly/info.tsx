@@ -34,11 +34,9 @@ export function AssemblyInfo(props: AssemblyInfoProps) {
               type: 'quantity',
               unit: meter,
               value,
-            } as const),
+            }) as const,
         )
-        .map((dimensionInMeters) =>
-          Math.floor(convert(dimensionInMeters, millimeter).value),
-        ),
+        .map((dimensionInMeters) => Math.floor(convert(dimensionInMeters, millimeter).value)),
     [boundingBox],
   )
 
@@ -67,23 +65,21 @@ export function AssemblyInfo(props: AssemblyInfoProps) {
             <VStack alignItems="flex-start">
               <Text sx={{ color: 'white' }}>Estimated price breakdown:</Text>
               <UnorderedList sx={{ paddingLeft: 4 }}>
-                <ListItem>
-                  Grid beams: ${dnum.format(estimatedPrice.gridbeam)}
-                </ListItem>
-                <ListItem>
-                  Grid panels: ${dnum.format(estimatedPrice.gridpanel)}
-                </ListItem>
+                <ListItem>Grid beams: ${dnum.format(estimatedPrice.gridbeam)}</ListItem>
+                <ListItem>Grid panels: ${dnum.format(estimatedPrice.gridpanel)}</ListItem>
+                {/*
                 <ListItem>
                   Fasteners: ${dnum.format(estimatedPrice.fastener)}
                 </ListItem>
+                */}
               </UnorderedList>
               <Text sx={{ color: 'white' }}>
-                Estimated price is automatically caclulated based on the
-                selected preset and customisations.
+                Estimated price is automatically caclulated based on the selected preset and
+                customisations.
               </Text>
               <Text sx={{ color: 'white' }}>
-                The estimated price is not (yet) indicative of actual checkout
-                price, due to parts being sold as bundles.
+                The estimated price is not (yet) indicative of actual checkout price, due to parts
+                being sold as bundles.
               </Text>
             </VStack>
           }
@@ -93,11 +89,7 @@ export function AssemblyInfo(props: AssemblyInfoProps) {
         />
       </HStack>
 
-      <HStack
-        as="section"
-        aria-label="Assembled dimensions"
-        alignItems="flex-start"
-      >
+      <HStack as="section" aria-label="Assembled dimensions" alignItems="flex-start">
         <VStack sx={{ textAlign: 'center' }}>
           <Text>Assembled Dimensions</Text>
 
@@ -110,12 +102,10 @@ export function AssemblyInfo(props: AssemblyInfoProps) {
         <InfoTooltip
           label={
             <VStack alignItems="flex-start">
-              <Text sx={{ color: 'white', fontStyle: 'italic' }}>
-                Width x Depth x Height
-              </Text>
+              <Text sx={{ color: 'white', fontStyle: 'italic' }}>Width x Depth x Height</Text>
               <Text sx={{ color: 'white' }}>
-                Dimensions are automatically caclulated based on the selected
-                preset and customisations.
+                Dimensions are automatically caclulated based on the selected preset and
+                customisations.
               </Text>
             </VStack>
           }

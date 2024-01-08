@@ -1,5 +1,5 @@
 import { FormControl, FormLabel, Select } from '@villagekit/ui'
-import React, { ChangeEvent, memo, useCallback } from 'react'
+import { ChangeEvent, memo, useCallback } from 'react'
 
 import { ExtractValuesFromParametersOptions, ParametersOptions } from '../'
 
@@ -42,11 +42,7 @@ export const PresetControls = memo(function PresetControls<
     <FormControl id="preset" role="group">
       <FormLabel>Preset</FormLabel>
 
-      <Select
-        role="menuitem"
-        value={currentPresetId}
-        onChange={handlePresetChange}
-      >
+      <Select role="menuitem" value={currentPresetId} onChange={handlePresetChange}>
         {presets.map((preset) => (
           <option key={preset.id} value={preset.id}>
             {preset.name}

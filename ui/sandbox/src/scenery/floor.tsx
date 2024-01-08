@@ -1,5 +1,5 @@
 import { ReactThreeFiber } from '@react-three/fiber'
-import React, { memo, useMemo } from 'react'
+import { useMemo } from 'react'
 import { Color, Vector2, Vector3 } from 'three'
 
 import { Grid } from './grid'
@@ -12,7 +12,7 @@ export interface FloorProps {
   shouldDisplayGrid?: boolean
 }
 
-export default memo(Floor)
+export default Floor
 
 function Floor(props: FloorProps) {
   const {
@@ -32,10 +32,7 @@ function Floor(props: FloorProps) {
       ? (centerInMeters as Vector2)
       : new Vector2(...(centerInMeters as Array<number>))
     // quantize to grid units
-    vector
-      .divideScalar(gridLengthInMeters)
-      .floor()
-      .multiplyScalar(gridLengthInMeters)
+    vector.divideScalar(gridLengthInMeters).floor().multiplyScalar(gridLengthInMeters)
     return vector
   }, [gridLengthInMeters, centerInMeters])
 
@@ -45,9 +42,7 @@ function Floor(props: FloorProps) {
 
   return (
     <group name="floor" position={position}>
-      {shouldDisplayAxes && (
-        <axesHelper args={[floorLength]} position={[0, 0, 1e-3]} />
-      )}
+      {shouldDisplayAxes && <axesHelper args={[floorLength]} position={[0, 0, 1e-3]} />}
       {shouldDisplayGrid && (
         <Grid
           axisLength={floorLength}

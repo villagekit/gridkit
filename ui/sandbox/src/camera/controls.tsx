@@ -2,14 +2,7 @@ import { useFrame, useThree } from '@react-three/fiber'
 import { useInterpret } from '@xstate/react'
 import type CameraControlsType from 'camera-controls'
 import CameraControlsImpl from 'camera-controls'
-import React, {
-  forwardRef,
-  useCallback,
-  useEffect,
-  useImperativeHandle,
-  useMemo,
-  useRef,
-} from 'react'
+import { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo, useRef } from 'react'
 import {
   Box3,
   MathUtils,
@@ -65,128 +58,124 @@ interface CameraControlsProps {
   shouldAutoRotate: boolean
 }
 
-export const CameraControls = forwardRef<
-  CameraControlsRef,
-  CameraControlsProps
->(function CameraControls(props, ref) {
-  const { boundingBox, mode, shouldAutoRotate } = props
+export const CameraControls = forwardRef<CameraControlsRef, CameraControlsProps>(
+  function CameraControls(props, ref) {
+    const { boundingBox, mode, shouldAutoRotate } = props
 
-  const service = useInterpret(() =>
-    machine(mode === 'screenshot' ? 'off' : 'auto'),
-  )
+    const service = useInterpret(() => machine(mode === 'screenshot' ? 'off' : 'auto'))
 
-  const isControlEnabled = true
+    const isControlEnabled = true
 
-  const invalidate = useThree(({ invalidate }) => invalidate)
-  const camera = useThree(({ camera }) => camera)
-  const gl = useThree(({ gl }) => gl)
-  // const performance = useThree(({ performance }) => performance)
+    const invalidate = useThree(({ invalidate }) => invalidate)
+    const camera = useThree(({ camera }) => camera)
+    const gl = useThree(({ gl }) => gl)
+    // const performance = useThree(({ performance }) => performance)
 
-  const controls = useMemo(() => {
-    return new CameraControlsImpl(camera, gl.domElement)
-  }, [camera, gl])
+    const controls = useMemo(() => {
+      return new CameraControlsImpl(camera, gl.domElement)
+    }, [camera, gl])
 
-  const resetControlsBox = useCallback(() => {
-    const fitBox = boundingBox.clone()
+    const resetControlsBox = useCallback(() => {
+      const fitBox = boundingBox.clone()
 
-    if (fitBox.isEmpty()) {
-      fitBox.expandByPoint(new Vector3(1, 1, 1))
-      fitBox.expandByPoint(new Vector3(-1, -1, -1))
-    }
+      if (fitBox.isEmpty()) {
+        fitBox.expandByPoint(new Vector3(1, 1, 1))
+        fitBox.expandByPoint(new Vector3(-1, -1, -1))
+      }
 
-    const enableFitTransition = mode === 'default'
+      const enableFitTransition = mode === 'default'
 
-    if (mode === 'screenshot') {
-      void controls.fitToBox(fitBox, enableFitTransition, {
-        paddingBottom: 0.4,
-        paddingLeft: 0.4,
-        paddingRight: 0.4,
-        paddingTop: 0.4,
-      })
+      if (mode === 'screenshot') {
+        void controls.fitToBox(fitBox, enableFitTransition, {
+          paddingBottom: 0.4,
+          paddingLeft: 0.4,
+          paddingRight: 0.4,
+          paddingTop: 0.4,
+        })
 
-      void controls.rotateTo((3 / 8) * ROT, (3 / 16) * ROT, false)
-    } else {
-      const fitSphere = fitBox.getBoundingSphere(new Sphere())
-      void controls.fitToSphere(fitSphere, enableFitTransition)
-    }
-  }, [boundingBox, controls, mode])
+        void controls.rotateTo((3 / 8) * ROT, (3 / 16) * ROT, false)
+      } else {
+        const fitSphere = fitBox.getBoundingSphere(new Sphere())
+        void controls.fitToSphere(fitSphere, enableFitTransition)
+      }
+    }, [boundingBox, controls, mode])
 
-  const resetControlsRotation = useCallback(
-    (enableTransition: boolean) => {
-      const { azimuthAngle, polarAngle } = controls
+    const resetControlsRotation = useCallback(
+      (enableTransition: boolean) => {
+        const { azimuthAngle, polarAngle } = controls
 
-      const nextAzimuthAngle =
-        azimuthAngle - (azimuthAngle % ROT) + (3 / 8) * ROT
-      const nextPolarAngle = polarAngle - (polarAngle % ROT) + (3 / 16) * ROT
+        const nextAzimuthAngle = azimuthAngle - (azimuthAngle % ROT) + (3 / 8) * ROT
+        const nextPolarAngle = polarAngle - (polarAngle % ROT) + (3 / 16) * ROT
 
-      void controls.rotateTo(nextAzimuthAngle, nextPolarAngle, enableTransition)
-    },
-    [controls],
-  )
-
-  useImperativeHandle(
-    ref,
-    () => ({
-      reset: () => {
-        resetControlsBox()
-        resetControlsRotation(true)
+        void controls.rotateTo(nextAzimuthAngle, nextPolarAngle, enableTransition)
       },
-      zoomIn: () => {
-        void controls.dolly(controls.distance * 0.25, true)
-      },
-      zoomOut: () => {
-        void controls.dolly(-controls.distance * 0.25, true)
-      },
-    }),
-    [controls, resetControlsBox, resetControlsRotation],
-  )
+      [controls],
+    )
 
-  useFrame((_, delta) => controls.update(delta))
+    useImperativeHandle(
+      ref,
+      () => ({
+        reset: () => {
+          resetControlsBox()
+          resetControlsRotation(true)
+        },
+        zoomIn: () => {
+          void controls.dolly(controls.distance * 0.25, true)
+        },
+        zoomOut: () => {
+          void controls.dolly(-controls.distance * 0.25, true)
+        },
+      }),
+      [controls, resetControlsBox, resetControlsRotation],
+    )
 
-  useEffect(() => {
-    controls.addEventListener('update', onUpdate)
-    return () => controls.removeEventListener('update', onUpdate)
+    useFrame((_, delta) => controls.update(delta))
 
-    function onUpdate() {
-      invalidate()
-      // performance.regress()
-    }
-  }, [controls, invalidate])
+    useEffect(() => {
+      controls.addEventListener('update', onUpdate)
+      return () => controls.removeEventListener('update', onUpdate)
 
-  useAutoRotate({ controls, mode, service, shouldAutoRotate })
+      function onUpdate() {
+        invalidate()
+        // performance.regress()
+      }
+    }, [controls, invalidate])
 
-  useEffect(() => {
-    resetControlsBox()
-  }, [resetControlsBox])
+    useAutoRotate({ controls, mode, service, shouldAutoRotate })
 
-  useEffect(() => {
-    resetControlsRotation(false)
-  }, [resetControlsRotation])
+    useEffect(() => {
+      resetControlsBox()
+    }, [resetControlsBox])
 
-  // TODO: pull request upstream?
-  const middleMouseAction = useMemo(() => {
-    return (camera as THREE.PerspectiveCamera).isPerspectiveCamera
-      ? ACTION.DOLLY
-      : (camera as THREE.OrthographicCamera).isOrthographicCamera
-      ? ACTION.ZOOM
-      : ACTION.NONE
-  }, [camera])
+    useEffect(() => {
+      resetControlsRotation(false)
+    }, [resetControlsRotation])
 
-  return (
-    <primitive
-      object={controls}
-      dispose={undefined}
-      enabled={isControlEnabled}
-      dampingFactor={0.1}
-      azimuthRotateSpeed={0.5}
-      polarRotateSpeed={0.5}
-      mouseButtons-middle={middleMouseAction}
-      minDistance={0.15}
-      maxDistance={10}
-      {...props}
-    />
-  )
-})
+    // TODO: pull request upstream?
+    const middleMouseAction = useMemo(() => {
+      return (camera as THREE.PerspectiveCamera).isPerspectiveCamera
+        ? ACTION.DOLLY
+        : (camera as THREE.OrthographicCamera).isOrthographicCamera
+        ? ACTION.ZOOM
+        : ACTION.NONE
+    }, [camera])
+
+    return (
+      <primitive
+        object={controls}
+        dispose={undefined}
+        enabled={isControlEnabled}
+        dampingFactor={0.1}
+        azimuthRotateSpeed={0.5}
+        polarRotateSpeed={0.5}
+        mouseButtons-middle={middleMouseAction}
+        minDistance={0.15}
+        maxDistance={10}
+        {...props}
+      />
+    )
+  },
+)
 
 interface AutoRotateOptions {
   service: InterpreterFrom<ReturnType<typeof machine>>
@@ -200,9 +189,7 @@ function useAutoRotate(options: AutoRotateOptions) {
 
   // use ref and custom subscribe for performance
   const controlModeRef = useRef(service.initialState.value)
-  const rotationSpeedRef = useRef(
-    service.initialState.context.autoRotationSpeed,
-  )
+  const rotationSpeedRef = useRef(service.initialState.context.autoRotationSpeed)
 
   useFrame((_, delta) => {
     if (controls == null) return
@@ -211,8 +198,8 @@ function useAutoRotate(options: AutoRotateOptions) {
       service.send({ delta, type: 'CONTROL.AUTO.TICK' })
 
       // clamp to handle game loop sleeping
-      delta = Math.min(delta, 0.5)
-      const azimuthAngle = delta * rotationSpeedRef.current
+      const clampedDelta = Math.min(delta, 0.5)
+      const azimuthAngle = clampedDelta * rotationSpeedRef.current
       void controls.rotate(azimuthAngle, 0, true)
     }
   })

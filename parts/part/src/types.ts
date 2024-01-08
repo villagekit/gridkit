@@ -9,13 +9,13 @@ declare global {
   // eslint-disable-next-line @typescript-eslint/no-namespace
   namespace VK {
     export interface EveryPartCreator {
-      noop: { type: 'noop' }
+      noop: { type: 'noop'; id: string }
     }
     export interface EveryPartVariants {
       noop: { noop: null }
     }
     export interface EveryPartState {
-      noop: { type: 'noop' }
+      noop: { type: 'noop'; id: string }
     }
     export interface EveryPartGlValue {
       noop: { type: 'noop' }

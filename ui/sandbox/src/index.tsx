@@ -7,28 +7,18 @@ import { DesignContext, useDesignContext } from '@villagekit/design'
 import { Box, useDisclosure } from '@villagekit/ui'
 import { Perf } from 'r3f-perf'
 import React, { useCallback, useMemo, useRef, useState } from 'react'
-import {
-  ACESFilmicToneMapping,
-  Box3,
-  PCFSoftShadowMap,
-  sRGBEncoding,
-  Vector3,
-} from 'three'
+import { ACESFilmicToneMapping, Box3, PCFSoftShadowMap, sRGBEncoding, Vector3 } from 'three'
 
 import { AssemblyGl } from './assembly'
 import { CameraControls, CameraControlsRef } from './camera'
 import { SandboxControls } from './controls'
 import { SceneryGl } from './scenery'
-import {
-  useDefaultSandboxControlSettings,
-  useSaveSandboxControlSettings,
-} from './settings'
+import { useDefaultSandboxControlSettings, useSaveSandboxControlSettings } from './settings'
 
 export { AssemblyInfo, AssemblySummary } from './assembly'
 
 const isDebug =
-  process.env.NODE_ENV !== 'production' &&
-  process.env.NEXT_PUBLIC_DISABLE_SANDBOX_DEBUG !== 'true'
+  process.env.NODE_ENV !== 'production' && process.env.NEXT_PUBLIC_DISABLE_SANDBOX_DEBUG !== 'true'
 
 export type SandboxMode = 'default' | 'screenshot'
 
@@ -64,15 +54,13 @@ function SandboxWithAssemblyProvider(props: Omit<SandboxProps, 'model'>) {
 
   const defaultSandboxControlSettings = useDefaultSandboxControlSettings()
 
-  const { isOpen: shouldAutoRotate, onToggle: onToggleAutoRotate } =
-    useDisclosure({
-      defaultIsOpen: defaultSandboxControlSettings.shouldAutoRotate,
-    })
+  const { isOpen: shouldAutoRotate, onToggle: onToggleAutoRotate } = useDisclosure({
+    defaultIsOpen: defaultSandboxControlSettings.shouldAutoRotate,
+  })
 
-  const { isOpen: shouldDisplayGrid, onToggle: onToggleDisplayGrid } =
-    useDisclosure({
-      defaultIsOpen: defaultSandboxControlSettings.shouldDisplayGrid,
-    })
+  const { isOpen: shouldDisplayGrid, onToggle: onToggleDisplayGrid } = useDisclosure({
+    defaultIsOpen: defaultSandboxControlSettings.shouldDisplayGrid,
+  })
 
   useSaveSandboxControlSettings(shouldAutoRotate, shouldDisplayGrid)
 
@@ -188,26 +176,17 @@ interface ContentGlProps {
 }
 
 function ContentGl(props: ContentGlProps) {
-  const {
-    scale = 1,
-    mode,
-    shouldAutoRotate,
-    shouldDisplayGrid,
-    cameraControlsRef,
-  } = props
+  const { scale = 1, mode, shouldAutoRotate, shouldDisplayGrid, cameraControlsRef } = props
 
   const gridLengthInMeters = 0.04
 
   const [boundingBox, setBoundingBox] = useState<Box3>(new Box3())
-  const center = useMemo(() => {
+  const center: [number, number, number] = useMemo(() => {
     const centerVector = new Vector3()
     boundingBox.getCenter(centerVector)
     return [centerVector.x, centerVector.y, centerVector.z]
   }, [boundingBox])
-  const sceneryCenterInMeters: [number, number] = useMemo(
-    () => [center[0], center[1]],
-    [center],
-  )
+  const sceneryCenterInMeters: [number, number] = useMemo(() => [center[0], center[1]], [center])
 
   const handleBoundingBoxChange = useCallback(
     (nextBoundingBox: Box3) => {
@@ -217,7 +196,7 @@ function ContentGl(props: ContentGlProps) {
       )
       setBoundingBox(scaledBoundingBox)
     },
-    [scale, setBoundingBox],
+    [scale],
   )
 
   return (

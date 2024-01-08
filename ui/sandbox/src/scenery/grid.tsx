@@ -94,23 +94,29 @@ export class VkGridMaterial extends ShaderMaterial {
   }
 
   get smallSize() {
+    // @ts-ignore
     return this.uniforms.uSmallSize.value
   }
   set smallSize(value: number) {
+    // @ts-ignore
     this.uniforms.uSmallSize.value = value
   }
 
   get largeSize() {
+    // @ts-ignore
     return this.uniforms.uLargeSize.value
   }
   set largeSize(value: number) {
+    // @ts-ignore
     this.uniforms.uLargeSize.value = value
   }
 
   get color() {
+    // @ts-ignore
     return this.uniforms.uColor.value
   }
   set color(color: Color) {
+    // @ts-ignore
     this.uniforms.uColor.value = color
   }
 }
@@ -146,11 +152,7 @@ export function Grid(props: GridProps) {
   return (
     <mesh frustumCulled={false} renderOrder={renderOrder}>
       <planeGeometry args={[2 * axisLength, 2 * axisLength, 1, 1]} />
-      <vkGridMaterial
-        smallSize={smallSize}
-        largeSize={largeSize}
-        color={color}
-      />
+      <vkGridMaterial smallSize={smallSize} largeSize={largeSize} color={color} />
     </mesh>
   )
 }

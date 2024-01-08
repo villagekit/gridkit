@@ -2,9 +2,7 @@ import { PartCreator } from '@villagekit/part'
 
 import { DesignParts, RecursiveArray } from './types'
 
-export function getPartCreatorsFromDesignParts(
-  parts: DesignParts,
-): Array<PartCreator> {
+export function getPartCreatorsFromDesignParts(parts: DesignParts): Array<PartCreator> {
   const results: Array<PartCreator> = []
   deepForEach(parts, (value, indices) => {
     if (value === false || value === undefined || value === null) {
@@ -31,6 +29,7 @@ function deepForEach<T>(
 
   while (index < array.length) {
     const value = array[index]
+    if (value === undefined) throw new Error('unexpected: value is undefined')
     if (Array.isArray(value)) {
       deepForEach(value, fn, indices.concat(index))
     } else {

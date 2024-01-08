@@ -1,5 +1,4 @@
 import { InfoTooltip } from '@villagekit/ui'
-import React from 'react'
 
 import { useParameterControlsInternalContext } from '../internal-context'
 
@@ -12,7 +11,5 @@ export function HelperTooltip(props: HelperTooltipProps) {
 
   const { containerRef } = useParameterControlsInternalContext()
 
-  return (
-    <InfoTooltip label={label} portalProps={{ containerRef: containerRef }} />
-  )
+  return <InfoTooltip label={label} portalProps={{ containerRef: containerRef }} />
 }

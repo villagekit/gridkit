@@ -1,5 +1,4 @@
 import { FormLabel, HStack } from '@villagekit/ui'
-import React from 'react'
 
 import { HelperTooltip } from './helper-tooltip'
 

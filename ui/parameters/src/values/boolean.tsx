@@ -1,5 +1,5 @@
 import { FormControl, Switch as SwitchComponent } from '@villagekit/ui'
-import React, { ChangeEvent, useCallback } from 'react'
+import { ChangeEvent, useCallback } from 'react'
 import { BooleanParam } from 'serialize-query-params'
 
 import { Label } from '../components/label'
@@ -13,9 +13,9 @@ export interface BooleanOptions extends BaseOptions {
   type: typeof BooleanId
 }
 
-export type BooleanProps = Omit<BooleanOptions, 'type'> &
-  BaseProps<BooleanValue>
+export type BooleanProps = Omit<BooleanOptions, 'type'> & BaseProps<BooleanValue>
 
+// biome-ignore lint/suspicious/noShadowRestrictedNames:
 export function Boolean(props: BooleanProps) {
   const { id, onChange, value, label, helperText } = props
 
@@ -30,12 +30,7 @@ export function Boolean(props: BooleanProps) {
     <FormControl id={id}>
       <Label label={label} helperText={helperText} htmlFor={id} />
 
-      <SwitchComponent
-        id={id}
-        aria-label={label}
-        isChecked={value}
-        onChange={handleChange}
-      />
+      <SwitchComponent id={id} aria-label={label} isChecked={value} onChange={handleChange} />
     </FormControl>
   )
 }

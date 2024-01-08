@@ -119,6 +119,8 @@ export type {
   AspectRatioProps,
   LinkBoxProps,
   LinkOverlayProps,
+  ListProps,
+  ListItemProps,
 } from '@chakra-ui/react'
 export {
   Box,
@@ -129,6 +131,11 @@ export {
   Grid,
   Wrap,
   AspectRatio,
+  List,
+  ListItem,
+  ListIcon,
+  UnorderedList,
+  OrderedList,
   LinkBox,
   LinkOverlay,
 } from '@chakra-ui/react'

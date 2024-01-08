@@ -1,6 +1,6 @@
 import { useDesignContext } from '@villagekit/design'
 import { PartsGlForAll } from '@villagekit/part'
-import React, { useEffect } from 'react'
+import { useEffect } from 'react'
 import { Box3 } from 'three'
 
 interface AssemblyGlProps {
