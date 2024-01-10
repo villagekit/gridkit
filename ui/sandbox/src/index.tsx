@@ -17,14 +17,12 @@ import { useDefaultSandboxControlSettings, useSaveSandboxControlSettings } from 
 
 export { AssemblyInfo, AssemblySummary } from './assembly'
 
-const isDebug =
-  process.env.NODE_ENV !== 'production' && process.env.NEXT_PUBLIC_DISABLE_SANDBOX_DEBUG !== 'true'
-
 export type SandboxMode = 'default' | 'screenshot'
 
 export interface SandboxProps {
   scale?: number
   mode?: SandboxMode
+  isDebug?: boolean
   showParameterControls?: boolean
   alwaysShowFullscreenControls?: boolean
 }
@@ -43,6 +41,7 @@ function SandboxWithAssemblyProvider(props: Omit<SandboxProps, 'model'>) {
   const {
     scale,
     mode = 'default',
+    isDebug = false,
     showParameterControls = false,
     alwaysShowFullscreenControls = false,
   } = props
@@ -117,7 +116,7 @@ function SandboxWithAssemblyProvider(props: Omit<SandboxProps, 'model'>) {
         resize={{ polyfill: ResizeObserver }}
       >
         <ContextBridge>
-          <ContainerGl mode={mode}>
+          <ContainerGl mode={mode} isDebug={isDebug}>
             {meta != null && (
               <ContentGl
                 scale={scale}
@@ -153,10 +152,11 @@ function SandboxWithAssemblyProvider(props: Omit<SandboxProps, 'model'>) {
 interface ContainerGlProps {
   children: React.ReactNode | Array<React.ReactNode>
   mode: SandboxMode
+  isDebug: boolean
 }
 
 function ContainerGl(props: ContainerGlProps) {
-  const { children, mode } = props
+  const { children, mode, isDebug } = props
 
   return (
     <>
