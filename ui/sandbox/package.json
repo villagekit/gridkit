@@ -15,7 +15,10 @@
     },
     "./package.json": "./package.json"
   },
-  "sideEffects": false,
+  "sideEffects": [
+    "./src/globals.ts",
+    "./dist/globals.js"
+  ],
   "scripts": {
     "build": "tsup src --dts",
     "lint": "biome lint ."
