@@ -2,10 +2,11 @@
   "name": "villagekit",
   "private": true,
   "scripts": {
-    "build": "turbo build",
-    "build:watch": "tsx ./watch.ts",
+    "build:pkg": "turbo build:pkg",
+    "dev:pkg": "tsx ./watch.ts",
     "//": "--concurrency 1000 until https://github.com/vercel/turbo/pull/6790 fixed",
-    "dev": "turbo dev --concurrency 1000",
+    "dev:app": "turbo dev:app --concurrency 1000",
+    "dev": "pnpm run '/^dev:.*/'",
     "lint": "turbo lint",
     "format": "biome format --write ."
   },

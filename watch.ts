@@ -30,16 +30,16 @@ const triggers = (p: PackageInfo): Trigger[] => [
         ],
       ],
     ],
-    name: `${p.name}:build`,
+    name: `${p.name}:build:pkg`,
     initialRun: false,
     onChange: async ({ spawn, files }) => {
       console.log(`${p.root}: changes detected: ${files.map((f) => f.name)}`)
-      await spawn`npx turbo build --output-logs=new-only ${p.turboFilterFlags}`
+      await spawn`npx turbo build:pkg --output-logs=new-only ${p.turboFilterFlags}`
     },
   },
 ]
 
 const kickstartCommand = async (k: KickstartContext) =>
-  k.$`npx turbo build --output-logs=new-only ${k.turboFilterFlags}`
+  k.$`npx turbo build:pkg --output-logs=new-only ${k.turboFilterFlags}`
 
 watchTree(__dirname, triggers, kickstartCommand)

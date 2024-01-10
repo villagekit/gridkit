@@ -18,7 +18,7 @@
   "sideEffects": false,
   "scripts": {
     "deps": "depcheck",
-    "build": "tsup src --dts",
+    "build:pkg": "tsup src --dts",
     "lint": "biome lint ."
   },
   "dependencies": {

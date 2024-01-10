@@ -4,8 +4,8 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "storybook dev -p 6006",
-    "build": "storybook build",
+    "dev:app": "storybook dev -p 6006",
+    "build:app": "storybook build",
     "lint": "biome lint ."
   },
   "dependencies": {

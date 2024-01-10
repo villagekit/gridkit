@@ -20,7 +20,7 @@
     "./dist/index.js"
   ],
   "scripts": {
-    "build": "tsup src --dts",
+    "build:pkg": "tsup src --dts",
     "lint": "biome lint ."
   },
   "dependencies": {
