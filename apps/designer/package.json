@@ -1,0 +1,27 @@
+{
+  "name": "@villagekit/designer",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev:app:next": "next dev --port 3000",
+    "dev:app": "tauri dev",
+    "icon": "tauri icon ./public/icon.png",
+    "build:app:next": "next build",
+    "start": "next start",
+    "lint": "biome lint ."
+  },
+  "dependencies": {
+    "@tauri-apps/api": "^1.5.3",
+    "next": "14.0.4",
+    "react": "^18",
+    "react-dom": "^18",
+    "tauri-plugin-fs-watch-api": "github:tauri-apps/tauri-plugin-fs-watch#v1",
+    "tauri-plugin-store-api": "github:tauri-apps/tauri-plugin-store#v1"
+  },
+  "devDependencies": {
+    "@types/node": "^20",
+    "@types/react": "^18",
+    "@types/react-dom": "^18",
+    "typescript": "^5"
+  }
+}

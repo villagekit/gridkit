@@ -1,0 +1,13 @@
+{
+  "extends": "@villagekit/tsconfig/nextjs.json",
+  "compilerOptions": {},
+  "include": [
+    "src",
+    ".next/types/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "out",
+    "src-tauri"
+  ]
+}
