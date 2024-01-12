@@ -7,7 +7,7 @@
     "distDir": "../out"
   },
   "package": {
-    "productName": "designer.villagekit.com",
+    "productName": "VillageKit Designer",
     "version": "0.1.0"
   },
   "tauri": {
@@ -23,7 +23,7 @@
     "bundle": {
       "active": true,
       "category": "DeveloperTool",
-      "copyright": "",
+      "copyright": "Village Kit",
       "deb": {
         "depends": []
       },
@@ -35,7 +35,7 @@
         "icons/icon.icns",
         "icons/icon.ico"
       ],
-      "identifier": "com.tauri.dev",
+      "identifier": "com.villagekit.designer",
       "longDescription": "",
       "macOS": {
         "entitlements": null,

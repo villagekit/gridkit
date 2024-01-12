@@ -1,27 +1,48 @@
 'use client'
 
-import { useCallback, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { open } from '@tauri-apps/api/dialog'
 
-export default function Landing() {
-  const [currentDirectory, setCurrentDirectory] = useState<string | null>(null)
+import { useWorkspacesContext } from '../context/workspaces'
 
-  const handleOpenDirectory = useCallback(() => {
+interface WorkspaceConfig {
+  path: string
+}
+
+export default function Landing() {
+  const { workspaces, addWorkspace, removeWorkspace } = useWorkspacesContext()
+
+  const handleAddWorkspace = useCallback(() => {
     ;(async () => {
-      const selectedDirectory = (await open({
+      const selectedDirectory = await open({
         directory: true,
         multiple: false,
-      })) as string | null
-      setCurrentDirectory(selectedDirectory)
+      })
+      if (typeof selectedDirectory !== 'string') return
+      addWorkspace(selectedDirectory)
     })()
-  }, [])
+  }, [addWorkspace])
 
   return (
     <main>
-      <button type="button" onClick={handleOpenDirectory}>
-        Open
-      </button>
-      {currentDirectory}
+      <div>
+        <div>Workspaces:</div>
+        <ul>
+          {workspaces.map((workspace) => (
+            <li id={workspace.path}>
+              <div>
+                <div>{workspace.path}</div>
+                <button type="button" onClick={() => removeWorkspace(workspace.path)}>
+                  X
+                </button>
+              </div>
+            </li>
+          ))}
+        </ul>
+        <button type="button" onClick={handleAddWorkspace}>
+          Open new workspace
+        </button>
+      </div>
     </main>
   )
 }
