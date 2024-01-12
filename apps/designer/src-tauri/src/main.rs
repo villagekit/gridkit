@@ -2,7 +2,7 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 use serde::{Deserialize, Serialize};
-use std::path::PathBuf;
+use std::{ffi::OsString, path::PathBuf};
 use tokio::fs::create_dir_all;
 use toml::{de::Error as TomlDeError, ser::Error as TomlSerError};
 
@@ -11,7 +11,8 @@ fn main() {
         .invoke_handler(tauri::generate_handler![
             list_workspaces,
             add_workspace,
-            remove_workspace
+            remove_workspace,
+            list_products,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
@@ -27,6 +28,8 @@ enum Error {
     DisplayToml(#[source] TomlSerError),
     #[error("could not resolve app dir")]
     NoAppDir,
+    #[error("invalid product file path: {path}")]
+    InvalidProductPath { path: PathBuf },
 }
 
 impl serde::Serialize for Error {
@@ -104,4 +107,36 @@ async fn remove_workspace(app_handle: tauri::AppHandle, workspace_path: PathBuf)
         .retain(|workspace| workspace.path != workspace_path);
     save_app_config(app_handle, app_config).await?;
     Ok(())
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+struct ProductIndex {
+    path: PathBuf,
+    name: String,
+}
+
+#[tauri::command]
+async fn list_products(workspace_path: PathBuf) -> Result<Vec<ProductIndex>> {
+    let mut dir_reader = tokio::fs::read_dir(workspace_path).await?;
+    let mut products = Vec::new();
+    loop {
+        let Some(next_dir_entry) = dir_reader.next_entry().await? else {
+            break;
+        };
+        let product_path = next_dir_entry.path();
+        let product_name = product_path
+            .clone()
+            .file_name()
+            .and_then(|file_name| file_name.to_str())
+            .ok_or_else(|| Error::InvalidProductPath {
+                path: product_path.clone(),
+            })?
+            .to_string();
+        products.push(ProductIndex {
+            path: product_path,
+            name: product_name,
+        })
+    }
+
+    Ok(products)
 }

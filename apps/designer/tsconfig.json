@@ -1,6 +1,11 @@
 {
   "extends": "@villagekit/tsconfig/nextjs.json",
-  "compilerOptions": {},
+  "compilerOptions": {
+    "baseUrl": "src/",
+    "paths": {
+      "@/*": ["*"]
+    }
+  },
   "include": [
     "src",
     ".next/types/**/*.ts"

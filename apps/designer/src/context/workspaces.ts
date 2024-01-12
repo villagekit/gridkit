@@ -8,13 +8,13 @@ export interface Workspace {
   path: string
 }
 
-export interface Workspaces {
+export interface WorkspacesState {
   workspaces: Array<Workspace>
   addWorkspace: (workspacePath: string) => void
   removeWorkspace: (workspacePath: string) => void
 }
 
-function useWorkspaces() {
+function useWorkspaces(): WorkspacesState {
   const [workspaces, setWorkspaces] = useState<Array<Workspace>>([])
 
   useEffect(() => {

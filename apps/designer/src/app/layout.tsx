@@ -1,7 +1,8 @@
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 
-import { WorkspacesProvider } from '../context/workspaces'
+import { WorkspacesProvider } from '@/context/workspaces'
+import { WorkspaceProvider } from '@/context/workspace'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -19,7 +20,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <WorkspacesProvider>{children}</WorkspacesProvider>
+        <WorkspacesProvider>
+          <WorkspaceProvider>{children}</WorkspaceProvider>
+        </WorkspacesProvider>
       </body>
     </html>
   )
