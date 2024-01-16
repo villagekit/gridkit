@@ -5,7 +5,7 @@ import { useWorkspacesContext } from '@/context/workspaces'
 
 export default function WorkspaceSelector() {
   const { activeWorkspace } = useWorkspacesContext()
-  const { products, selectProduct } = useWorkspaceContext()
+  const { productIndexes, selectProductName } = useWorkspaceContext()
 
   if (activeWorkspace == null) {
     throw new Error('Unexpected: activeWorkspace is null')
@@ -17,16 +17,16 @@ export default function WorkspaceSelector() {
         <div>Workspace: ${activeWorkspace.path}</div>
         <div>Products:</div>
         <ul>
-          {products.map((product) => (
-            <li key={product.name}>
+          {productIndexes.map((productIndex) => (
+            <li key={productIndex.path}>
               <div>
                 <div>
-                  <button type="button" onClick={() => selectProduct(product.name)}>
-                    {product.name}
+                  <button type="button" onClick={() => selectProductName(productIndex.name)}>
+                    {productIndex.name}
                   </button>
                 </div>
                 {/*
-                <button type="button" onClick={() => removeProduct(product.name)}>
+                <button type="button" onClick={() => removeproductName(productName.name)}>
                   X
                 </button>
                 */}
@@ -35,8 +35,8 @@ export default function WorkspaceSelector() {
           ))}
         </ul>
         {/*
-        <button type="button" onClick={handleCreateProduct}>
-          Create new product
+        <button type="button" onClick={handleCreateproductName}>
+          Create new productName
         </button>
         */}
       </div>

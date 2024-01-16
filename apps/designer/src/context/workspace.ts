@@ -1,21 +1,22 @@
 import constate from 'constate'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { invoke } from '@tauri-apps/api'
 
 import { Workspace } from './workspaces'
 
-export interface Product {
+export interface WorkspaceOptions {
+  workspace: Workspace
+}
+
+export interface ProductIndex {
+  path: string
   name: string
 }
 
-export interface WorkspaceOptions {
-  workspace: Workspace | null
-}
-
 export interface WorkspaceState {
-  products: Array<Product>
-  activeProduct: Product | null
-  selectProduct: (productName: string | null) => void
+  productIndexes: Array<ProductIndex>
+  activeProductIndex: ProductIndex | null
+  selectProductName: (productName: string | null) => void
   // createProduct: (productName: string) => void
   // removeProduct: (productName: string) => void
 }
@@ -23,22 +24,21 @@ export interface WorkspaceState {
 function useWorkspace(options: WorkspaceOptions): WorkspaceState {
   const { workspace } = options
 
-  const [products, setProducts] = useState<Array<Product>>([])
-  const [activeProductName, selectProduct] = useState<string | null>(null)
+  const [productIndexes, setProductIndexes] = useState<Array<ProductIndex>>([])
+  const [activeProductName, selectProductName] = useState<string | null>(null)
 
   useEffect(() => {
     ;(async () => {
-      if (workspace == null) return
       const { path: workspacePath } = workspace
       const products = await invoke('list_products', { workspacePath })
-      setProducts(products as Array<Product>)
+      setProductIndexes(products as Array<ProductIndex>)
     })()
   }, [workspace])
 
-  const activeProduct = useMemo(() => {
+  const activeProductIndex = useMemo(() => {
     if (activeProductName == null) return null
-    return products.find((product) => product.name === activeProductName) || null
-  }, [activeProductName, products])
+    return productIndexes.find((productIndex) => productIndex.name === activeProductName) || null
+  }, [productIndexes, activeProductName])
 
   /*
   const addWorkspace = useCallback(
@@ -68,9 +68,9 @@ function useWorkspace(options: WorkspaceOptions): WorkspaceState {
   */
 
   return {
-    products,
-    activeProduct,
-    selectProduct,
+    productIndexes,
+    activeProductIndex,
+    selectProductName,
   }
 }
 

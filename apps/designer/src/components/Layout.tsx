@@ -1,6 +1,7 @@
 'use client'
 
-import { WorkspaceProvider } from '@/context/workspace'
+import { ProductProvider } from '@/context/product'
+import { WorkspaceProvider, useWorkspaceContext } from '@/context/workspace'
 import { WorkspacesProvider, useWorkspacesContext } from '@/context/workspaces'
 
 export interface LayoutProps {
@@ -21,5 +22,15 @@ export function WorkspacesLayout({ children }: LayoutProps) {
 export function WorkspaceLayout({ children }: LayoutProps) {
   const { activeWorkspace } = useWorkspacesContext()
 
+  if (activeWorkspace == null) return children
+
   return <WorkspaceProvider workspace={activeWorkspace}>{children}</WorkspaceProvider>
+}
+
+export function ProductLayout({ children }: LayoutProps) {
+  const { activeProductName } = useWorkspaceContext()
+
+  if (activeProductName == null) return children
+
+  return <ProductProvider productName={activeProductName}>{children}</ProductProvider>
 }

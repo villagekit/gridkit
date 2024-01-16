@@ -3,6 +3,7 @@
 import WorkspaceSelector from '@/components/WorkspaceSelector'
 import Workspace from '@/components/Workspace'
 import { useWorkspacesContext } from '@/context/workspaces'
+import { useWorkspaceContext } from '@/context/workspace'
 
 export default function RootPage() {
   const { activeWorkspace } = useWorkspacesContext()
@@ -11,5 +12,16 @@ export default function RootPage() {
     return <WorkspaceSelector />
   }
 
-  return <Workspace />
+  return <WorkspacePage />
+}
+
+function WorkspacePage() {
+  const { activeProductIndex } = useWorkspaceContext()
+
+  if (activeProductIndex == null) {
+    return <Workspace />
+  }
+
+  return <>product</>
+  // <Product />
 }
