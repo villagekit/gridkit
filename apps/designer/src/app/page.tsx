@@ -1,13 +1,13 @@
 'use client'
 
-import { useWorkspaceContext } from '@/context/workspace'
 import WorkspaceSelector from '@/components/WorkspaceSelector'
 import Workspace from '@/components/Workspace'
+import { useWorkspacesContext } from '@/context/workspaces'
 
 export default function RootPage() {
-  const { workspace } = useWorkspaceContext()
+  const { activeWorkspace } = useWorkspacesContext()
 
-  if (workspace == null) {
+  if (activeWorkspace == null) {
     return <WorkspaceSelector />
   }
 

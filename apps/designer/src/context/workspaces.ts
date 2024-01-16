@@ -1,7 +1,5 @@
-'use client'
-
 import constate from 'constate'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { invoke } from '@tauri-apps/api'
 
 export interface Workspace {
@@ -10,12 +8,15 @@ export interface Workspace {
 
 export interface WorkspacesState {
   workspaces: Array<Workspace>
-  addWorkspace: (workspacePath: string) => void
-  removeWorkspace: (workspacePath: string) => void
+  addWorkspace: (workspacePath: string) => Promise<void>
+  removeWorkspace: (workspacePath: string) => Promise<void>
+  activeWorkspace: Workspace | null
+  selectWorkspace: (workspacePath: string | null) => void
 }
 
 function useWorkspaces(): WorkspacesState {
   const [workspaces, setWorkspaces] = useState<Array<Workspace>>([])
+  const [activeWorkspacePath, selectWorkspace] = useState<string | null>(null)
 
   useEffect(() => {
     ;(async () => {
@@ -24,8 +25,15 @@ function useWorkspaces(): WorkspacesState {
     })()
   }, [])
 
+  const activeWorkspace = useMemo(() => {
+    if (activeWorkspacePath == null) return null
+    return workspaces.find((workspace) => workspace.path === activeWorkspacePath) || null
+  }, [activeWorkspacePath, workspaces])
+
+  console.log('activeWorkspacePath', activeWorkspacePath)
+
   const addWorkspace = useCallback(
-    (workspacePath: string) => {
+    async (workspacePath: string) => {
       if (workspaces.find((workspace) => workspace.path === workspacePath)) {
         return
       }
@@ -34,23 +42,25 @@ function useWorkspaces(): WorkspacesState {
       const nextWorkspaces = [...workspaces, newWorkspace]
       setWorkspaces(nextWorkspaces)
 
-      invoke('add_workspace', { workspace: newWorkspace })
+      await invoke('add_workspace', { workspace: newWorkspace })
     },
     [workspaces],
   )
 
   const removeWorkspace = useCallback(
-    (workspacePath: string) => {
+    async (workspacePath: string) => {
       const nextWorkspaces = workspaces.filter((workspace) => workspace.path !== workspacePath)
       setWorkspaces(nextWorkspaces)
 
-      invoke('remove_workspace', { workspacePath })
+      await invoke('remove_workspace', { workspacePath })
     },
     [workspaces],
   )
 
   return {
     workspaces,
+    activeWorkspace,
+    selectWorkspace,
     addWorkspace,
     removeWorkspace,
   }

@@ -1,39 +1,44 @@
-'use client'
-
 import constate from 'constate'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { invoke } from '@tauri-apps/api'
 
-import { Workspace, useWorkspacesContext } from './workspaces'
+import { Workspace } from './workspaces'
 
 export interface Product {
   name: string
 }
 
-export interface WorkspaceState {
+export interface WorkspaceOptions {
   workspace: Workspace | null
-  selectWorkspace: (workspacePath: string | null) => void
+}
+
+export interface WorkspaceState {
   products: Array<Product>
+  activeProduct: Product | null
+  selectProduct: (productName: string | null) => void
   // createProduct: (productName: string) => void
   // removeProduct: (productName: string) => void
 }
 
-function useWorkspace(): WorkspaceState {
-  const [workspacePath, selectWorkspace] = useState<string | null>(null)
-
-  const { workspaces } = useWorkspacesContext()
-  const workspace = workspaces?.find((workspace) => workspace.path === workspacePath) || null
-
-  console.log('workspace', workspace)
+function useWorkspace(options: WorkspaceOptions): WorkspaceState {
+  const { workspace } = options
 
   const [products, setProducts] = useState<Array<Product>>([])
+  const [activeProductName, selectProduct] = useState<string | null>(null)
 
   useEffect(() => {
     ;(async () => {
+      if (workspace == null) return
+      const { path: workspacePath } = workspace
       const products = await invoke('list_products', { workspacePath })
       setProducts(products as Array<Product>)
     })()
-  }, [workspacePath])
+  }, [workspace])
+
+  const activeProduct = useMemo(() => {
+    if (activeProductName == null) return null
+    return products.find((product) => product.name === activeProductName) || null
+  }, [activeProductName, products])
 
   /*
   const addWorkspace = useCallback(
@@ -63,9 +68,9 @@ function useWorkspace(): WorkspaceState {
   */
 
   return {
-    workspace,
-    selectWorkspace,
     products,
+    activeProduct,
+    selectProduct,
   }
 }
 

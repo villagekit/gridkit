@@ -4,22 +4,19 @@ import { useCallback } from 'react'
 import { open } from '@tauri-apps/api/dialog'
 
 import { useWorkspacesContext } from '@/context/workspaces'
-import { useWorkspaceContext } from '@/context/workspace'
 
 export default function WorkspaceSelector() {
-  const { workspaces, addWorkspace, removeWorkspace } = useWorkspacesContext()
-  const { selectWorkspace } = useWorkspaceContext()
+  const { workspaces, addWorkspace, removeWorkspace, selectWorkspace } = useWorkspacesContext()
 
-  const handleAddWorkspace = useCallback(() => {
-    ;(async () => {
-      const selectedDirectory = await open({
-        directory: true,
-        multiple: false,
-      })
-      if (typeof selectedDirectory !== 'string') return
-      addWorkspace(selectedDirectory)
-    })()
-  }, [addWorkspace])
+  const handleOpenWorkspace = useCallback(async () => {
+    const selectedDirectory = await open({
+      directory: true,
+      multiple: false,
+    })
+    if (typeof selectedDirectory !== 'string') return
+    await addWorkspace(selectedDirectory)
+    selectWorkspace(selectedDirectory)
+  }, [addWorkspace, selectWorkspace])
 
   return (
     <main>
@@ -41,7 +38,7 @@ export default function WorkspaceSelector() {
             </li>
           ))}
         </ul>
-        <button type="button" onClick={handleAddWorkspace}>
+        <button type="button" onClick={handleOpenWorkspace}>
           Open new workspace
         </button>
       </div>

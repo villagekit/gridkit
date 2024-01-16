@@ -1,31 +1,29 @@
 'use client'
 
 import { useWorkspaceContext } from '@/context/workspace'
+import { useWorkspacesContext } from '@/context/workspaces'
 
 export default function WorkspaceSelector() {
-  const { workspace, products } = useWorkspaceContext()
+  const { activeWorkspace } = useWorkspacesContext()
+  const { products, selectProduct } = useWorkspaceContext()
 
-  if (workspace == null) {
-    throw new Error('Unexpected: workspace is null')
+  if (activeWorkspace == null) {
+    throw new Error('Unexpected: activeWorkspace is null')
   }
 
   return (
     <main>
       <div>
-        <div>Workspace: ${workspace.path}</div>
+        <div>Workspace: ${activeWorkspace.path}</div>
         <div>Products:</div>
         <ul>
           {products.map((product) => (
             <li key={product.name}>
               <div>
                 <div>
-                  {/*
                   <button type="button" onClick={() => selectProduct(product.name)}>
-                */}
-                  {product.name}
-                  {/*
+                    {product.name}
                   </button>
-                */}
                 </div>
                 {/*
                 <button type="button" onClick={() => removeProduct(product.name)}>
