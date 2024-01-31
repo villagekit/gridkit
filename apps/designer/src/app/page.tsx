@@ -2,6 +2,7 @@
 
 import WorkspaceSelector from '@/components/WorkspaceSelector'
 import Workspace from '@/components/Workspace'
+import Product from '@/components/Product'
 import { useWorkspacesContext } from '@/context/workspaces'
 import { useWorkspaceContext } from '@/context/workspace'
 
@@ -22,6 +23,5 @@ function WorkspacePage() {
     return <Workspace />
   }
 
-  return <>product</>
-  // <Product />
+  return <Product />
 }

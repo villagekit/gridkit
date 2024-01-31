@@ -2,8 +2,7 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 use serde::{Deserialize, Serialize};
-use std::{ffi::OsString, path::PathBuf};
-use tokio::fs::create_dir_all;
+use std::path::PathBuf;
 use toml::{de::Error as TomlDeError, ser::Error as TomlSerError};
 
 fn main() {
@@ -13,6 +12,7 @@ fn main() {
             add_workspace,
             remove_workspace,
             list_products,
+            get_product_meta,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
@@ -112,7 +112,7 @@ async fn remove_workspace(app_handle: tauri::AppHandle, workspace_path: PathBuf)
 #[derive(Debug, Clone, Serialize, Deserialize)]
 struct ProductIndex {
     path: PathBuf,
-    name: String,
+    id: String,
 }
 
 #[tauri::command]
@@ -124,7 +124,7 @@ async fn list_products(workspace_path: PathBuf) -> Result<Vec<ProductIndex>> {
             break;
         };
         let product_path = next_dir_entry.path();
-        let product_name = product_path
+        let product_id = product_path
             .clone()
             .file_name()
             .and_then(|file_name| file_name.to_str())
@@ -134,9 +134,23 @@ async fn list_products(workspace_path: PathBuf) -> Result<Vec<ProductIndex>> {
             .to_string();
         products.push(ProductIndex {
             path: product_path,
-            name: product_name,
+            id: product_id,
         })
     }
 
     Ok(products)
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+struct ProductMeta {
+    name: String,
+}
+
+#[tauri::command]
+async fn get_product_meta(product_path: PathBuf) -> Result<ProductMeta> {
+    let product_meta_path = product_path.join("meta.toml");
+    let product_meta_string = tokio::fs::read_to_string(product_meta_path).await?;
+    let product_meta: ProductMeta =
+        toml::from_str(&product_meta_string).map_err(Error::ParseToml)?;
+    Ok(product_meta)
 }

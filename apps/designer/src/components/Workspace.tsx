@@ -5,7 +5,7 @@ import { useWorkspacesContext } from '@/context/workspaces'
 
 export default function WorkspaceSelector() {
   const { activeWorkspace } = useWorkspacesContext()
-  const { productIndexes, selectProductName } = useWorkspaceContext()
+  const { productIndexes, selectProductId } = useWorkspaceContext()
 
   if (activeWorkspace == null) {
     throw new Error('Unexpected: activeWorkspace is null')
@@ -21,8 +21,8 @@ export default function WorkspaceSelector() {
             <li key={productIndex.path}>
               <div>
                 <div>
-                  <button type="button" onClick={() => selectProductName(productIndex.name)}>
-                    {productIndex.name}
+                  <button type="button" onClick={() => selectProductId(productIndex.id)}>
+                    {productIndex.id}
                   </button>
                 </div>
                 {/*

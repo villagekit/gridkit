@@ -10,22 +10,22 @@ export interface WorkspaceOptions {
 
 export interface ProductIndex {
   path: string
-  name: string
+  id: string
 }
 
 export interface WorkspaceState {
   productIndexes: Array<ProductIndex>
   activeProductIndex: ProductIndex | null
-  selectProductName: (productName: string | null) => void
-  // createProduct: (productName: string) => void
-  // removeProduct: (productName: string) => void
+  selectProductId: (productId: string | null) => void
+  // createProduct: (productId: string) => void
+  // removeProduct: (productId: string) => void
 }
 
 function useWorkspace(options: WorkspaceOptions): WorkspaceState {
   const { workspace } = options
 
   const [productIndexes, setProductIndexes] = useState<Array<ProductIndex>>([])
-  const [activeProductName, selectProductName] = useState<string | null>(null)
+  const [activeProductId, selectProductId] = useState<string | null>(null)
 
   useEffect(() => {
     ;(async () => {
@@ -36,9 +36,9 @@ function useWorkspace(options: WorkspaceOptions): WorkspaceState {
   }, [workspace])
 
   const activeProductIndex = useMemo(() => {
-    if (activeProductName == null) return null
-    return productIndexes.find((productIndex) => productIndex.name === activeProductName) || null
-  }, [productIndexes, activeProductName])
+    if (activeProductId == null) return null
+    return productIndexes.find((productIndex) => productIndex.id === activeProductId) || null
+  }, [productIndexes, activeProductId])
 
   /*
   const addWorkspace = useCallback(
@@ -70,7 +70,7 @@ function useWorkspace(options: WorkspaceOptions): WorkspaceState {
   return {
     productIndexes,
     activeProductIndex,
-    selectProductName,
+    selectProductId,
   }
 }
 

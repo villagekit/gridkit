@@ -10,7 +10,9 @@ export interface LayoutProps {
 export function AppLayout({ children }: LayoutProps) {
   return (
     <WorkspacesLayout>
-      <WorkspaceLayout>{children}</WorkspaceLayout>
+      <WorkspaceLayout>
+        <ProductLayout>{children}</ProductLayout>
+      </WorkspaceLayout>
     </WorkspacesLayout>
   )
 }
@@ -28,9 +30,9 @@ export function WorkspaceLayout({ children }: LayoutProps) {
 }
 
 export function ProductLayout({ children }: LayoutProps) {
-  const { activeProductName } = useWorkspaceContext()
+  const { activeProductIndex } = useWorkspaceContext()
 
-  if (activeProductName == null) return children
+  if (activeProductIndex == null) return children
 
-  return <ProductProvider productName={activeProductName}>{children}</ProductProvider>
+  return <ProductProvider productPath={activeProductIndex.path}>{children}</ProductProvider>
 }

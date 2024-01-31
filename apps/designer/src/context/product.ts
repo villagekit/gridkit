@@ -1,24 +1,42 @@
+import { invoke } from '@tauri-apps/api'
 import constate from 'constate'
+import { useEffect, useState } from 'react'
 
-export interface Product {
+export interface ProductOptions {
+  productPath: string
+}
+
+export interface ProductMeta {
   name: string
 }
 
-export interface ProductOptions {
-  productName: string
+export interface Product {
+  meta: ProductMeta
 }
 
 export interface ProductState {
-  product: Product
+  product: Product | null
 }
 
 function useProduct(options: ProductOptions): ProductState {
-  const { productName } = options
+  const { productPath } = options
 
-  const product = { name: productName }
+  const [productMeta, setProductMeta] = useState<ProductMeta | null>(null)
+
+  useEffect(() => {
+    ;(async () => {
+      const productMeta = await invoke('get_product_meta', { productPath })
+      console.log('product meta', productMeta)
+      setProductMeta(productMeta as ProductMeta)
+    })()
+  }, [productPath])
+
+  if (productMeta == null) return { product: null }
 
   return {
-    product,
+    product: {
+      meta: productMeta,
+    },
   }
 }
 
