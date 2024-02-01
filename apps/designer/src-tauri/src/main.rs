@@ -160,24 +160,27 @@ struct ProductMeta {
     #[serde(rename = "type")]
     typ: ProductType,
     parameters: ProductMetaParameters,
+    presets: ProductMetaPresets,
 }
 
 #[derive(Debug, Clone, PartialEq, PartialOrd, Serialize, Deserialize)]
 #[serde(tag = "type", rename_all = "kebab-case")]
 enum ProductMetaParameterOptions {
+    #[serde(rename_all = "kebab-case")]
     Boolean {
         label: String,
         #[serde(default)]
-        helper_text: Option<String>,
+        description: Option<String>,
         #[serde(default)]
-        query_param_id: Option<String>,
+        short_id: Option<String>,
     },
+    #[serde(rename_all = "kebab-case")]
     Number {
         label: String,
         #[serde(default)]
-        helper_text: Option<String>,
+        description: Option<String>,
         #[serde(default)]
-        query_param_id: Option<String>,
+        short_id: Option<String>,
         #[serde(default)]
         min: Option<f64>,
         #[serde(default)]
@@ -185,12 +188,13 @@ enum ProductMetaParameterOptions {
         #[serde(default)]
         step: Option<f64>,
     },
+    #[serde(rename_all = "kebab-case")]
     Choice {
         label: String,
         #[serde(default)]
-        helper_text: Option<String>,
+        description: Option<String>,
         #[serde(default)]
-        query_param_id: Option<String>,
+        short_id: Option<String>,
         options: BTreeMap<String, String>,
     },
 }
@@ -201,22 +205,55 @@ struct ProductMetaParameterId(String);
 #[derive(Debug, Clone, PartialEq, PartialOrd, Serialize, Deserialize)]
 struct ProductMetaParameters(BTreeMap<ProductMetaParameterId, ProductMetaParameterOptions>);
 
+#[derive(Debug, Clone, PartialEq, PartialOrd, Serialize, Deserialize)]
+#[serde(untagged)]
+enum ProductMetaParameterValue {
+    Number(f64),
+    Boolean(bool),
+    Choice(String),
+}
+
+#[derive(Debug, Clone, PartialEq, PartialOrd, Serialize, Deserialize)]
+struct ProductMetaParameterValues(BTreeMap<String, ProductMetaParameterValue>);
+
+#[derive(Debug, Clone, PartialEq, PartialOrd, Serialize, Deserialize)]
+struct ProductMetaPresetValue {
+    label: String,
+    #[serde(flatten)]
+    values: ProductMetaParameterValues,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
+struct ProductMetaPresetId(String);
+
+#[derive(Debug, Clone, PartialEq, PartialOrd, Serialize, Deserialize)]
+struct ProductMetaPresets(BTreeMap<ProductMetaPresetId, ProductMetaPresetValue>);
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 struct ProductMetaFile {
     product: ProductMetaProduct,
     parameters: ProductMetaParameters,
+    presets: ProductMetaPresets,
 }
 
 #[tauri::command]
 async fn get_product_meta(product_path: PathBuf) -> Result<ProductMeta> {
     let product_meta_path = product_path.join("meta.toml");
     let product_meta_string = tokio::fs::read_to_string(product_meta_path).await?;
-    let product_meta_file: ProductMetaFile =
-        toml::from_str(&product_meta_string).map_err(Error::ParseToml)?;
+    let product_meta_file_res: Result<ProductMetaFile> =
+        toml::from_str(&product_meta_string).map_err(Error::ParseToml);
+    let product_meta_file = match product_meta_file_res {
+        Ok(product_meta_file) => product_meta_file,
+        Err(err) => {
+            println!("{:?}", err);
+            return Err(err);
+        }
+    };
     let product_meta = ProductMeta {
         name: product_meta_file.product.name,
         typ: product_meta_file.product.typ,
         parameters: product_meta_file.parameters,
+        presets: product_meta_file.presets,
     };
     Ok(product_meta)
 }

@@ -49,12 +49,18 @@ importers:
       '@tauri-apps/api':
         specifier: ^1.5.3
         version: 1.5.3
+      '@types/lodash-es':
+        specifier: ^4.17.12
+        version: 4.17.12
       '@villagekit/parameters':
         specifier: workspace:^
         version: link:../../ui/parameters
       constate:
         specifier: ^3.3.2
         version: 3.3.2(react@18.2.0)
+      lodash-es:
+        specifier: ^4.17.21
+        version: 4.17.21
       next:
         specifier: 14.0.4
         version: 14.0.4(react-dom@18.2.0)(react@18.2.0)
