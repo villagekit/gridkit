@@ -2,7 +2,7 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 use serde::{Deserialize, Serialize};
-use std::path::PathBuf;
+use std::{collections::BTreeMap, path::PathBuf};
 use toml::{de::Error as TomlDeError, ser::Error as TomlSerError};
 
 fn main() {
@@ -142,15 +142,81 @@ async fn list_products(workspace_path: PathBuf) -> Result<Vec<ProductIndex>> {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "kebab-case")]
+enum ProductType {
+    Assembly,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+struct ProductMetaProduct {
+    name: String,
+    #[serde(rename = "type")]
+    typ: ProductType,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
 struct ProductMeta {
     name: String,
+    #[serde(rename = "type")]
+    typ: ProductType,
+    parameters: ProductMetaParameters,
+}
+
+#[derive(Debug, Clone, PartialEq, PartialOrd, Serialize, Deserialize)]
+#[serde(tag = "type", rename_all = "kebab-case")]
+enum ProductMetaParameterOptions {
+    Boolean {
+        label: String,
+        #[serde(default)]
+        helper_text: Option<String>,
+        #[serde(default)]
+        query_param_id: Option<String>,
+    },
+    Number {
+        label: String,
+        #[serde(default)]
+        helper_text: Option<String>,
+        #[serde(default)]
+        query_param_id: Option<String>,
+        #[serde(default)]
+        min: Option<f64>,
+        #[serde(default)]
+        max: Option<f64>,
+        #[serde(default)]
+        step: Option<f64>,
+    },
+    Choice {
+        label: String,
+        #[serde(default)]
+        helper_text: Option<String>,
+        #[serde(default)]
+        query_param_id: Option<String>,
+        options: BTreeMap<String, String>,
+    },
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
+struct ProductMetaParameterId(String);
+
+#[derive(Debug, Clone, PartialEq, PartialOrd, Serialize, Deserialize)]
+struct ProductMetaParameters(BTreeMap<ProductMetaParameterId, ProductMetaParameterOptions>);
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+struct ProductMetaFile {
+    product: ProductMetaProduct,
+    parameters: ProductMetaParameters,
 }
 
 #[tauri::command]
 async fn get_product_meta(product_path: PathBuf) -> Result<ProductMeta> {
     let product_meta_path = product_path.join("meta.toml");
     let product_meta_string = tokio::fs::read_to_string(product_meta_path).await?;
-    let product_meta: ProductMeta =
+    let product_meta_file: ProductMetaFile =
         toml::from_str(&product_meta_string).map_err(Error::ParseToml)?;
+    let product_meta = ProductMeta {
+        name: product_meta_file.product.name,
+        typ: product_meta_file.product.typ,
+        parameters: product_meta_file.parameters,
+    };
     Ok(product_meta)
 }

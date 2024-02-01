@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@tauri-apps/api": "^1.5.3",
+    "@villagekit/parameters": "workspace:^",
     "constate": "^3.3.2",
     "next": "14.0.4",
     "react": "^18",

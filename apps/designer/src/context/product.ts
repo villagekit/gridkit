@@ -2,12 +2,15 @@ import { invoke } from '@tauri-apps/api'
 import constate from 'constate'
 import { useEffect, useState } from 'react'
 
+import { ParametersOptions } from '@villagekit/parameters'
+
 export interface ProductOptions {
   productPath: string
 }
 
 export interface ProductMeta {
   name: string
+  parameters: ParametersOptions
 }
 
 export interface Product {
@@ -26,7 +29,6 @@ function useProduct(options: ProductOptions): ProductState {
   useEffect(() => {
     ;(async () => {
       const productMeta = await invoke('get_product_meta', { productPath })
-      console.log('product meta', productMeta)
       setProductMeta(productMeta as ProductMeta)
     })()
   }, [productPath])

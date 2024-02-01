@@ -13,6 +13,7 @@ export default function Product() {
     <main>
       <div>
         <div>Product: {product.meta.name}</div>
+        <div>Product: {JSON.stringify(product, null, 2)}</div>
       </div>
     </main>
   )
