@@ -1,34 +1,49 @@
 {
   "name": "@villagekit/designer",
-  "version": "0.1.0",
+  "productName": "Village Kit Designer",
+  "version": "0.0.0",
   "private": true,
+  "description": "Design modular products with Village Kit",
+  "main": ".vite/build/main.js",
   "scripts": {
-    "dev:app:next": "next dev --port 3000",
-    "dev:app": "export WEBKIT_DISABLE_COMPOSITING_MODE=1; tauri dev",
-    "icon": "tauri icon ./public/icon.png",
-    "build:app:next": "next build",
-    "start": "next start",
+    "dev:app": "electron-forge start --inspect-electron",
+    "start": "electron-forge start",
+    "package": "electron-forge package",
+    "make": "electron-forge make",
+    "publish": "electron-forge publish",
     "lint": "biome lint ."
   },
-  "dependencies": {
-    "@tauri-apps/api": "^1.5.3",
+  "devDependencies": {
+    "@electron-forge/cli": "^7.2.0",
+    "@electron-forge/maker-deb": "^7.2.0",
+    "@electron-forge/maker-rpm": "^7.2.0",
+    "@electron-forge/maker-squirrel": "^7.2.0",
+    "@electron-forge/maker-zip": "^7.2.0",
+    "@electron-forge/plugin-auto-unpack-natives": "^7.2.0",
+    "@electron-forge/plugin-vite": "^7.2.0",
     "@types/lodash-es": "^4.17.12",
+    "@types/react": "^18",
+    "@types/react-dom": "^18",
     "@types/three": "^0.150.1",
+    "electron": "28.2.2",
+    "ts-node": "^10.0.0",
+    "typescript": "^5"
+  },
+  "dependencies": {
+    "@electron-forge/shared-types": "^7.2.0",
+    "@trpc/client": "^10.45.1",
+    "@trpc/server": "^10.45.1",
     "@villagekit/design": "workspace:^",
     "@villagekit/parameters": "workspace:^",
     "@villagekit/sandbox": "workspace:^",
     "@villagekit/ui": "workspace:^",
     "constate": "^3.3.2",
+    "electron-squirrel-startup": "^1.0.0",
+    "electron-trpc": "^0.5.2",
     "lodash-es": "^4.17.21",
-    "next": "14.0.4",
     "react": "^18",
     "react-dom": "^18",
-    "three": "^0.161.0"
-  },
-  "devDependencies": {
-    "@types/node": "^20",
-    "@types/react": "^18",
-    "@types/react-dom": "^18",
-    "typescript": "^5"
+    "three": "^0.161.0",
+    "zod": "^3.22.4"
   }
 }

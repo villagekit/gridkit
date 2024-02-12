@@ -1,18 +1,12 @@
 {
-  "extends": "@villagekit/tsconfig/nextjs.json",
+  "extends": "@villagekit/tsconfig/react-library.json",
   "compilerOptions": {
+    "module": "CommonJS",
+    "allowJs": true,
     "baseUrl": "src/",
     "paths": {
       "@/*": ["*"]
     }
   },
-  "include": [
-    "src",
-    ".next/types/**/*.ts"
-  ],
-  "exclude": [
-    "node_modules",
-    "out",
-    "src-tauri"
-  ]
+  "include": ["src"]
 }

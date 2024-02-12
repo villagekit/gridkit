@@ -20,7 +20,9 @@
     "tsx": "^4.7.0",
     "turbo": "^1.11.3",
     "turbotree": "^1.0.1",
-    "turbowatch": "^2.29.4"
+    "turbowatch": "^2.29.4",
+    "vite": "^5.0.0",
+    "vite-tsconfig-paths": "^4.3.1"
   },
   "packageManager": "pnpm",
   "pnpm": {
