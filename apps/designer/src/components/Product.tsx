@@ -1,7 +1,9 @@
 'use client'
 
+import { DesignWrapper } from '@villagekit/design'
+
 import { useProductContext } from '@/context/product'
-import { ParameterControlsContextProvider } from '@villagekit/parameters'
+import { Sandbox } from '@villagekit/sandbox'
 
 export default function Product() {
   const { product } = useProductContext()
@@ -10,19 +12,17 @@ export default function Product() {
     return <main>Loading</main>
   }
 
-  console.log('product.meta', product.meta)
-
   return (
-    <ParameterControlsContextProvider
-      parameters={product.meta.parameters}
-      presets={product.meta.presets}
-    >
+    <DesignWrapper design={product}>
       <main>
         <div>
           <div>Product: {product.meta.name}</div>
           <div>Product: {JSON.stringify(product, null, 2)}</div>
+          <div>
+            <Sandbox />
+          </div>
         </div>
       </main>
-    </ParameterControlsContextProvider>
+    </DesignWrapper>
   )
 }

@@ -1,22 +1,28 @@
 import { invoke } from '@tauri-apps/api'
 import constate from 'constate'
 import { useEffect, useState } from 'react'
-import { camelCase, mapKeys, mapValues } from 'lodash-es'
+import { mapValues } from 'lodash-es'
 
 import { ParametersOptions, Presets } from '@villagekit/parameters'
+import {
+  DesignAssemblyParameterized,
+  DesignMeta,
+} from '@villagekit/design'
 
 export interface ProductOptions {
   productPath: string
 }
 
-export interface ProductMeta<ParamsOptions extends ParametersOptions> {
-  name: string
+export type ProductMeta = DesignMeta
+
+export interface ProductAssemblyMeta<ParamsOptions extends ParametersOptions> {
   parameters: ParamsOptions
   presets: Presets<ParamsOptions>
 }
 
-export interface Product<ParamsOptions extends ParametersOptions> {
-  meta: ProductMeta<ParamsOptions>
+export type Product<ParamsOptions extends ParametersOptions> = {
+  meta: ProductMeta
+  assembly: DesignAssemblyParameterized<ParamsOptions>
 }
 
 export interface ProductState<ParamsOptions extends ParametersOptions> {
@@ -26,21 +32,37 @@ export interface ProductState<ParamsOptions extends ParametersOptions> {
 function useProduct(options: ProductOptions): ProductState<any> {
   const { productPath } = options
 
-  const [productMeta, setProductMeta] = useState<ProductMeta<any> | null>(null)
+  const [productMeta, setProductMeta] = useState<ProductMeta | null>(null)
+  const [productAssemblyMeta, setProductAssemblyMeta] = useState<ProductAssemblyMeta<any> | null>(
+    null,
+  )
 
   useEffect(() => {
     ;(async () => {
-      const productMeta = await invoke('get_product_meta', { productPath })
-      const jsProductMeta = {
+      const productMetaRs = await invoke('get_product_meta', { productPath })
+      const productMeta = {
         // @ts-ignore
-        ...productMeta,
+        id: productMetaRs.id,
         // @ts-ignore
-        parameters: mapValues(productMeta.parameters, (parameterOptions) => {
+        name: productMetaRs.label,
+        // @ts-ignore
+        description: productMetaRs.description ?? '',
+      }
+      setProductMeta(productMeta as ProductMeta)
+    })()
+  }, [productPath])
+
+  useEffect(() => {
+    ;(async () => {
+      const productAssemblyMetaRs = await invoke('get_product_assembly_meta', { productPath })
+      const productAssemblyMeta = {
+        // @ts-ignore
+        parameters: mapValues(productAssemblyMetaRs.parameters, (parameterOptions) => {
           const { 'short-id': queryParamId, ...rest } = parameterOptions
           return { queryParamId, ...rest }
         }),
         // @ts-ignore
-        presets: Object.entries(productMeta.presets).map(([presetId, presetValue]) => {
+        presets: Object.entries(productAssemblyMetaRs.presets).map(([presetId, presetValue]) => {
           // @ts-ignore
           const { label, ...values } = presetValue
           return {
@@ -49,16 +71,22 @@ function useProduct(options: ProductOptions): ProductState<any> {
             values,
           }
         }),
-      } as ProductMeta<any>
-      setProductMeta(jsProductMeta)
+      }
+      setProductAssemblyMeta(productAssemblyMeta as ProductAssemblyMeta<any>)
     })()
   }, [productPath])
 
   if (productMeta == null) return { product: null }
+  if (productAssemblyMeta == null) return { product: null }
 
   return {
     product: {
       meta: productMeta,
+      assembly: {
+        ...productAssemblyMeta,
+        type: 'parameterized',
+        createParts: () => [],
+      },
     },
   }
 }

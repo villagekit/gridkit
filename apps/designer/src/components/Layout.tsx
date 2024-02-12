@@ -3,17 +3,30 @@
 import { ProductProvider } from '@/context/product'
 import { WorkspaceProvider, useWorkspaceContext } from '@/context/workspace'
 import { WorkspacesProvider, useWorkspacesContext } from '@/context/workspaces'
+import { ChakraProvider, theme } from '@villagekit/ui'
+import { useEffect } from 'react'
+import WebGL from 'three/addons/capabilities/WebGL'
 
 export interface LayoutProps {
   children: React.ReactNode
 }
 export function AppLayout({ children }: LayoutProps) {
+  useEffect(() => {
+    const isWebGLAvailable = WebGL.isWebGL2Available()
+    console.log('is web gl available', isWebGLAvailable)
+    if (!isWebGLAvailable) {
+      console.log('web gl error', WebGL.getWebGLErrorMessage())
+    }
+  }, [])
+
   return (
-    <WorkspacesLayout>
-      <WorkspaceLayout>
-        <ProductLayout>{children}</ProductLayout>
-      </WorkspaceLayout>
-    </WorkspacesLayout>
+    <ChakraProvider theme={theme}>
+      <WorkspacesLayout>
+        <WorkspaceLayout>
+          <ProductLayout>{children}</ProductLayout>
+        </WorkspaceLayout>
+      </WorkspacesLayout>
+    </ChakraProvider>
   )
 }
 

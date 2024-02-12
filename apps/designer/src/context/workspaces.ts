@@ -30,8 +30,6 @@ function useWorkspaces(): WorkspacesState {
     return workspaces.find((workspace) => workspace.path === activeWorkspacePath) || null
   }, [activeWorkspacePath, workspaces])
 
-  console.log('activeWorkspacePath', activeWorkspacePath)
-
   const addWorkspace = useCallback(
     async (workspacePath: string) => {
       if (workspaces.find((workspace) => workspace.path === workspacePath)) {
