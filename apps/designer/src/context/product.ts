@@ -1,13 +1,10 @@
-import { invoke } from '@tauri-apps/api'
 import constate from 'constate'
 import { useEffect, useState } from 'react'
 import { mapValues } from 'lodash-es'
 
 import { ParametersOptions, Presets } from '@villagekit/parameters'
-import {
-  DesignAssemblyParameterized,
-  DesignMeta,
-} from '@villagekit/design'
+import { DesignAssemblyParameterized, DesignMeta } from '@villagekit/design'
+import { client } from '@/client'
 
 export interface ProductOptions {
   productPath: string
@@ -32,11 +29,15 @@ export interface ProductState<ParamsOptions extends ParametersOptions> {
 function useProduct(options: ProductOptions): ProductState<any> {
   const { productPath } = options
 
-  const [productMeta, setProductMeta] = useState<ProductMeta | null>(null)
-  const [productAssemblyMeta, setProductAssemblyMeta] = useState<ProductAssemblyMeta<any> | null>(
-    null,
-  )
+  const productMetaQuery = client.getProductMeta.useQuery({ productPath })
+  const productMeta = productMetaQuery.isSuccess ? productMetaQuery.data : null
 
+  const productAssemblyMetaQuery = client.getProductAssemblyMeta.useQuery()
+  const productAssemblyMeta = productAssemblyMetaQuery.isSuccess
+    ? productAssemblyMetaQuery.data
+    : null
+
+  /*
   useEffect(() => {
     ;(async () => {
       const productMetaRs = await invoke('get_product_meta', { productPath })
@@ -75,20 +76,26 @@ function useProduct(options: ProductOptions): ProductState<any> {
       setProductAssemblyMeta(productAssemblyMeta as ProductAssemblyMeta<any>)
     })()
   }, [productPath])
+  */
 
   if (productMeta == null) return { product: null }
   if (productAssemblyMeta == null) return { product: null }
 
+  return { product: { meta: productMeta }, assembly: null }
+
+  /*
   return {
     product: {
       meta: productMeta,
       assembly: {
         ...productAssemblyMeta,
         type: 'parameterized',
+        parameters: {},
         createParts: () => [],
       },
     },
   }
+  */
 }
 
 export const [ProductProvider, useProductContext] = constate(useProduct)

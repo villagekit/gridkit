@@ -1,8 +1,8 @@
 import constate from 'constate'
-import { useEffect, useMemo, useState } from 'react'
-import { invoke } from '@tauri-apps/api'
+import { useMemo, useState } from 'react'
 
 import { Workspace } from './workspaces'
+import { client } from '@/client'
 
 export interface WorkspaceOptions {
   workspace: Workspace
@@ -14,7 +14,7 @@ export interface ProductIndex {
 }
 
 export interface WorkspaceState {
-  productIndexes: Array<ProductIndex>
+  productIndexes: Array<ProductIndex> | null
   activeProductIndex: ProductIndex | null
   selectProductId: (productId: string | null) => void
   // createProduct: (productId: string) => void
@@ -24,18 +24,13 @@ export interface WorkspaceState {
 function useWorkspace(options: WorkspaceOptions): WorkspaceState {
   const { workspace } = options
 
-  const [productIndexes, setProductIndexes] = useState<Array<ProductIndex>>([])
+  const productIndexesQuery = client.listProducts.useQuery({ workspacePath: workspace.path })
+  const productIndexes = productIndexesQuery.isSuccess ? productIndexesQuery.data : null
+
   const [activeProductId, selectProductId] = useState<string | null>(null)
 
-  useEffect(() => {
-    ;(async () => {
-      const { path: workspacePath } = workspace
-      const products = await invoke('list_products', { workspacePath })
-      setProductIndexes(products as Array<ProductIndex>)
-    })()
-  }, [workspace])
-
   const activeProductIndex = useMemo(() => {
+    if (productIndexes == null) return null
     if (activeProductId == null) return null
     return productIndexes.find((productIndex) => productIndex.id === activeProductId) || null
   }, [productIndexes, activeProductId])

@@ -1,62 +1,71 @@
 import constate from 'constate'
-import { useCallback, useEffect, useMemo, useState } from 'react'
-import { invoke } from '@tauri-apps/api'
+import { useCallback, useMemo, useState } from 'react'
+import { client } from '@/client'
 
 export interface Workspace {
   path: string
 }
 
 export interface WorkspacesState {
-  workspaces: Array<Workspace>
-  addWorkspace: (workspacePath: string) => Promise<void>
-  removeWorkspace: (workspacePath: string) => Promise<void>
+  workspaces: Array<Workspace> | null
+  openWorkspace: () => void
   activeWorkspace: Workspace | null
+  addWorkspace: (workspacePath: string) => void
+  removeWorkspace: (workspacePath: string) => void
   selectWorkspace: (workspacePath: string | null) => void
 }
 
 function useWorkspaces(): WorkspacesState {
-  const [workspaces, setWorkspaces] = useState<Array<Workspace>>([])
+  const queryUtils = client.useUtils()
+
+  const listWorkspacesQuery = client.listWorkspaces.useQuery()
+  const workspaces = listWorkspacesQuery.isSuccess ? listWorkspacesQuery.data : null
+
+  const openWorkspaceMutation = client.openWorkspace.useMutation({
+    onSuccess(selectedDirectory) {
+      if (typeof selectedDirectory !== 'string') return
+      addWorkspace(selectedDirectory)
+      selectWorkspace(selectedDirectory)
+    },
+  })
+  const openWorkspace = useCallback(() => {
+    openWorkspaceMutation.mutate()
+  }, [openWorkspaceMutation])
+
   const [activeWorkspacePath, selectWorkspace] = useState<string | null>(null)
-
-  useEffect(() => {
-    ;(async () => {
-      const workspaces = await invoke('list_workspaces')
-      setWorkspaces(workspaces as Array<Workspace>)
-    })()
-  }, [])
-
   const activeWorkspace = useMemo(() => {
+    if (workspaces == null) return null
     if (activeWorkspacePath == null) return null
     return workspaces.find((workspace) => workspace.path === activeWorkspacePath) || null
   }, [activeWorkspacePath, workspaces])
 
-  const addWorkspace = useCallback(
-    async (workspacePath: string) => {
-      if (workspaces.find((workspace) => workspace.path === workspacePath)) {
-        return
-      }
-
-      const newWorkspace = { path: workspacePath }
-      const nextWorkspaces = [...workspaces, newWorkspace]
-      setWorkspaces(nextWorkspaces)
-
-      await invoke('add_workspace', { workspace: newWorkspace })
+  const addWorkspaceMutation = client.addWorkspace.useMutation({
+    onSuccess() {
+      queryUtils.listWorkspaces.invalidate()
     },
-    [workspaces],
+  })
+  const addWorkspace = useCallback(
+    (workspacePath: string) => {
+      addWorkspaceMutation.mutate({ workspace: { path: workspacePath } })
+    },
+    [addWorkspaceMutation],
   )
 
-  const removeWorkspace = useCallback(
-    async (workspacePath: string) => {
-      const nextWorkspaces = workspaces.filter((workspace) => workspace.path !== workspacePath)
-      setWorkspaces(nextWorkspaces)
-
-      await invoke('remove_workspace', { workspacePath })
+  const removeWorkspaceMutation = client.removeWorkspace.useMutation({
+    onSuccess() {
+      queryUtils.listWorkspaces.invalidate()
     },
-    [workspaces],
+  })
+  const removeWorkspace = useCallback(
+    (workspacePath: string) => {
+      removeWorkspaceMutation.mutate({ workspacePath })
+    },
+    [removeWorkspaceMutation],
   )
 
   return {
     workspaces,
+    openWorkspace,
     activeWorkspace,
     selectWorkspace,
     addWorkspace,
