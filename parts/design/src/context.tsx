@@ -14,6 +14,7 @@ import React, { createContext, useContext, useEffect, useMemo, useState } from '
 import { Box3 } from 'three'
 
 import {
+  AssemblyPlugin,
   DesignInstance,
   DesignInstanceParameterized,
   DesignInstanceStatic,
@@ -139,6 +140,8 @@ export function useDesignContext(): DesignContextType {
 type UsePartsOptions = DesignInstance
 type UsePartsValue = Pick<DesignContextTypeBase, 'isLoading' | 'parts'>
 
+const noPlugins: Array<AssemblyPlugin> = []
+
 function useParts(options: UsePartsOptions): UsePartsValue {
   const partVariants = useMemo(() => getPartVariants(), [])
   const assemblyParts = useMemo(() => {
@@ -152,19 +155,11 @@ function useParts(options: UsePartsOptions): UsePartsValue {
     }
   }, [options, partVariants])
 
-  const [partCreators] = useState<Array<PartCreator>>(() =>
-    getPartCreatorsFromDesignParts(assemblyParts),
-  )
-  const [isLoading] = useState(false)
-
-  /*
-  TODO: Uncomment this. Seems to create an infinite react update loop.
-
   const [partCreators, setPartCreators] = useState<Array<PartCreator>>([])
   const [isLoading, setLoading] = useState(false)
 
   const {
-    assembly: { plugins = [] },
+    assembly: { plugins = noPlugins },
   } = options
   const generatePluginParts = useMemo(() => {
     return pDebounce((partCreators: Array<PartCreator>) => {
@@ -192,7 +187,6 @@ function useParts(options: UsePartsOptions): UsePartsValue {
       isCancelled = true
     }
   }, [assemblyParts, generatePluginParts])
-  */
 
   const partStates = useMemo(() => {
     return calculateStateForAll(partCreators)

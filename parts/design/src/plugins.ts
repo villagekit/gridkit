@@ -8,7 +8,7 @@ export interface AssemblyPlugin<PluginState = unknown> {
 }
 
 export function generatePartsForPlugins(
-  plugins: Array<AssemblyPlugin> = [],
+  plugins: Array<AssemblyPlugin>,
   partCreators: Array<PartCreator>,
 ): Promise<Array<PartCreator>> {
   const partStates = calculateStateForAll(partCreators)
