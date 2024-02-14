@@ -1,4 +1,4 @@
-'use client'
+import { Button, HStack, Heading, List, ListItem, Text, VStack } from '@villagekit/ui'
 
 import { useWorkspaceContext } from '@/context/workspace'
 import { useWorkspacesContext } from '@/context/workspaces'
@@ -12,34 +12,34 @@ export default function WorkspaceSelector() {
   }
 
   return (
-    <main>
-      <div>
-        <div>Workspace: ${activeWorkspace.path}</div>
-        <div>Products:</div>
-        <ul>
+    <VStack sx={{ maxWidth: { md: 'container.lg', base: 'full' } }}>
+      <Heading as="h2">
+        Workspace: <Text sx={{ fontSize: 'md' }}>{activeWorkspace.path}</Text>
+      </Heading>
+      <VStack>
+        <Heading as="h3">Products:</Heading>
+        <List>
           {productIndexes?.map((productIndex) => (
-            <li key={productIndex.path}>
-              <div>
-                <div>
-                  <button type="button" onClick={() => selectProductId(productIndex.id)}>
-                    {productIndex.id}
-                  </button>
-                </div>
+            <ListItem key={productIndex.path}>
+              <HStack>
+                <Button variant="toolbar" onClick={() => selectProductId(productIndex.id)}>
+                  {productIndex.id}
+                </Button>
                 {/*
                 <button type="button" onClick={() => removeproductName(productName.name)}>
                   X
                 </button>
                 */}
-              </div>
-            </li>
+              </HStack>
+            </ListItem>
           ))}
-        </ul>
+        </List>
         {/*
         <button type="button" onClick={handleCreateproductName}>
           Create new productName
         </button>
         */}
-      </div>
-    </main>
+      </VStack>
+    </VStack>
   )
 }
