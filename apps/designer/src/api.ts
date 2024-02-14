@@ -1,12 +1,12 @@
 import { initTRPC } from '@trpc/server'
 import { z } from 'zod'
 import { app, dialog } from 'electron'
-import { camelCase, deepCamelCase } from 'lodash-es'
+import { camelCase } from 'lodash-es'
 import { access, constants, mkdir, readFile, readdir, writeFile } from 'fs/promises'
 import { basename, join } from 'path'
 import { parse as parseToml, stringify as stringifyToml } from 'smol-toml'
 
-const t = initTRPC.create()
+const t = initTRPC.create({ isServer: true })
 
 const workspacePathSchema = z.string()
 

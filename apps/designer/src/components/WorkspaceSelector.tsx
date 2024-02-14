@@ -1,8 +1,7 @@
 import { useWorkspacesContext } from '@/context/workspaces'
 
 export default function WorkspaceSelector() {
-  const { workspaces, openWorkspace, addWorkspace, removeWorkspace, selectWorkspace } =
-    useWorkspacesContext()
+  const { workspaces, openWorkspace, removeWorkspace, selectWorkspace } = useWorkspacesContext()
 
   return (
     <main>

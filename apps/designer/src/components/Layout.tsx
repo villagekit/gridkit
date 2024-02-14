@@ -7,6 +7,7 @@ import { ProductProvider } from '@/context/product'
 import { WorkspaceProvider, useWorkspaceContext } from '@/context/workspace'
 import { WorkspacesProvider, useWorkspacesContext } from '@/context/workspaces'
 import { ChakraProvider, theme } from '@villagekit/ui'
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 
 export interface LayoutProps {
   children: React.ReactNode
@@ -14,17 +15,22 @@ export interface LayoutProps {
 export function AppLayout({ children }: LayoutProps) {
   return (
     <ProvidersLayout>
-      <WorkspacesLayout>
-        <WorkspaceLayout>
-          <ProductLayout>{children}</ProductLayout>
-        </WorkspaceLayout>
-      </WorkspacesLayout>
+      <ContentLayout>{children}</ContentLayout>
     </ProvidersLayout>
   )
 }
 
 export function ProvidersLayout({ children }: LayoutProps) {
-  const [queryClient] = useState(() => new QueryClient())
+  const [queryClient] = useState(
+    () =>
+      new QueryClient({
+        defaultOptions: {
+          queries: {
+            throwOnError: true,
+          },
+        },
+      }),
+  )
   const [trpcClient] = useState(() =>
     client.createClient({
       links: [ipcLink()],
@@ -34,14 +40,21 @@ export function ProvidersLayout({ children }: LayoutProps) {
   return (
     <ChakraProvider theme={theme}>
       <client.Provider client={trpcClient} queryClient={queryClient}>
-        <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+        <QueryClientProvider client={queryClient}>
+          <ReactQueryDevtools initialIsOpen />
+          {children}
+        </QueryClientProvider>
       </client.Provider>
     </ChakraProvider>
   )
 }
 
-export function WorkspacesLayout({ children }: LayoutProps) {
-  return <WorkspacesProvider>{children}</WorkspacesProvider>
+export function ContentLayout({ children }: LayoutProps) {
+  return (
+    <WorkspacesProvider>
+      <WorkspaceLayout>{children}</WorkspaceLayout>
+    </WorkspacesProvider>
+  )
 }
 
 export function WorkspaceLayout({ children }: LayoutProps) {
@@ -49,7 +62,11 @@ export function WorkspaceLayout({ children }: LayoutProps) {
 
   if (activeWorkspace == null) return children
 
-  return <WorkspaceProvider workspace={activeWorkspace}>{children}</WorkspaceProvider>
+  return (
+    <WorkspaceProvider workspace={activeWorkspace}>
+      <ProductLayout>{children}</ProductLayout>
+    </WorkspaceProvider>
+  )
 }
 
 export function ProductLayout({ children }: LayoutProps) {

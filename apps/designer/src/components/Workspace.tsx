@@ -17,7 +17,7 @@ export default function WorkspaceSelector() {
         <div>Workspace: ${activeWorkspace.path}</div>
         <div>Products:</div>
         <ul>
-          {productIndexes.map((productIndex) => (
+          {productIndexes?.map((productIndex) => (
             <li key={productIndex.path}>
               <div>
                 <div>
