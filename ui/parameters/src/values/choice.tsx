@@ -4,21 +4,24 @@ import { ChangeEvent, useCallback } from 'react'
 import { StringParam } from 'serialize-query-params'
 
 import { Label } from '../components/label'
-import { BaseOptions, BaseProps } from './base'
+import { BaseProps, baseOptionsSchema } from './base'
+import { z } from 'zod'
 
 export const ChoiceId = 'choice'
 export type ChoiceValue = string
+export const choiceValueSchema = z.string()
 export const ChoiceQueryParam = StringParam
 
-export interface ChoiceOptions extends BaseOptions {
-  type: typeof ChoiceId
-  options: Record<ChoiceValue, string>
-}
+export const choiceOptionsSchema = baseOptionsSchema.extend({
+  type: z.literal(ChoiceId),
+  options: z.record(z.string(), z.string()),
+})
+export type ChoiceOptions = z.infer<typeof choiceOptionsSchema>
 
 export type ChoiceProps = Omit<ChoiceOptions, 'type'> & BaseProps<ChoiceValue>
 
 export function Choice(props: ChoiceProps) {
-  const { id, onChange, value, label, helperText, options } = props
+  const { id, onChange, value, label, description, options } = props
 
   const handleChange = useCallback(
     (ev: ChangeEvent<HTMLSelectElement>) => {
@@ -29,7 +32,7 @@ export function Choice(props: ChoiceProps) {
 
   return (
     <FormControl id={id}>
-      <Label label={label} helperText={helperText} />
+      <Label label={label} description={description} />
 
       <SelectComponent aria-label={label} value={value} onChange={handleChange}>
         {map(options, (label, value) => (

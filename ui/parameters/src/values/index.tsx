@@ -1,20 +1,59 @@
 import { Box, VStack } from '@villagekit/ui'
-import { map } from 'lodash-es'
+import { map, mapValues } from 'lodash-es'
 import { memo, useCallback } from 'react'
 
-// biome-ignore lint/suspicious/noShadowRestrictedNames:
-import { Boolean, BooleanId, BooleanOptions, BooleanQueryParam, BooleanValue } from './boolean'
-import { Choice, ChoiceId, ChoiceOptions, ChoiceQueryParam, ChoiceValue } from './choice'
-// biome-ignore lint/suspicious/noShadowRestrictedNames:
-import { Number, NumberId, NumberOptions, NumberQueryParam, NumberValue } from './number'
+import {
+  // biome-ignore lint/suspicious/noShadowRestrictedNames:
+  Boolean,
+  BooleanId,
+  BooleanQueryParam,
+  BooleanValue,
+  booleanOptionsSchema,
+  booleanValueSchema,
+} from './boolean'
+import {
+  Choice,
+  ChoiceId,
+  ChoiceQueryParam,
+  ChoiceValue,
+  choiceOptionsSchema,
+  choiceValueSchema,
+} from './choice'
+import {
+  // biome-ignore lint/suspicious/noShadowRestrictedNames:
+  Number,
+  NumberId,
+  NumberQueryParam,
+  NumberValue,
+  numberOptionsSchema,
+  numberValueSchema,
+} from './number'
+import { z } from 'zod'
 
-export type ParameterOptions = ChoiceOptions | NumberOptions | BooleanOptions
+export const parameterOptionsSchema = z.discriminatedUnion('type', [
+  booleanOptionsSchema,
+  choiceOptionsSchema,
+  numberOptionsSchema,
+])
+export type ParameterOptions = z.infer<typeof parameterOptionsSchema>
 
 export type ParameterValuesByType = {
   [BooleanId]: BooleanValue
   [ChoiceId]: ChoiceValue
   [NumberId]: NumberValue
 }
+
+export const parameterValueSchemasByType = {
+  [BooleanId]: booleanValueSchema,
+  [ChoiceId]: choiceValueSchema,
+  [NumberId]: numberValueSchema,
+}
+
+export const parameterValueSchema = z.union([
+  booleanValueSchema,
+  choiceValueSchema,
+  numberValueSchema,
+])
 
 export const parameterQueryParamsByType = {
   [BooleanId]: BooleanQueryParam,
@@ -26,17 +65,30 @@ export type ParametersOptions = {
   [Id: string]: ParameterOptions
 }
 
+export const parametersOptionsSchema = z.record(z.string(), parameterOptionsSchema)
+
 export function ParametersOptions<ParamsOptions extends ParametersOptions>(
   parameters: ParamsOptions,
 ): ParamsOptions {
   return parameters
 }
 
-export type ExtractValueFromParameterOptions<ParamOptions extends ParameterOptions,> =
+export type ExtractValueFromParameterOptions<ParamOptions extends ParameterOptions> =
   ParameterValuesByType[ParamOptions['type']]
 
-export type ExtractValuesFromParametersOptions<ParamsOptions extends ParametersOptions,> = {
+export type ExtractValuesFromParametersOptions<ParamsOptions extends ParametersOptions> = {
   [Key in keyof ParamsOptions]: ExtractValueFromParameterOptions<ParamsOptions[Key]>
+}
+
+export function extractValueSchemaFromParameterOptions<ParamOptions extends ParameterOptions>(
+  parameter: ParamOptions,
+) {
+  return parameterValueSchemasByType[parameter.type]
+}
+export function extractValuesSchemaFromParametersOptions<ParamsOptions extends ParametersOptions>(
+  parameters: ParamsOptions,
+) {
+  return z.object(mapValues(parameters, extractValueSchemaFromParameterOptions))
 }
 
 export interface ParameterValueControlsProps<Params extends ParametersOptions> {

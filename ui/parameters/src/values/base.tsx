@@ -1,10 +1,16 @@
 import { JsonParam } from 'serialize-query-params'
+import { z } from 'zod'
 
-export interface BaseOptions {
-  queryParamId?: string
-  label: string
-  helperText?: string
-}
+export const baseOptionsSchema = z.object({
+  label: z.string(),
+  description: z.string().optional(),
+  shortId: z
+    .string()
+    .regex(/[a-zA-Z0-9-]/)
+    .optional(),
+})
+
+export type BaseOptions = z.infer<typeof baseOptionsSchema>
 
 export interface BaseProps<Value = any> extends BaseOptions {
   id: string

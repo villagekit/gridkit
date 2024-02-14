@@ -19,7 +19,7 @@ export interface Design {
 
 export interface DesignMeta {
   id: string
-  name: string
+  label: string
   description: string
   categories?: Array<DesignCategory>
 }
@@ -37,9 +37,8 @@ export interface DesignAssemblyStatic extends DesignAssemblyBase {
   parts: DesignParts
 }
 
-export interface DesignAssemblyParameterized<
-  ParamsOptions extends ParametersOptions,
-> extends DesignAssemblyBase {
+export interface DesignAssemblyParameterized<ParamsOptions extends ParametersOptions,>
+  extends DesignAssemblyBase {
   type: 'parameterized'
   parameters: ParamsOptions
   presets: Presets<ParamsOptions>
@@ -50,22 +49,16 @@ export interface DesignAssemblyParameterized<
   plugins?: Array<AssemblyPlugin>
 }
 
-export type DesignAssembly =
-  | DesignAssemblyStatic
-  | DesignAssemblyParameterized<any>
+export type DesignAssembly = DesignAssemblyStatic | DesignAssemblyParameterized<any>
 
-export function DesignAssembly(
-  assembly: Omit<DesignAssemblyStatic, 'type'>,
-): DesignAssemblyStatic {
+export function DesignAssembly(assembly: Omit<DesignAssemblyStatic, 'type'>): DesignAssemblyStatic {
   return {
     type: 'static',
     ...assembly,
   }
 }
 
-export function DesignAssemblyParameterized<
-  ParamsOptions extends ParametersOptions,
->(
+export function DesignAssemblyParameterized<ParamsOptions extends ParametersOptions,>(
   assembly: Omit<DesignAssemblyParameterized<ParamsOptions>, 'type'>,
 ): DesignAssemblyParameterized<ParamsOptions> {
   return {
@@ -80,18 +73,14 @@ export interface DesignInstanceStatic {
   assembly: DesignAssemblyStatic
 }
 
-export interface DesignInstanceParameterized<
-  ParamsOptions extends ParametersOptions,
-> {
+export interface DesignInstanceParameterized<ParamsOptions extends ParametersOptions,> {
   type: 'parameterized'
   meta: DesignMeta
   assembly: DesignAssemblyParameterized<ParamsOptions>
   parameterValues: ExtractValuesFromParametersOptions<ParamsOptions> | null
 }
 
-export type DesignInstance =
-  | DesignInstanceStatic
-  | DesignInstanceParameterized<any>
+export type DesignInstance = DesignInstanceStatic | DesignInstanceParameterized<any>
 
 /* utils */
 

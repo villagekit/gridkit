@@ -1,12 +1,33 @@
 import { FormControl, FormLabel, Select } from '@villagekit/ui'
 import { ChangeEvent, memo, useCallback } from 'react'
+import { z } from 'zod'
 
-import { ExtractValuesFromParametersOptions, ParametersOptions } from '../'
+import {
+  ExtractValuesFromParametersOptions,
+  ParametersOptions,
+  extractValuesSchemaFromParametersOptions,
+} from '../'
 
 export interface Preset<ParamsOptions extends ParametersOptions> {
   id: string
-  name: string
+  label: string
   values: ExtractValuesFromParametersOptions<ParamsOptions>
+}
+
+export function getPresetValuesSchema<ParamsOptions extends ParametersOptions>(
+  parameters: ParamsOptions,
+) {
+  return extractValuesSchemaFromParametersOptions(parameters)
+}
+
+export function getPresetSchema<ParamsOptions extends ParametersOptions>(
+  parameters: ParamsOptions,
+) {
+  return z.object({
+    id: z.string(),
+    label: z.string(),
+    values: getPresetValuesSchema(parameters),
+  })
 }
 
 export type Presets<ParamsOptions extends ParametersOptions> = [
@@ -18,6 +39,13 @@ export function Presets<ParamsOptions extends ParametersOptions>(
   presets: Presets<ParamsOptions>,
 ): Presets<ParamsOptions> {
   return presets
+}
+
+export function getPresetsSchema<ParamsOptions extends ParametersOptions>(
+  parameters: ParamsOptions,
+) {
+  const presetSchema = getPresetSchema(parameters)
+  return z.array(presetSchema).min(1)
 }
 
 export interface PresetControlsProps<ParamsOptions extends ParametersOptions> {
@@ -45,7 +73,7 @@ export const PresetControls = memo(function PresetControls<
       <Select role="menuitem" value={currentPresetId} onChange={handlePresetChange}>
         {presets.map((preset) => (
           <option key={preset.id} value={preset.id}>
-            {preset.name}
+            {preset.label}
           </option>
         ))}
 

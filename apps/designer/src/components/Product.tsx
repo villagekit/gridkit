@@ -1,6 +1,7 @@
 'use client'
 
 import { DesignWrapper } from '@villagekit/design'
+import React from 'react'
 
 import { useProductContext } from '@/context/product'
 import { Sandbox } from '@villagekit/sandbox'
@@ -16,10 +17,12 @@ export default function Product() {
     <DesignWrapper design={product}>
       <main>
         <div>
-          <div>Product: {product.meta.name}</div>
+          <div>Product: {product.meta.label}</div>
           <div>Product: {JSON.stringify(product, null, 2)}</div>
           <div>
-            <Sandbox />
+            <React.Suspense>
+              <Sandbox />
+            </React.Suspense>
           </div>
         </div>
       </main>

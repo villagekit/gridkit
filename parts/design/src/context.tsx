@@ -152,6 +152,14 @@ function useParts(options: UsePartsOptions): UsePartsValue {
     }
   }, [options, partVariants])
 
+  const [partCreators] = useState<Array<PartCreator>>(() =>
+    getPartCreatorsFromDesignParts(assemblyParts),
+  )
+  const [isLoading] = useState(false)
+
+  /*
+  TODO: Uncomment this. Seems to create an infinite react update loop.
+
   const [partCreators, setPartCreators] = useState<Array<PartCreator>>([])
   const [isLoading, setLoading] = useState(false)
 
@@ -184,6 +192,7 @@ function useParts(options: UsePartsOptions): UsePartsValue {
       isCancelled = true
     }
   }, [assemblyParts, generatePluginParts])
+  */
 
   const partStates = useMemo(() => {
     return calculateStateForAll(partCreators)

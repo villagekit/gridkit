@@ -80,7 +80,7 @@ function SandboxWithAssemblyProvider(props: Omit<SandboxProps, 'model'>) {
     <Box
       id="sandbox-container"
       role="img"
-      aria-label={meta.name}
+      aria-label={meta.label}
       ref={containerRef}
       sx={{
         ':hover, :focus-within': {

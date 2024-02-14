@@ -123,7 +123,7 @@ function useParameters<ParamsOptions extends ParametersOptions>(
         const parameter = parameters[parameterKey]
         if (parameter === undefined) throw new Error('parameter is undefined')
 
-        sofar[parameter.queryParamId || parameterKey] = queryParamConfigForParameter(
+        sofar[parameter.shortId || parameterKey] = queryParamConfigForParameter(
           parameterKey,
           parameter,
         )
@@ -146,7 +146,7 @@ function useParameters<ParamsOptions extends ParametersOptions>(
           const parameter = parameters[parameterKey]
           if (parameter === undefined) throw new Error('parameter is undefined')
 
-          sofar[parameter.queryParamId || parameterKey] = values[parameterKey]
+          sofar[parameter.shortId || parameterKey] = values[parameterKey]
           return sofar
         },
         {},
@@ -162,7 +162,7 @@ function useParameters<ParamsOptions extends ParametersOptions>(
           const parameter = parameters[parameterKey]
           if (parameter === undefined) throw new Error('parameter is undefined')
 
-          sofar[parameterKey] = values[parameter.queryParamId || parameterKey]
+          sofar[parameterKey] = values[parameter.shortId || parameterKey]
           return sofar
         },
         {},

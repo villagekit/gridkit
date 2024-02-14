@@ -4,12 +4,12 @@ import { HelperTooltip } from './helper-tooltip'
 
 interface LabelProps {
   label: string
-  helperText?: string
+  description?: string
   htmlFor?: string
 }
 
 export function Label(props: LabelProps) {
-  const { label, helperText, htmlFor } = props
+  const { label, description, htmlFor } = props
 
   return (
     <>
@@ -18,7 +18,7 @@ export function Label(props: LabelProps) {
           {label}
         </FormLabel>
 
-        {helperText != null && <HelperTooltip label={helperText} />}
+        {description != null && <HelperTooltip label={description} />}
       </HStack>
     </>
   )

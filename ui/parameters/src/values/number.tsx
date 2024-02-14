@@ -12,24 +12,27 @@ import { NumberParam } from 'serialize-query-params'
 
 import { Label } from '../components/label'
 import { useParameterControlsInternalContext } from '../internal-context'
-import { BaseOptions, BaseProps } from './base'
+import { BaseProps, baseOptionsSchema } from './base'
+import { z } from 'zod'
 
 export const NumberId = 'number'
 export type NumberValue = number
+export const numberValueSchema = z.number()
 export const NumberQueryParam = NumberParam
 
-export interface NumberOptions extends BaseOptions {
-  type: typeof NumberId
-  min: NumberValue
-  max: NumberValue
-  step?: NumberValue
-}
+export const numberOptionsSchema = baseOptionsSchema.extend({
+  type: z.literal(NumberId),
+  min: z.number(),
+  max: z.number(),
+  step: z.number().optional(),
+})
+export type NumberOptions = z.infer<typeof numberOptionsSchema>
 
 export type NumberProps = Omit<NumberOptions, 'type'> & BaseProps<NumberValue>
 
 // biome-ignore lint/suspicious/noShadowRestrictedNames:
 export function Number(props: NumberProps) {
-  const { id, onChange, value, label, helperText, min, max, step = 1 } = props
+  const { id, onChange, value, label, description, min, max, step = 1 } = props
 
   const { onPointerEnterTooltip, onPointerLeaveTooltip, showTooltip } = useMobileFriendlyTooltip()
 
@@ -37,7 +40,7 @@ export function Number(props: NumberProps) {
 
   return (
     <FormControl id={id} role="group">
-      <Label label={label} helperText={helperText} />
+      <Label label={label} description={description} />
 
       <SliderComponent
         aria-label={label}

@@ -1,10 +1,17 @@
 import { initTRPC } from '@trpc/server'
 import { z } from 'zod'
 import { app, dialog } from 'electron'
-import { camelCase } from 'lodash-es'
+import { camelCase, kebabCase } from 'lodash-es'
 import { access, constants, mkdir, readFile, readdir, writeFile } from 'fs/promises'
 import { basename, join } from 'path'
 import { parse as parseToml, stringify as stringifyToml } from 'smol-toml'
+import {
+  ParametersOptions,
+  Presets,
+  getPresetsSchema,
+  parameterValueSchema,
+  parametersOptionsSchema,
+} from '@villagekit/parameters'
 
 const t = initTRPC.create({ isServer: true })
 
@@ -30,7 +37,7 @@ const productIndexSchema = z.object({
   id: productIdSchema,
 })
 
-const productTypeSchema = z.enum(['Assembly'])
+const productTypeSchema = z.enum(['assembly'])
 const productMetaSchema = z.object({
   id: productIdSchema,
   label: z.string(),
@@ -40,6 +47,29 @@ const productMetaSchema = z.object({
 const productMetaFileSchema = z.object({
   product: productMetaSchema,
 })
+
+const productAssemblyMetaFileSchema = z.object({
+  parameters: parametersOptionsSchema,
+  presets: z.record(
+    z.intersection(
+      z.object({
+        label: z.string(),
+      }),
+      z.record(parameterValueSchema),
+    ),
+  ),
+})
+
+function getProductAssemblyPresetsSchema<ParamsOptions extends ParametersOptions>(
+  parameters: ParamsOptions,
+) {
+  return getPresetsSchema(parameters)
+}
+
+type ProductAssemblyMeta<ParamsOptions extends ParametersOptions> = {
+  parameters: ParamsOptions
+  presets: Presets<ParamsOptions>
+}
 
 export const router = t.router({
   listWorkspaces: t.procedure.query(async function listWorkspaces(): Promise<
@@ -85,7 +115,7 @@ export const router = t.router({
       for (const productPath of dirEntries) {
         const productId = basename(productPath)
         products.push({
-          path: productPath,
+          path: join(workspacePath, productPath),
           id: productId,
         })
       }
@@ -96,13 +126,36 @@ export const router = t.router({
     .query(async function getProductMeta(opts) {
       const { productPath } = opts.input
       const productMetaPath = join(productPath, 'meta.toml')
-      const productMetaString = await readFile(productMetaPath, 'utf8')
-      const productMetaData = mapKeysDeep(parseToml(productMetaString), camelCase)
+      const productMetaData = await readTomlFile(productMetaPath)
       const productMetaFile = await productMetaFileSchema.parseAsync(productMetaData)
       return productMetaFile.product
     }),
 
-  getProductAssemblyMeta: t.procedure.query(() => null),
+  getProductAssemblyMeta: t.procedure
+    .input(z.object({ productPath: productPathSchema }))
+    .query(async function getProductAssemblyMeta(opts) {
+      const { productPath } = opts.input
+      const productAssemblyMetaPath = join(productPath, 'assembly.toml')
+      const productAssemblyMetaData = await readTomlFile(productAssemblyMetaPath)
+      const productAssemblyMetaFile =
+        await productAssemblyMetaFileSchema.parseAsync(productAssemblyMetaData)
+      const { parameters, presets: presetsObject } = productAssemblyMetaFile
+      const presetsData = Object.entries(presetsObject).map(([presetId, preset]) => {
+        const { label, ...values } = preset
+        return {
+          id: presetId,
+          label,
+          values,
+        }
+      })
+      const presetsSchema = getProductAssemblyPresetsSchema(parameters)
+      const presets = await presetsSchema.parseAsync(presetsData)
+      const productAssemblyMeta = {
+        parameters,
+        presets,
+      } as ProductAssemblyMeta<any>
+      return productAssemblyMeta
+    }),
 })
 
 export type Router = typeof router
@@ -125,8 +178,7 @@ async function loadAppConfig(): Promise<AppConfig> {
   )
 
   if (appConfigExists) {
-    const appConfigString = await readFile(appConfigPath, 'utf8')
-    const appConfigData = parseToml(appConfigString)
+    const appConfigData = await readTomlFile(appConfigPath)
     const appConfig = await appConfigSchema.parseAsync(appConfigData)
     return appConfig
   } else {
@@ -136,94 +188,24 @@ async function loadAppConfig(): Promise<AppConfig> {
 
 async function saveAppConfig(appConfig: AppConfig) {
   const appConfigPath = await getAppConfigPath()
-  const appConfigString = stringifyToml(appConfig)
-  await writeFile(appConfigPath, appConfigString, 'utf8')
+  return await writeTomlFile(appConfigPath, appConfig)
 }
 
-/*
-
-#[derive(Debug, Clone, PartialEq, PartialOrd, Serialize, Deserialize)]
-#[serde(tag = "type", rename_all = "kebab-case")]
-enum ProductParameterOptions {
-    #[serde(rename_all = "kebab-case")]
-    Boolean {
-        label: String,
-        #[serde(default)]
-        description: Option<String>,
-        #[serde(default)]
-        short_id: Option<String>,
-    },
-    #[serde(rename_all = "kebab-case")]
-    Number {
-        label: String,
-        #[serde(default)]
-        description: Option<String>,
-        #[serde(default)]
-        short_id: Option<String>,
-        #[serde(default)]
-        min: Option<f64>,
-        #[serde(default)]
-        max: Option<f64>,
-        #[serde(default)]
-        step: Option<f64>,
-    },
-    #[serde(rename_all = "kebab-case")]
-    Choice {
-        label: String,
-        #[serde(default)]
-        description: Option<String>,
-        #[serde(default)]
-        short_id: Option<String>,
-        options: BTreeMap<String, String>,
-    },
+async function readTomlFile(filePath: string) {
+  const fileString = await readFile(filePath, 'utf8')
+  const fileDataKebab = parseToml(fileString)
+  const fileDataCamel = mapKeysDeep(fileDataKebab, camelCase)
+  return fileDataCamel
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
-struct ProductParameterId(String);
-
-#[derive(Debug, Clone, PartialEq, PartialOrd, Serialize, Deserialize)]
-struct ProductParameters(BTreeMap<ProductParameterId, ProductParameterOptions>);
-
-#[derive(Debug, Clone, PartialEq, PartialOrd, Serialize, Deserialize)]
-#[serde(untagged)]
-enum ProductParameterValue {
-    Number(f64),
-    Boolean(bool),
-    Choice(String),
+async function writeTomlFile(
+  filePath: string,
+  fileDataCamel: Record<string | number | symbol, unknown>,
+) {
+  const fileDataKebab = mapKeysDeep(fileDataCamel, kebabCase)
+  const fileString = stringifyToml(fileDataKebab)
+  await writeFile(filePath, fileString, 'utf8')
 }
-
-#[derive(Debug, Clone, PartialEq, PartialOrd, Serialize, Deserialize)]
-struct ProductParameterValues(BTreeMap<String, ProductParameterValue>);
-
-#[derive(Debug, Clone, PartialEq, PartialOrd, Serialize, Deserialize)]
-struct ProductPresetValue {
-    label: String,
-    #[serde(flatten)]
-    values: ProductParameterValues,
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
-struct ProductPresetId(String);
-
-#[derive(Debug, Clone, PartialEq, PartialOrd, Serialize, Deserialize)]
-struct ProductPresets(BTreeMap<ProductPresetId, ProductPresetValue>);
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-struct ProductAssemblyMeta {
-    parameters: ProductParameters,
-    presets: ProductPresets,
-}
-
-#[tauri::command]
-async fn get_product_assembly_meta(product_path: PathBuf) -> Result<ProductAssemblyMeta> {
-    let product_assembly_meta_path = product_path.join("assembly.toml");
-    let product_assembly_meta_string =
-        tokio::fs::read_to_string(product_assembly_meta_path).await?;
-    let product_assembly_meta: ProductAssemblyMeta =
-        toml::from_str(&product_assembly_meta_string).map_err(Error::ParseToml)?;
-    Ok(product_assembly_meta)
-}
-*/
 
 /**
  * https://stackoverflow.com/questions/38304401/javascript-check-if-dictionary/71975382#71975382
