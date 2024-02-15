@@ -36,7 +36,7 @@ export function WorkspaceLayout(props: WorkspaceLayoutProps) {
   return (
     <Resplit.Root direction="horizontal" asChild>
       <Flex sx={{ flexDirection: 'row', width: '100%' }}>
-        <Resplit.Pane order={0} initialSize="0.2fr" asChild>
+        <Resplit.Pane order={0} initialSize="0.15fr" asChild>
           <VStack sx={{ paddingY: 4 }}>
             <Tooltip label={activeWorkspace.path}>
               <Box>
@@ -81,7 +81,7 @@ export function WorkspaceLayout(props: WorkspaceLayoutProps) {
         <Resplit.Splitter order={1} size="16px" asChild>
           <Box sx={{ backgroundColor: 'gray.100' }} />
         </Resplit.Splitter>
-        <Resplit.Pane order={2} initialSize="0.8fr" asChild>
+        <Resplit.Pane order={2} initialSize="0.85fr" asChild>
           <VStack as="main" sx={{ flex: 1 }}>
             {children}
           </VStack>
