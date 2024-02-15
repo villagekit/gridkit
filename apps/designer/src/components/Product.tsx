@@ -1,31 +1,45 @@
-'use client'
-
 import { DesignWrapper } from '@villagekit/design'
 import React from 'react'
+import { AssemblyInfo, Sandbox } from '@villagekit/sandbox'
+import { Box, Flex, Heading, VStack } from '@villagekit/ui'
+import { Resplit } from 'react-resplit'
 
+import { Loading } from './Loading'
 import { useProductContext } from '@/context/product'
-import { Sandbox } from '@villagekit/sandbox'
+import { ParameterControls } from '@villagekit/parameters'
 
 export default function Product() {
   const { product } = useProductContext()
 
   if (product == null) {
-    return <main>Loading</main>
+    return <Loading />
   }
 
   return (
     <DesignWrapper design={product}>
-      <main>
-        <div>
-          <div>Product: {product.meta.label}</div>
-          <div>Product: {JSON.stringify(product, null, 2)}</div>
-          <div>
-            <React.Suspense>
-              <Sandbox />
-            </React.Suspense>
-          </div>
-        </div>
-      </main>
+      <Resplit.Root direction="vertical" asChild>
+        <Flex sx={{ flexDirection: 'column', width: '100%', height: '100%' }}>
+          <Resplit.Pane order={0} initialSize="0.8fr" minSize="0.4fr" asChild>
+            <VStack sx={{ padding: 3 }}>
+              <Heading as="h2">{product.meta.label}</Heading>
+              <Box sx={{ flexGrow: 1, minHeight: 0, width: '100%' }}>
+                <React.Suspense fallback={<Loading />}>
+                  <Sandbox showParameterControls />
+                </React.Suspense>
+              </Box>
+            </VStack>
+          </Resplit.Pane>
+          <Resplit.Splitter order={1} size="16px" asChild>
+            <Box sx={{ backgroundColor: 'gray.100' }} />
+          </Resplit.Splitter>
+          <Resplit.Pane order={2} initialSize="0.2fr" minSize="0.1fr">
+            <VStack spacing={8} sx={{ height: '100%', padding: 3, overflowY: 'auto' }}>
+              <ParameterControls />
+              <AssemblyInfo />
+            </VStack>
+          </Resplit.Pane>
+        </Flex>
+      </Resplit.Root>
     </DesignWrapper>
   )
 }

@@ -2,4 +2,6 @@
 id = "chair"
 label = "Chair"
 description = ""
+
 type = "assembly"
+main = "./assembly"
