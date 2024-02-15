@@ -1,11 +1,9 @@
-import './index.css'
-
-import * as React from 'react'
+import React from 'react'
 import { createRoot } from 'react-dom/client'
 
 import { AppLayout } from '@/components/Layout'
 import WorkspaceSelector from '@/components/WorkspaceSelector'
-import Workspace from '@/components/Workspace'
+import { WorkspaceLayout } from '@/components/WorkspaceLayout'
 import Product from '@/components/Product'
 import { useWorkspacesContext } from '@/context/workspaces'
 import { useWorkspaceContext } from '@/context/workspace'
@@ -36,8 +34,12 @@ function WorkspacePage() {
   const { activeProductIndex } = useWorkspaceContext()
 
   if (activeProductIndex == null) {
-    return <Workspace />
+    return null
   }
 
-  return <Product />
+  return (
+    <WorkspaceLayout>
+      <Product />
+    </WorkspaceLayout>
+  )
 }

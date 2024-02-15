@@ -1,7 +1,8 @@
-import { app, BrowserWindow, ipcMain } from 'electron'
+import { app, BrowserWindow } from 'electron'
 import { join } from 'path'
-import { createIPCHandler, ELECTRON_TRPC_CHANNEL } from 'electron-trpc/main'
+import { createIPCHandler } from 'electron-trpc/main'
 import { router } from '@/api'
+import installExtension, { REACT_DEVELOPER_TOOLS } from 'electron-devtools-installer'
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require('electron-squirrel-startup')) {
@@ -28,7 +29,15 @@ const createWindow = () => {
   }
 
   // Open the DevTools.
-  mainWindow.webContents.openDevTools()
+  if (process.env.NODE_ENV === 'development') {
+    mainWindow.webContents.openDevTools()
+
+    app.whenReady().then(() => {
+      installExtension(REACT_DEVELOPER_TOOLS)
+        .then((name) => console.log(`Added extension:  ${name}`))
+        .catch((err) => console.log('Failed to install extension: ', err))
+    })
+  }
 }
 
 // This method will be called when Electron has finished

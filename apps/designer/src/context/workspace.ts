@@ -1,5 +1,5 @@
 import constate from 'constate'
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 
 import { Workspace } from './workspaces'
 import { client } from '@/client'
@@ -28,6 +28,12 @@ function useWorkspace(options: WorkspaceOptions): WorkspaceState {
   const productIndexes = productIndexesQuery.isSuccess ? productIndexesQuery.data : null
 
   const [activeProductId, selectProductId] = useState<string | null>(null)
+
+  useEffect(() => {
+    if (activeProductId == null && productIndexes?.[0] != null) {
+      selectProductId(productIndexes[0].id)
+    }
+  }, [productIndexes, activeProductId])
 
   const activeProductIndex = useMemo(() => {
     if (productIndexes == null) return null

@@ -1,13 +1,14 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { useState } from 'react'
 import { ipcLink } from 'electron-trpc/renderer'
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
+import { ChakraProvider, Flex } from '@villagekit/ui'
 
 import { client } from '@/client'
+import { theme } from '@/theme'
 import { ProductProvider } from '@/context/product'
 import { WorkspaceProvider, useWorkspaceContext } from '@/context/workspace'
 import { WorkspacesProvider, useWorkspacesContext } from '@/context/workspaces'
-import { ChakraProvider, theme } from '@villagekit/ui'
-import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 
 export interface LayoutProps {
   children: React.ReactNode
@@ -15,7 +16,9 @@ export interface LayoutProps {
 export function AppLayout({ children }: LayoutProps) {
   return (
     <ProvidersLayout>
-      <ContentLayout>{children}</ContentLayout>
+      <ContextLayout>
+        <ContentLayout>{children}</ContentLayout>
+      </ContextLayout>
     </ProvidersLayout>
   )
 }
@@ -26,7 +29,7 @@ export function ProvidersLayout({ children }: LayoutProps) {
       new QueryClient({
         defaultOptions: {
           queries: {
-            throwOnError: true,
+            useErrorBoundary: process.env.NODE_ENV === 'development',
           },
         },
       }),
@@ -41,7 +44,7 @@ export function ProvidersLayout({ children }: LayoutProps) {
     <ChakraProvider theme={theme}>
       <client.Provider client={trpcClient} queryClient={queryClient}>
         <QueryClientProvider client={queryClient}>
-          <ReactQueryDevtools initialIsOpen />
+          <ReactQueryDevtools />
           {children}
         </QueryClientProvider>
       </client.Provider>
@@ -49,7 +52,7 @@ export function ProvidersLayout({ children }: LayoutProps) {
   )
 }
 
-export function ContentLayout({ children }: LayoutProps) {
+function ContextLayout({ children }: LayoutProps) {
   return (
     <WorkspacesProvider>
       <WorkspaceLayout>{children}</WorkspaceLayout>
@@ -57,7 +60,7 @@ export function ContentLayout({ children }: LayoutProps) {
   )
 }
 
-export function WorkspaceLayout({ children }: LayoutProps) {
+function WorkspaceLayout({ children }: LayoutProps) {
   const { activeWorkspace } = useWorkspacesContext()
 
   if (activeWorkspace == null) return children
@@ -69,10 +72,22 @@ export function WorkspaceLayout({ children }: LayoutProps) {
   )
 }
 
-export function ProductLayout({ children }: LayoutProps) {
+function ProductLayout({ children }: LayoutProps) {
   const { activeProductIndex } = useWorkspaceContext()
 
   if (activeProductIndex == null) return children
 
   return <ProductProvider productPath={activeProductIndex.path}>{children}</ProductProvider>
+}
+
+function ContentLayout({ children }: LayoutProps) {
+  return (
+    <>
+      <Flex
+        sx={{ flexDirection: 'row', justifyContent: 'center', minHeight: '100dvh', width: '100%' }}
+      >
+        {children}
+      </Flex>
+    </>
+  )
 }
