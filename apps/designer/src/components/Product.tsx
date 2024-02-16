@@ -7,6 +7,7 @@ import { Resplit } from 'react-resplit'
 import { Loading } from './Loading'
 import { useProductContext } from '@/context/product'
 import { ParameterControls } from '@villagekit/parameters'
+import { ProductEditor } from './editor/ProductEditor'
 
 export default function Product() {
   const { product } = useProductContext()
@@ -32,10 +33,6 @@ export default function Product() {
       </Resplit.Root>
     </DesignWrapper>
   )
-}
-
-function ProductEditor() {
-  return <Box>Edit!</Box>
 }
 
 function ProductViewer() {
