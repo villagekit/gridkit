@@ -68,6 +68,16 @@ interface ProductAssemblyRenderOptions {
 function useProductAssemblyTypeScript(
   _options: ProductAssemblyRenderOptions,
 ): ProductAssemblyRenderState {
+  /*
+  const [quickjs, setQuickJs] = useState<QuickJSWASMModule | null>(null)
+
+  useEffect(() => {
+    ;(async () => {
+      setQuickJs(await getQuickJS())
+    })()
+  }, [])
+  */
+
   return {
     type: 'static',
     parts: [],
@@ -76,7 +86,7 @@ function useProductAssemblyTypeScript(
 
 // export helpers
 
-function NullProductAssemblyContext(props: ContextProviderProps) {
+function NullProductAssemblyProvider(props: ContextProviderProps) {
   const { children } = props
   return (
     <ProductAssemblyFileContext.Provider value={null}>
@@ -87,7 +97,7 @@ function NullProductAssemblyContext(props: ContextProviderProps) {
   )
 }
 
-function NullProductAssemblyRenderContext(props: ContextProviderProps) {
+function NullProductAssemblyRenderProvider(props: ContextProviderProps) {
   const { children } = props
   return (
     <ProductAssemblyRenderContext.Provider value={null}>
@@ -96,14 +106,14 @@ function NullProductAssemblyRenderContext(props: ContextProviderProps) {
   )
 }
 
-export function ProductContextProvider(props: ProductOptions & ContextProviderProps) {
+export function ProductProvider(props: ProductOptions & ContextProviderProps) {
   const { children, ...options } = props
   const meta = useProductMeta(options)
 
   if (meta == null)
     return (
       <ProductMetaContext.Provider value={null}>
-        <NullProductAssemblyContext>{children}</NullProductAssemblyContext>
+        <NullProductAssemblyProvider>{children}</NullProductAssemblyProvider>
       </ProductMetaContext.Provider>
     )
 
@@ -112,28 +122,26 @@ export function ProductContextProvider(props: ProductOptions & ContextProviderPr
   return (
     <ProductMetaContext.Provider value={meta}>
       {type === 'assembly' ? (
-        <ProductAssemblyContextProvider productAssemblyPath={entry}>
-          {children}
-        </ProductAssemblyContextProvider>
+        <ProductAssemblyProvider productAssemblyPath={entry}>{children}</ProductAssemblyProvider>
       ) : (
-        <NullProductAssemblyContext>{children}</NullProductAssemblyContext>
+        <NullProductAssemblyProvider>{children}</NullProductAssemblyProvider>
       )}
     </ProductMetaContext.Provider>
   )
 }
 
-function ProductAssemblyContextProvider(props: ProductAssemblyOptions & ContextProviderProps) {
+function ProductAssemblyProvider(props: ProductAssemblyOptions & ContextProviderProps) {
   const { children, ...options } = props
 
   const file = useProductAssemblyFile(options)
   const { type, data } = file
 
-  let inner = <NullProductAssemblyRenderContext>{children}</NullProductAssemblyRenderContext>
+  let inner = <NullProductAssemblyRenderProvider>{children}</NullProductAssemblyRenderProvider>
   if (data != null && type === 'typescript') {
     inner = (
-      <ProductAssemblyTypeScriptContextProvider productAssemblyData={data}>
+      <ProductAssemblyTypeScriptProvider productAssemblyData={data}>
         {children}
-      </ProductAssemblyTypeScriptContextProvider>
+      </ProductAssemblyTypeScriptProvider>
     )
   }
 
@@ -142,7 +150,7 @@ function ProductAssemblyContextProvider(props: ProductAssemblyOptions & ContextP
   )
 }
 
-function ProductAssemblyTypeScriptContextProvider(
+function ProductAssemblyTypeScriptProvider(
   props: ProductAssemblyRenderOptions & ContextProviderProps,
 ) {
   const { children, ...options } = props

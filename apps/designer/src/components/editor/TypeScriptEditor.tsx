@@ -15,7 +15,14 @@ import { autocompletion } from '@codemirror/autocomplete'
 // @ts-ignore
 import typesDts from './types.d.ts?raw'
 
-export function TypeScriptEditor() {
+interface TypeScriptEditorProps {
+  data: string
+  setData: (data: string) => void
+}
+
+export function TypeScriptEditor(props: TypeScriptEditorProps) {
+  const { data, setData } = props
+
   const [fsMap, setFsMap] = useState<Map<string, string> | null>(null)
   useEffect(() => {
     ;(async () => {
@@ -50,40 +57,7 @@ export function TypeScriptEditor() {
     if (env == null) return
     setEditor(
       new EditorView({
-        doc: `import { DesignAssemblyParameterized, DesignParts } from '@villagekit/design'
-
-const assembly = DesignAssemblyParameterized({
-  parameters: {
-    height: {
-      label: 'Height',
-      type: 'number',
-      min: 0,
-      max: 100,
-      step: 5,
-    }
-  },
-  presets: [
-    {
-      id: 'default',
-      label: 'Default',
-      values: {
-        height: 10
-      }
-    }
-  ],
-  createParts(parameters) {
-    const { height } = parameters
-    const parts: DesignParts = [
-      {
-        type: 'gridbeam:z',
-        x: 0,
-        y: 0,
-        z: [0, height],
-      }
-    ]
-    return parts
-  }
-})`,
+        doc: data,
         extensions: [
           basicSetup,
           javascript({
@@ -101,7 +75,7 @@ const assembly = DesignAssemblyParameterized({
         parent: elementRef.current,
       }),
     )
-  }, [env])
+  }, [env, data])
 
   return <Box ref={elementRef} />
 }

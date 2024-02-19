@@ -17,6 +17,10 @@ export interface ParameterControlsProps {
 export function ParameterControls(props: ParameterControlsProps) {
   const { containerRef } = props
 
+  const context = useParameterControlsContext()
+
+  if (context == null) return null
+
   const {
     parameters,
     presets,
@@ -26,7 +30,7 @@ export function ParameterControls(props: ParameterControlsProps) {
     handleSetShowControls,
     handlePresetChange,
     handleCustomValuesChange,
-  } = useParameterControlsContext()
+  } = context
 
   return (
     <ParameterControlsInternalContextProvider containerRef={containerRef}>

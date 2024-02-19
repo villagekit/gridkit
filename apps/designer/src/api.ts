@@ -105,7 +105,13 @@ export const router = t.router({
       const productMetaPath = join(productPath, 'meta.toml')
       const productMetaData = await readTomlFile(productMetaPath)
       const productMetaFile = await productMetaFileSchema.parseAsync(productMetaData)
-      return productMetaFile.product
+      const { entry, ...rest } = productMetaFile.product
+      const productMeta = {
+        ...rest,
+        entry: join(productPath, entry),
+      }
+      console.log('product meta', productMeta)
+      return productMeta
     }),
 
   getProductAssembly: t.procedure
