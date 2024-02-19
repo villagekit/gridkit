@@ -50,7 +50,7 @@ export function TypeScriptEditor() {
     if (env == null) return
     setEditor(
       new EditorView({
-        doc: `import { DesignAssemblyParameterized } from '@villagekit/design'
+        doc: `import { DesignAssemblyParameterized, DesignParts } from '@villagekit/design'
 
 const assembly = DesignAssemblyParameterized({
   parameters: {
@@ -73,7 +73,7 @@ const assembly = DesignAssemblyParameterized({
   ],
   createParts(parameters) {
     const { height } = parameters
-    return [
+    const parts: DesignParts = [
       {
         type: 'gridbeam:z',
         x: 0,
@@ -81,9 +81,9 @@ const assembly = DesignAssemblyParameterized({
         z: [0, height],
       }
     ]
+    return parts
   }
-})
-`,
+})`,
         extensions: [
           basicSetup,
           javascript({

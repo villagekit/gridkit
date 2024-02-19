@@ -1,9 +1,19 @@
 import constate from 'constate'
 
-import { ParametersOptions, Presets } from '@villagekit/parameters'
-import { DesignAssemblyParameterized, DesignMeta } from '@villagekit/design'
-import { client } from '@/client'
-import { useMemo } from 'react'
+import { QuickJSWASMModule, getQuickJS } from 'quickjs-emscripten'
+import { useEffect, useState } from 'react'
+
+function useEval() {
+  const [quickjs, setQuickJs] = useState<QuickJSWASMModule | null>(null)
+
+  useEffect(() => {
+    ;(async () => {
+      setQuickJs(await getQuickJS())
+    })()
+  }, [])
+
+  const vm = 
+}
 
 export interface ProductOptions {
   productPath: string

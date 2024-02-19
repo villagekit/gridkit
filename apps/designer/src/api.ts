@@ -5,17 +5,12 @@ import { camelCase, kebabCase } from 'lodash-es'
 import { access, constants, mkdir, readFile, readdir, writeFile } from 'fs/promises'
 import { basename, join } from 'path'
 import { parse as parseToml, stringify as stringifyToml } from 'smol-toml'
-import {
-  ParametersOptions,
-  Presets,
-  getPresetsSchema,
-  parameterValueSchema,
-  parametersOptionsSchema,
-} from '@villagekit/parameters'
 
 const t = initTRPC.create({ isServer: true })
 
-const workspacePathSchema = z.string()
+const pathSchema = z.string()
+
+const workspacePathSchema = pathSchema
 
 const workspaceConfigSchema = z.object({
   path: workspacePathSchema,
@@ -29,8 +24,9 @@ const appConfigSchema = z.object({
 
 type AppConfig = z.infer<typeof appConfigSchema>
 
-const productPathSchema = z.string()
+const productPathSchema = pathSchema
 const productIdSchema = z.string()
+const productEntrySchema = pathSchema
 
 const productIndexSchema = z.object({
   path: productPathSchema,
@@ -43,33 +39,14 @@ const productMetaSchema = z.object({
   label: z.string(),
   description: z.string(),
   type: productTypeSchema,
+  entry: pathSchema,
 })
+
+export type ProductMeta = z.infer<typeof productMetaSchema>
+
 const productMetaFileSchema = z.object({
   product: productMetaSchema,
 })
-
-const productAssemblyMetaFileSchema = z.object({
-  parameters: parametersOptionsSchema,
-  presets: z.record(
-    z.intersection(
-      z.object({
-        label: z.string(),
-      }),
-      z.record(parameterValueSchema),
-    ),
-  ),
-})
-
-function getProductAssemblyPresetsSchema<ParamsOptions extends ParametersOptions>(
-  parameters: ParamsOptions,
-) {
-  return getPresetsSchema(parameters)
-}
-
-type ProductAssemblyMeta<ParamsOptions extends ParametersOptions> = {
-  parameters: ParamsOptions
-  presets: Presets<ParamsOptions>
-}
 
 export const router = t.router({
   listWorkspaces: t.procedure.query(async function listWorkspaces(): Promise<
@@ -131,30 +108,12 @@ export const router = t.router({
       return productMetaFile.product
     }),
 
-  getProductAssemblyMeta: t.procedure
-    .input(z.object({ productPath: productPathSchema }))
+  getProductAssembly: t.procedure
+    .input(z.object({ productAssemblyPath: productEntrySchema }))
     .query(async function getProductAssemblyMeta(opts) {
-      const { productPath } = opts.input
-      const productAssemblyMetaPath = join(productPath, 'assembly.toml')
-      const productAssemblyMetaData = await readTomlFile(productAssemblyMetaPath)
-      const productAssemblyMetaFile =
-        await productAssemblyMetaFileSchema.parseAsync(productAssemblyMetaData)
-      const { parameters, presets: presetsObject } = productAssemblyMetaFile
-      const presetsData = Object.entries(presetsObject).map(([presetId, preset]) => {
-        const { label, ...values } = preset
-        return {
-          id: presetId,
-          label,
-          values,
-        }
-      })
-      const presetsSchema = getProductAssemblyPresetsSchema(parameters)
-      const presets = await presetsSchema.parseAsync(presetsData)
-      const productAssemblyMeta = {
-        parameters,
-        presets,
-      } as ProductAssemblyMeta<any>
-      return productAssemblyMeta
+      const { productAssemblyPath } = opts.input
+      const productAssemblyData = await readFile(productAssemblyPath, 'utf-8')
+      return productAssemblyData
     }),
 })
 
