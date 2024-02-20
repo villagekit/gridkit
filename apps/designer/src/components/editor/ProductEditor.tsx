@@ -10,10 +10,10 @@ export function ProductEditor(_props: ProductEditorProps) {
   const { assembly } = product
   if (assembly == null) throw new Error('Missing product assembly context')
   const { file } = assembly
-  const { type: fileType, data, setData } = file
+  const { type: fileType } = file
 
   if (fileType === 'typescript') {
-    return <TypeScriptEditor data={data} setData={setData} />
+    return <TypeScriptEditor productType="assembly" />
   }
 
   throw new Error(`Unexpected product assembly file type: ${fileType}`)

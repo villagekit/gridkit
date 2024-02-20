@@ -8,13 +8,34 @@ import ts from 'typescript'
 import { useEffect, useMemo, useState } from 'react'
 import { javascript } from '@codemirror/lang-javascript'
 import { autocompletion } from '@codemirror/autocomplete'
+import {
+  newQuickJSWASMModuleFromVariant,
+  newVariant as newQuickVariant,
+  RELEASE_SYNC as QUICK_RELEASE_SYNC,
+  QuickJSWASMModule,
+} from 'quickjs-emscripten'
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-expect-error - ?url returns a URL resolving to the given asset.
+import wasmLocation from '@jitl/quickjs-wasmfile-release-sync/wasm?url'
+import initSwc, { transformSync } from '@swc/wasm-web'
+
+import type { ProductType } from '@/api'
+import { useEditorContext } from '@/context/editor'
 
 // @ts-ignore
 import typesDts from './types.d.ts?raw'
 
 import { BaseEditor } from './BaseEditor'
 
-export function TypeScriptEditor() {
+const quickWasmVariant = newQuickVariant(QUICK_RELEASE_SYNC, {
+  wasmLocation,
+})
+
+interface TypeScriptEditorProps {
+  productType: ProductType
+}
+
+export function TypeScriptEditor(props: TypeScriptEditorProps) {
   const [fsMap, setFsMap] = useState<Map<string, string> | null>(null)
   useEffect(() => {
     ;(async () => {
@@ -60,6 +81,26 @@ export function TypeScriptEditor() {
           ],
     [env],
   )
+
+  const [quickJs, setQuickJs] = useState<QuickJSWASMModule | null>(null)
+  useEffect(() => {
+    newQuickJSWASMModuleFromVariant(quickWasmVariant).then(setQuickJs)
+  }, [])
+
+  const [isSwcInitialized, setSwcInitialized] = useState(false)
+  useEffect(() => {
+    initSwc().then(() => setSwcInitialized(true))
+  }, [])
+
+  const { code: tsCode } = useEditorContext()
+
+  useEffect(() => {
+    if (quickJs == null) return
+    if (!isSwcInitialized) return
+    const vm = quickJs.newContext()
+    const jsCode = transformSync(tsCode, {})
+    console.log('js', jsCode)
+  }, [isSwcInitialized, tsCode])
 
   if (env == null) return null
 

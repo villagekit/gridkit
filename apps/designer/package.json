@@ -40,6 +40,8 @@
     "@codemirror/state": "^6.4.1",
     "@codemirror/view": "^6.24.0",
     "@electron-forge/shared-types": "^7.2.0",
+    "@jitl/quickjs-wasmfile-release-sync": "^0.29.0",
+    "@swc/wasm-web": "^1.4.2",
     "@tanstack/react-query": "^4",
     "@tanstack/react-query-devtools": "^4",
     "@trpc/client": "^10",

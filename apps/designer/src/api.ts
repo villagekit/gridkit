@@ -34,6 +34,8 @@ const productIndexSchema = z.object({
 })
 
 const productTypeSchema = z.enum(['assembly'])
+export type ProductType = z.infer<typeof productTypeSchema>
+
 const productMetaSchema = z.object({
   id: productIdSchema,
   label: z.string(),

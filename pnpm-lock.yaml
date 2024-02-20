@@ -76,6 +76,12 @@ importers:
       '@electron-forge/shared-types':
         specifier: ^7.2.0
         version: 7.2.0
+      '@jitl/quickjs-wasmfile-release-sync':
+        specifier: ^0.29.0
+        version: 0.29.0
+      '@swc/wasm-web':
+        specifier: ^1.4.2
+        version: 1.4.2
       '@tanstack/react-query':
         specifier: ^4
         version: 4.36.1(react-dom@18.2.0)(react@18.2.0)
@@ -4757,6 +4763,10 @@ packages:
     resolution: {integrity: sha512-OzEGuyeJuOzIbdMkFiLrTuKrvSAzksp+N1yfBrTimnApb/il6nH/UeontqLeEFm++iH9xWqYNFuwVZ/R0GeNEg==}
     dev: false
 
+  /@jitl/quickjs-ffi-types@0.29.0:
+    resolution: {integrity: sha512-MJgGUq4gQ6UuzEMFMNJuSsfKJrQs5cjqm/Sd0dwqVKs3lxyLeWjfGfbVakffnjuiRZzej/QzkDJP4HYNMzT8AQ==}
+    dev: false
+
   /@jitl/quickjs-wasmfile-debug-asyncify@0.28.0:
     resolution: {integrity: sha512-8CtMcr1BTCJZR4NaokUNsRVyJewHRk6iu6WfvGoK+iz4cRVot0U2QmI0dQekjKHkKEUn58YFQ2dxPqYYOfEKgA==}
     dependencies:
@@ -4779,6 +4789,12 @@ packages:
     resolution: {integrity: sha512-gsPVQj7PNs2h+f7M8KTPxVsvxHTh8QoYSGRqTcIbr9NSKLG6k1h5Aaj5TEcVOGuqxgVXz0vI6Z4BCWZZGSVm5w==}
     dependencies:
       '@jitl/quickjs-ffi-types': 0.28.0
+    dev: false
+
+  /@jitl/quickjs-wasmfile-release-sync@0.29.0:
+    resolution: {integrity: sha512-Lo2+wwir9+dSmlDz5zcilUeMPUtV5dAaWjm6b0vC9BXhMhDYPeQiIvbvMYqaRlfwod/y+wvJXX1QweO8rhHbJg==}
+    dependencies:
+      '@jitl/quickjs-ffi-types': 0.29.0
     dev: false
 
   /@joshwooding/vite-plugin-react-docgen-typescript@0.3.0(typescript@5.2.2)(vite@5.0.2):
@@ -6711,6 +6727,10 @@ packages:
   /@swc/types@0.1.5:
     resolution: {integrity: sha512-myfUej5naTBWnqOCc/MdVOLVjXUXtIA+NpDrDBKJtLLg2shUjBu3cZmB/85RyitKc55+lUUyl7oRfLOvkr2hsw==}
     dev: true
+
+  /@swc/wasm-web@1.4.2:
+    resolution: {integrity: sha512-v1g8zs6anbeZKjAv3oFkCA/E+OSaJftAVTgBT7tvmI+nUrIaTucShcIuQuDcbE2yXQPb3aEs3s9bakr7xqJq9A==}
+    dev: false
 
   /@szmarczak/http-timer@4.0.6:
     resolution: {integrity: sha512-4BAffykYOgO+5nzBWYwE3W90sBgLJoUPRWWcL8wlyiM8IB8ipJz3UMJ9KXQd1RKQXpKp8Tutn80HZtWsu2u76w==}
