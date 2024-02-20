@@ -1,8 +1,10 @@
 import { DesignAssembly } from '@villagekit/design'
-import { createContext, useContext } from 'react'
+import { createContext, useContext, useEffect } from 'react'
 
 import { client } from '@/client'
 import type { ProductMeta } from '@/api'
+
+import { useEditorContext } from './editor'
 
 type ContextProviderProps = {
   children: React.ReactNode
@@ -37,7 +39,6 @@ type ProductAssemblyState = {
 interface ProductAssemblyFileState {
   type: 'typescript' | 'unknown'
   data: string | null
-  setData: (data: string) => void
 }
 
 const ProductAssemblyFileContext = createContext<ProductAssemblyFileState | null>(null)
@@ -50,10 +51,15 @@ function useProductAssemblyFile(options: ProductAssemblyOptions): ProductAssembl
   const productAssemblyQuery = client.getProductAssembly.useQuery({ productAssemblyPath })
   const productAssemblyData = productAssemblyQuery.isSuccess ? productAssemblyQuery.data : null
 
+  const { setCodeToLoad } = useEditorContext()
+
+  useEffect(() => {
+    setCodeToLoad(productAssemblyData)
+  }, [setCodeToLoad, productAssemblyData])
+
   return {
     type: productAssemblyType,
     data: productAssemblyData,
-    setData: () => {},
   }
 }
 

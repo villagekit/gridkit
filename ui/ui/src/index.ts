@@ -83,6 +83,9 @@ export {
   useCallbackRef,
   useMergeRefs,
   useSafeLayoutEffect,
+  useColorMode,
+  useColorModeValue,
+  useColorModePreference,
 } from '@chakra-ui/react'
 
 export type { HeadingProps } from './components/Heading.js'

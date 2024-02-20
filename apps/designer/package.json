@@ -33,9 +33,11 @@
     "typescript": "^5"
   },
   "dependencies": {
+    "@catppuccin/palette": "^0.2.0",
     "@codemirror/autocomplete": "^6.12.0",
     "@codemirror/lang-javascript": "^6.2.1",
     "@codemirror/lint": "^6.5.0",
+    "@codemirror/state": "^6.4.1",
     "@codemirror/view": "^6.24.0",
     "@electron-forge/shared-types": "^7.2.0",
     "@tanstack/react-query": "^4",
@@ -55,6 +57,7 @@
     "@villagekit/util-math": "workspace:^",
     "add": "^2.0.6",
     "codemirror": "^6.0.1",
+    "codemirror-theme-catppuccin": "^0.3.0",
     "constate": "^3.3.2",
     "electron-squirrel-startup": "^1.0.0",
     "electron-trpc": "^0.5.2",

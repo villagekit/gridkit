@@ -9,6 +9,7 @@ import { theme } from '@/theme'
 import { ProductProvider } from '@/context/product'
 import { WorkspaceProvider, useWorkspaceContext } from '@/context/workspace'
 import { WorkspacesProvider, useWorkspacesContext } from '@/context/workspaces'
+import { EditorProvider } from '@/context/editor'
 
 export interface LayoutProps {
   children: React.ReactNode
@@ -77,7 +78,11 @@ function ProductLayout({ children }: LayoutProps) {
 
   if (activeProductIndex == null) return children
 
-  return <ProductProvider productPath={activeProductIndex.path}>{children}</ProductProvider>
+  return (
+    <EditorProvider>
+      <ProductProvider productPath={activeProductIndex.path}>{children}</ProductProvider>
+    </EditorProvider>
+  )
 }
 
 function ContentLayout({ children }: LayoutProps) {
