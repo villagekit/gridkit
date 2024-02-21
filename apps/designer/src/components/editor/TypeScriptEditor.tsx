@@ -12,7 +12,9 @@ import {
   newQuickJSWASMModuleFromVariant,
   newVariant as newQuickVariant,
   RELEASE_SYNC as QUICK_RELEASE_SYNC,
+  QuickJSRuntime,
   QuickJSWASMModule,
+  Scope,
 } from 'quickjs-emscripten'
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-expect-error - ?url returns a URL resolving to the given asset.
@@ -82,10 +84,31 @@ export function TypeScriptEditor(props: TypeScriptEditorProps) {
     [env],
   )
 
-  const [quickJs, setQuickJs] = useState<QuickJSWASMModule | null>(null)
+  const [_quickJs, setQuickJs] = useState<QuickJSWASMModule | null>(null)
+  const [quickJsRuntime, setQuickJsRuntime] = useState<QuickJSRuntime | null>(null)
   useEffect(() => {
-    newQuickJSWASMModuleFromVariant(quickWasmVariant).then(setQuickJs)
+    ;(async () => {
+      const newQuickJs = await newQuickJSWASMModuleFromVariant(quickWasmVariant)
+      setQuickJs(newQuickJs)
+
+      const newQuickJsRuntime = newQuickJs.newRuntime()
+      newQuickJsRuntime.setModuleLoader((moduleName) => {
+        console.log('load module', moduleName)
+        switch (moduleName) {
+          case '@villagekit/design':
+            return `
+  export const DesignAssemblyParameterized = (design) => ({
+    type: 'parameterized',
+    ...design
+  })
+            `
+        }
+        throw new Error(`Unexpected module : ${moduleName}`)
+      })
+      setQuickJsRuntime(newQuickJsRuntime)
+    })()
   }, [])
+  useEffect(() => () => quickJsRuntime?.dispose(), [quickJsRuntime])
 
   const [isSwcInitialized, setSwcInitialized] = useState(false)
   useEffect(() => {
@@ -95,12 +118,18 @@ export function TypeScriptEditor(props: TypeScriptEditorProps) {
   const { code: tsCode } = useEditorContext()
 
   useEffect(() => {
-    if (quickJs == null) return
+    if (quickJsRuntime == null) return
     if (!isSwcInitialized) return
-    const vm = quickJs.newContext()
-    const jsCode = transformSync(tsCode, {})
-    console.log('js', jsCode)
-  }, [isSwcInitialized, tsCode])
+
+    const { code: jsCode } = transformSync(tsCode, {})
+
+    Scope.withScope((scope) => {
+      const vm = scope.manage(quickJsRuntime.newContext())
+      const codeResult = vm.evalCode(jsCode, 'index.js', { type: 'module' })
+      const moduleExports = scope.manage(vm.unwrapResult(codeResult))
+      console.log('exports', vm.dump(moduleExports))
+    })
+  }, [quickJsRuntime, isSwcInitialized, tsCode])
 
   if (env == null) return null
 
