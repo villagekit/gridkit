@@ -112,7 +112,6 @@ export const router = t.router({
         ...rest,
         entry: join(productPath, entry),
       }
-      console.log('product meta', productMeta)
       return productMeta
     }),
 

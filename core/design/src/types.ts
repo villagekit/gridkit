@@ -2,85 +2,31 @@ import {
   ExtractValuesFromParametersOptions,
   ParametersOptions,
   Presets,
-  getPresetsSchema,
-  parametersOptionsSchema,
 } from '@villagekit/parameters'
-import { PartCreator, PartVariantsByType, partSchema } from '@villagekit/part'
+import { PartCreator, PartVariantsByType } from '@villagekit/part'
+import { z } from 'zod'
 
-// import { AssemblyPlugin } from './plugins'
-import { ZodSchema, z } from 'zod'
-import { AssemblyPlugin } from '.'
+import { AssemblyPlugin } from './plugins'
+import { designCategorySchema, designMetaSchema } from './schema'
 
 export type DesignPart = WithOptionalId<PartCreator>
 export type DesignParts = RecursiveArray<DesignPart | false | undefined | null>
 
-export const designCategorySchema = z.enum(['seating', 'tables', 'storage', 'office'])
 export type DesignCategory = z.infer<typeof designCategorySchema>
 
-export const designMetaSchema = z.object({
-  id: z.string().min(1),
-  label: z.string().min(1),
-  description: z.string().min(1),
-  categories: z.array(designCategorySchema).optional(),
-})
 export type DesignMeta = z.infer<typeof designMetaSchema>
 
 export function DesignMeta(designMeta: DesignMeta): DesignMeta {
   return designMeta
 }
 
-export const designPartSchema = z.intersection(
-  partSchema,
-  z.object({
-    id: z.string().optional(),
-  }),
-)
-
-const designPartsSchema: z.ZodType<RecursiveArray<z.infer<typeof designPartSchema>>> = z.lazy(
-  () => {
-    return z.array(z.union([designPartSchema, designPartsSchema]))
-  },
-)
-
 export interface DesignAssemblyBase {
   plugins?: Array<AssemblyPlugin>
 }
 
-export const designAssemblyStaticSchema = z.object({
-  type: z.literal('static'),
-  parts: designPartsSchema,
-})
 export interface DesignAssemblyStatic extends DesignAssemblyBase {
   type: 'static'
   parts: DesignParts
-}
-
-export const designAssemblyParameterizedSchema = (presetsSchema: ZodSchema) =>
-  z.object({
-    type: z.literal('parameterized'),
-    parameters: parametersOptionsSchema,
-    presets: presetsSchema,
-    createParts: z.function(),
-  })
-
-// TODO: fix
-// @ts-ignore
-export function designAssemblySafeParse(assembly: { type: 'parameterized' | 'static' }) {
-  if (assembly.type === 'static') {
-    return designAssemblyStaticSchema.safeParse(assembly)
-  } else if (assembly.type === 'parameterized') {
-    const assemblyResult = designAssemblyParameterizedSchema(z.array(z.unknown())).safeParse(
-      assembly,
-    )
-    if (assemblyResult.success) {
-      const { parameters } = assemblyResult.data
-      // TODO: fix
-      // @ts-ignore
-      return designAssemblyParameterizedSchema(getPresetsSchema(parameters)).safeParse(assembly)
-    } else {
-      return assemblyResult
-    }
-  }
 }
 
 export interface DesignAssemblyParameterized<ParamsOptions extends ParametersOptions>

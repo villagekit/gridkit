@@ -1,4 +1,4 @@
-import { DesignAssembly, designAssemblySafeParse, designAssemblySchema } from '@villagekit/design'
+import { DesignAssembly, designAssemblySafeParse } from '@villagekit/design'
 import { createContext, useContext, useEffect, useState } from 'react'
 import initSwc, { transformSync } from '@swc/wasm-web'
 
