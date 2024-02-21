@@ -96,7 +96,14 @@ function useProductAssemblyTypeScript(
   useEffect(() => {
     if (!isSwcInitialized) return
 
-    const { code: jsCode } = transformSync(tsCode, {})
+    let jsCode
+    try {
+      const tsTransformOutput = transformSync(tsCode, {})
+      jsCode = tsTransformOutput.code
+    } catch (error) {
+      setAssemblyRender({ type: 'error', error })
+      return
+    }
     ;(async () => {
       const jsCodeWithoutImports = jsCode.replace(
         /import (.*) from [\"\']@villagekit\/design[\"\']/,
@@ -114,10 +121,20 @@ function useProductAssemblyTypeScript(
         ${jsCodeWithoutImports}
       `
 
-      const jsModuleUrl = URL.createObjectURL(new Blob([jsModuleCode], { type: 'text/javascript' }))
-      const jsModule = await import(/* @vite-ignore */ jsModuleUrl)
+      let jsModule
+      try {
+        const jsModuleUrl = URL.createObjectURL(
+          new Blob([jsModuleCode], { type: 'text/javascript' }),
+        )
+        jsModule = await import(/* @vite-ignore */ jsModuleUrl)
+        URL.revokeObjectURL(jsModuleUrl)
+      } catch (error) {
+        setAssemblyRender({ type: 'error', error })
+        return
+      }
 
       // validate module
+      if (jsModule.assembly == null) return
       const assemblyResult = designAssemblySafeParse(jsModule.assembly)
 
       if (assemblyResult == null) return

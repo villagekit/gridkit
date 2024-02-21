@@ -54,10 +54,12 @@ function ProductAssemblyViewer() {
 
   if (render == null) return <Loading />
   if (render.type === 'error') {
+    const error = render.error
+    const errorString = typeof error === 'string' ? error : error.message
     return (
       <Box>
         <code>
-          <pre>{JSON.stringify(render.error, null, 2)}</pre>
+          <pre>{errorString}</pre>
         </code>
       </Box>
     )
