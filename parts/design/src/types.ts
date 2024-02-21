@@ -3,7 +3,7 @@ import {
   ParametersOptions,
   Presets,
   getPresetsSchema,
-  parameterOptionsSchema,
+  parametersOptionsSchema,
 } from '@villagekit/parameters'
 import { PartCreator, PartVariantsByType, partSchema } from '@villagekit/part'
 
@@ -58,7 +58,7 @@ export interface DesignAssemblyStatic extends DesignAssemblyBase {
 export const designAssemblyParameterizedSchema = (presetsSchema: ZodSchema) =>
   z.object({
     type: z.literal('parameterized'),
-    parameters: parameterOptionsSchema,
+    parameters: parametersOptionsSchema,
     presets: presetsSchema,
     createParts: z.function(),
   })
