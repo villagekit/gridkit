@@ -1,3 +1,6 @@
+import '@villagekit/part-gridbeam'
+import '@villagekit/part-gridpanel'
+
 import { DesignWrapper } from '@villagekit/design'
 import React from 'react'
 import { AssemblyInfo, Sandbox } from '@villagekit/sandbox'

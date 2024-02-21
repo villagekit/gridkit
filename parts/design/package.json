@@ -27,8 +27,9 @@
     "@types/three": "^0.150.1",
     "@villagekit/parameters": "workspace:*",
     "@villagekit/part": "workspace:*",
+    "lodash-es": "^4.17.21",
     "p-debounce": "^4.0.0",
-    "lodash-es": "^4.17.21"
+    "zod": "^3.22.4"
   },
   "peerDependencies": {
     "react": "18.2.0",

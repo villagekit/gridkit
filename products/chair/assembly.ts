@@ -42,7 +42,7 @@ export const assembly = DesignAssemblyParameterized({
   presets: [
     {
       id: 'regular-with-back',
-      name: 'Regular With Back',
+      label: 'Regular With Back',
       values: {
         backHeight: 10,
         seatDepth: 10,
@@ -53,7 +53,7 @@ export const assembly = DesignAssemblyParameterized({
     },
     {
       id: 'regular',
-      name: 'Regular (Without Back)',
+      label: 'Regular (Without Back)',
       values: {
         backHeight: 10,
         seatDepth: 10,

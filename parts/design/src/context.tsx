@@ -18,6 +18,7 @@ import {
   DesignInstance,
   DesignInstanceParameterized,
   DesignInstanceStatic,
+  DesignParts,
   generatePartsForPlugins,
   getPartCreatorsFromDesignParts,
 } from './'
@@ -144,13 +145,22 @@ const noPlugins: Array<AssemblyPlugin> = []
 
 function useParts(options: UsePartsOptions): UsePartsValue {
   const partVariants = useMemo(() => getPartVariants(), [])
-  const assemblyParts = useMemo(() => {
+
+  const [assemblyParts, setAssemblyParts] = useState<DesignParts>([])
+  useEffect(() => {
     switch (options.type) {
       case 'static':
-        return options.assembly.parts
+        setAssemblyParts(options.assembly.parts)
+        break
       case 'parameterized': {
         const parameterValues = options.parameterValues != null ? options.parameterValues : []
-        return options.assembly.createParts(parameterValues, partVariants)
+        const parts = options.assembly.createParts(parameterValues, partVariants)
+        if (parts instanceof Promise) {
+          parts.then(setAssemblyParts)
+        } else {
+          setAssemblyParts(parts)
+        }
+        break
       }
     }
   }, [options, partVariants])
