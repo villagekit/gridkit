@@ -2,42 +2,88 @@ import {
   ExtractValuesFromParametersOptions,
   ParametersOptions,
   Presets,
+  getPresetsSchema,
+  parameterOptionsSchema,
 } from '@villagekit/parameters'
-import { PartCreator, PartVariantsByType } from '@villagekit/part'
+import { PartCreator, PartVariantsByType, partSchema } from '@villagekit/part'
 
-import { AssemblyPlugin } from './plugins'
+// import { AssemblyPlugin } from './plugins'
+import { ZodSchema, z } from 'zod'
+import { AssemblyPlugin } from '.'
 
 export type DesignPart = WithOptionalId<PartCreator>
 export type DesignParts = RecursiveArray<DesignPart | false | undefined | null>
 
-export type DesignCategory = 'seating' | 'tables' | 'storage' | 'office'
+export const designCategorySchema = z.enum(['seating', 'tables', 'storage', 'office'])
+export type DesignCategory = z.infer<typeof designCategorySchema>
 
-export interface Design {
-  meta: DesignMeta
-  assembly: DesignAssembly
-}
-
-export interface DesignMeta {
-  id: string
-  label: string
-  description: string
-  categories?: Array<DesignCategory>
-}
+export const designMetaSchema = z.object({
+  id: z.string().min(1),
+  label: z.string().min(1),
+  description: z.string().min(1),
+  categories: z.array(designCategorySchema).optional(),
+})
+export type DesignMeta = z.infer<typeof designMetaSchema>
 
 export function DesignMeta(designMeta: DesignMeta): DesignMeta {
   return designMeta
 }
 
+export const designPartSchema = z.intersection(
+  partSchema,
+  z.object({
+    id: z.string().optional(),
+  }),
+)
+
+const designPartsSchema: z.ZodType<RecursiveArray<z.infer<typeof designPartSchema>>> = z.lazy(
+  () => {
+    return z.array(z.union([designPartSchema, designPartsSchema]))
+  },
+)
+
 export interface DesignAssemblyBase {
   plugins?: Array<AssemblyPlugin>
 }
 
+export const designAssemblyStaticSchema = z.object({
+  type: z.literal('static'),
+  parts: designPartsSchema,
+})
 export interface DesignAssemblyStatic extends DesignAssemblyBase {
   type: 'static'
   parts: DesignParts
 }
 
-export interface DesignAssemblyParameterized<ParamsOptions extends ParametersOptions,>
+export const designAssemblyParameterizedSchema = (presetsSchema: ZodSchema) =>
+  z.object({
+    type: z.literal('parameterized'),
+    parameters: parameterOptionsSchema,
+    presets: presetsSchema,
+    createParts: z.function(),
+  })
+
+// TODO: fix
+// @ts-ignore
+export function designAssemblySafeParse(assembly: { type: 'parameterized' | 'static' }) {
+  if (assembly.type === 'static') {
+    return designAssemblyStaticSchema.safeParse(assembly)
+  } else if (assembly.type === 'parameterized') {
+    const assemblyResult = designAssemblyParameterizedSchema(z.array(z.unknown())).safeParse(
+      assembly,
+    )
+    if (assemblyResult.success) {
+      const { parameters } = assemblyResult.data
+      // TODO: fix
+      // @ts-ignore
+      return designAssemblyParameterizedSchema(getPresetsSchema(parameters)).safeParse(assembly)
+    } else {
+      return assemblyResult
+    }
+  }
+}
+
+export interface DesignAssemblyParameterized<ParamsOptions extends ParametersOptions>
   extends DesignAssemblyBase {
   type: 'parameterized'
   parameters: ParamsOptions
@@ -46,7 +92,6 @@ export interface DesignAssemblyParameterized<ParamsOptions extends ParametersOpt
     parameters: ExtractValuesFromParametersOptions<ParamsOptions>,
     partVariants: PartVariantsByType,
   ) => DesignParts
-  plugins?: Array<AssemblyPlugin>
 }
 
 export type DesignAssembly = DesignAssemblyStatic | DesignAssemblyParameterized<any>
@@ -81,6 +126,11 @@ export interface DesignInstanceParameterized<ParamsOptions extends ParametersOpt
 }
 
 export type DesignInstance = DesignInstanceStatic | DesignInstanceParameterized<any>
+
+export type Design = {
+  meta: DesignMeta
+  assembly: DesignAssembly
+}
 
 /* utils */
 

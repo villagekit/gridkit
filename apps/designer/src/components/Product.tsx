@@ -52,9 +52,20 @@ function ProductAssemblyViewer() {
   if (assembly == null) return <Loading />
   const { render } = assembly
 
+  if (render == null) return <Loading />
+  if (render.type === 'error') {
+    return (
+      <Box>
+        <code>
+          <pre>{JSON.stringify(render.error, null, 2)}</pre>
+        </code>
+      </Box>
+    )
+  }
+
   const design = {
     meta,
-    assembly: render != null ? render : { type: 'static' as const, parts: [] },
+    assembly: render.assembly,
   }
 
   return (

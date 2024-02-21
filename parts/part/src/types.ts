@@ -2,11 +2,14 @@ import { BasePartSummaryValue, PartsGlProps, PartsSummaryProps } from '@villagek
 import { AxisId, Location } from '@villagekit/util-math'
 import { ReactElement } from 'react'
 import { Box3 } from 'three'
-import { $Values } from 'utility-types'
+import { ZodDiscriminatedUnionOption } from 'zod'
 
 declare global {
   // eslint-disable-next-line @typescript-eslint/no-namespace
   namespace VK {
+    export interface EveryPartTypeId {
+      noop: 'noop'
+    }
     export interface EveryPartCreator {
       noop: { type: 'noop'; id: string }
     }
@@ -25,6 +28,10 @@ declare global {
   }
 }
 
+// https://github.com/piotrwitek/utility-types/blob/master/src/utility-types.ts
+type $Values<T extends object> = T[keyof T]
+
+export type PartTypeId = $Values<VK.EveryPartTypeId>
 export type PartCreator = $Values<VK.EveryPartCreator>
 export type PartState = $Values<VK.EveryPartState>
 export type PartGlValue = $Values<VK.EveryPartGlValue>
@@ -61,7 +68,7 @@ export type PartsSummary<SummaryValue extends BasePartSummaryValue> = (
 ) => ReactElement | null
 
 export interface PartModule<
-  Id extends PartState['type'],
+  Id extends PartTypeId,
   Creator extends PartCreator,
   State extends PartState,
   GlValue,
@@ -83,10 +90,11 @@ export interface PartModule<
     calculateFasteningPoints: CalculatePartFasteningPoints<State>
     calculateNumFastenersToFasten: CalculateNumFastenersToFasten<State>
   }
+  schemas: Array<ZodDiscriminatedUnionOption<'type'>>
 }
 
 export type PartModulesByType = {
-  [PT in PartState['type']]: PartModule<
+  [PT in PartTypeId]: PartModule<
     PT,
     VK.EveryPartCreator[PT],
     VK.EveryPartState[PT],
@@ -97,5 +105,5 @@ export type PartModulesByType = {
 }
 
 export type PartVariantsByType = {
-  [PT in PartState['type']]: VK.EveryPartVariants[PT]
+  [PT in PartTypeId]: VK.EveryPartVariants[PT]
 }

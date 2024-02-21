@@ -33,11 +33,7 @@ export function DesignWrapper(props: DesignWrapperProps) {
       )
     case 'parameterized':
       return (
-        <DesignParameterized
-          meta={meta}
-          assembly={assembly}
-          onLocationUpdate={onLocationUpdate}
-        >
+        <DesignParameterized meta={meta} assembly={assembly} onLocationUpdate={onLocationUpdate}>
           {children}
         </DesignParameterized>
       )
@@ -65,8 +61,7 @@ interface DesignParameterizedProps extends DesignHandlerProps {
 function DesignParameterized(props: DesignParameterizedProps) {
   const { meta, assembly, children, onLocationUpdate } = props
 
-  const { parameterValues, handleParamValuesChange } =
-    useAssemblyParameters(assembly)
+  const { parameterValues, handleParamValuesChange } = useAssemblyParameters(assembly)
 
   return (
     <DesignContextProviderParameterized
@@ -96,14 +91,9 @@ function useAssemblyParameters<ParamsOptions extends ParametersOptions>(
   ) => void
 } {
   const [parameterValues, setParameterValues] =
-    useState<ExtractValuesFromParametersOptions<ParamsOptions> | null>(
-      assembly.presets[0].values,
-    )
+    useState<ExtractValuesFromParametersOptions<ParamsOptions> | null>(assembly.presets[0].values)
   const handleParamValuesChange = useCallback(
-    (
-      _presetId: string,
-      values: ExtractValuesFromParametersOptions<ParamsOptions> | null,
-    ) => {
+    (_presetId: string, values: ExtractValuesFromParametersOptions<ParamsOptions> | null) => {
       setParameterValues(values)
     },
     [],

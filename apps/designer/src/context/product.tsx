@@ -1,4 +1,4 @@
-import { DesignAssembly } from '@villagekit/design'
+import { DesignAssembly, designAssemblySafeParse, designAssemblySchema } from '@villagekit/design'
 import { createContext, useContext, useEffect, useState } from 'react'
 import initSwc, { transformSync } from '@swc/wasm-web'
 
@@ -71,7 +71,7 @@ type ProductAssemblyRenderState =
     }
   | {
       type: 'error'
-      error: string
+      error: any
     }
   | null
 
@@ -117,11 +117,17 @@ function useProductAssemblyTypeScript(
       const jsModuleUrl = URL.createObjectURL(new Blob([jsModuleCode], { type: 'text/javascript' }))
       const jsModule = await import(/* @vite-ignore */ jsModuleUrl)
 
-      assemblySchema
-
       // validate module
-      const assembly = jsModule.assembly
-      setAssemblyRender({ type: 'assembly', assembly })
+      const assemblyResult = designAssemblySafeParse(jsModule.assembly)
+
+      if (assemblyResult == null) return
+      if (assemblyResult.success) {
+        // TODO: fix
+        // @ts-ignore
+        setAssemblyRender({ type: 'assembly', assembly: assemblyResult.data })
+      } else {
+        setAssemblyRender({ type: 'error', error: assemblyResult.error })
+      }
     })()
   }, [isSwcInitialized, tsCode])
 
