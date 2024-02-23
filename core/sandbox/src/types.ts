@@ -28,7 +28,8 @@ export type DesignRender<ParamsOptions extends ParametersOptions = never> =
 
 export type DesignInstance<ParamsOptions extends ParametersOptions = never> = {
   file: DesignFile
-  render: DesignRender<ParametersOptions>
+  render: DesignRender<ParametersOptions> | null
+  renderError: string | Error | null
   parameterValues: ParamsOptions extends never
     ? null
     : ExtractValuesFromParametersOptions<ParamsOptions>
