@@ -1,15 +1,33 @@
 import { useProductContext } from '@/context/product'
+import { EditorProvider, useEditorContext } from '@/context/editor'
 
 import { TypeScriptEditor } from './TypeScriptEditor'
+import { useEffect } from 'react'
 
 interface ProductEditorProps {}
 
 export function ProductEditor(_props: ProductEditorProps) {
-  const context = useProductContext()
+  return (
+    <EditorProvider>
+      <EditorWithContext />
+    </EditorProvider>
+  )
+}
 
-  if (context == null) return null
+function EditorWithContext() {
+  const productContext = useProductContext()
+  const editorContext = useEditorContext()
 
-  const { type, language } = context.file
+  useEffect(() => {
+    const code = productContext?.file?.code
+    const setCodeToLoad = editorContext?.setCodeToLoad
+    if (code == null || setCodeToLoad == null) return
+    setCodeToLoad(code)
+  }, [productContext?.file?.code, editorContext?.setCodeToLoad])
+
+  if (productContext == null) return null
+
+  const { type, language } = productContext.file
 
   if (language === 'typescript') {
     return <TypeScriptEditor productType={type} />

@@ -45,34 +45,47 @@ function ProductAssembly() {
 }
 
 function ProductAssemblyViewer() {
-  const product = useProductContext()
-  if (product == null) return <Loading />
+  return (
+    <Resplit.Root direction="vertical" asChild>
+      <Flex sx={{ flexDirection: 'column', width: '100%', height: '100%' }}>
+        <Resplit.Pane order={0} initialSize="0.8fr" minSize="0.4fr" asChild>
+          <VStack sx={{ padding: 3, minWidth: 0 }}>
+            <ProductAssemblyTitle />
+            <Box sx={{ flexGrow: 1, minHeight: 0, width: '100%' }}>
+              <ProductAssemblyGl />
+            </Box>
+          </VStack>
+        </Resplit.Pane>
+        <Resplit.Splitter order={1} size="16px" asChild>
+          <Box sx={{ backgroundColor: 'gray.100' }} />
+        </Resplit.Splitter>
+        <Resplit.Pane order={2} initialSize="0.2fr" minSize="0.1fr">
+          <VStack spacing={8} sx={{ height: '100%', padding: 3, overflowY: 'auto' }}>
+            <ProductAssemblyDetails />
+          </VStack>
+        </Resplit.Pane>
+      </Flex>
+    </Resplit.Root>
+  )
+}
+
+function ProductAssemblyGl() {
+  const context = useSandboxContext()
+
+  if (context == null) return <Loading />
+
+  const { renderError } = context
+  if (renderError != null)
+    return (
+      <Box as="code">
+        <Box as="pre">{renderError instanceof Error ? renderError.message : renderError}</Box>
+      </Box>
+    )
 
   return (
-    <SandboxProvider file={product.file}>
-      <Resplit.Root direction="vertical" asChild>
-        <Flex sx={{ flexDirection: 'column', width: '100%', height: '100%' }}>
-          <Resplit.Pane order={0} initialSize="0.8fr" minSize="0.4fr" asChild>
-            <VStack sx={{ padding: 3, minWidth: 0 }}>
-              <ProductAssemblyTitle />
-              <Box sx={{ flexGrow: 1, minHeight: 0, width: '100%' }}>
-                <React.Suspense fallback={<Loading />}>
-                  <Sandbox showParameterControls />
-                </React.Suspense>
-              </Box>
-            </VStack>
-          </Resplit.Pane>
-          <Resplit.Splitter order={1} size="16px" asChild>
-            <Box sx={{ backgroundColor: 'gray.100' }} />
-          </Resplit.Splitter>
-          <Resplit.Pane order={2} initialSize="0.2fr" minSize="0.1fr">
-            <VStack spacing={8} sx={{ height: '100%', padding: 3, overflowY: 'auto' }}>
-              <ProductAssemblyDetails />
-            </VStack>
-          </Resplit.Pane>
-        </Flex>
-      </Resplit.Root>
-    </SandboxProvider>
+    <React.Suspense fallback={<Loading />}>
+      <Sandbox showParameterControls />
+    </React.Suspense>
   )
 }
 
@@ -84,8 +97,6 @@ function ProductAssemblyTitle() {
 
 function ProductAssemblyDetails() {
   const context = useSandboxContext()
-
-  console.log('context', context)
 
   if (context?.render?.type !== 'assembly') return <Loading />
 

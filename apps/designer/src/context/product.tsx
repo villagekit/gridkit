@@ -1,6 +1,11 @@
 import { client } from '@/client'
-import { DesignFile } from '@villagekit/sandbox'
+import { SandboxProvider, DesignFile } from '@villagekit/sandbox'
 import constate from 'constate'
+import { createContext, useContext } from 'react'
+
+type ProviderProps = {
+  children: React.ReactNode
+}
 
 export interface ProductOptions {
   productPath: string
@@ -39,4 +44,19 @@ function useProduct(options: ProductOptions): ProductState {
   }
 }
 
-export const [ProductProvider, useProductContext] = constate(useProduct)
+export const ProductContext = createContext<ProductState | null>(null)
+
+export function useProductContext() {
+  return useContext(ProductContext)
+}
+
+export function ProductProvider(props: ProductOptions & ProviderProps) {
+  const { children, ...options } = props
+
+  const product = useProduct(options)
+
+  const sandbox =
+    product == null ? children : <SandboxProvider file={product.file}>{children}</SandboxProvider>
+
+  return <ProductContext.Provider value={product}>{sandbox}</ProductContext.Provider>
+}
