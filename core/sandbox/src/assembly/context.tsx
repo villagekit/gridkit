@@ -1,4 +1,4 @@
-import { ParametersOptions } from '@villagekit/parameters'
+import { ExtractValuesFromParametersOptions, ParametersOptions } from '@villagekit/parameters'
 import {
   calculateBoundingBoxForAll,
   calculateGlValueForAll,
@@ -18,12 +18,14 @@ import {
   generatePartsForPlugins,
   getPartCreatorsFromDesignParts,
 } from '@villagekit/design'
-import { DesignAssembly } from '@villagekit/design'
 import constate from 'constate'
+import { DesignRenderAssembly } from '../types'
 
 type SandboxAssemblyOptions<ParamsOptions extends ParametersOptions> = {
-  assembly: DesignAssembly
-  parameterValues: ParamsOptions
+  assembly: DesignRenderAssembly<ParamsOptions>
+  parameterValues: ParamsOptions extends never
+    ? null
+    : ExtractValuesFromParametersOptions<ParamsOptions>
 }
 
 type SandboxAssemblyState = {
@@ -50,7 +52,7 @@ function useSandboxAssembly<ParamsOptions extends ParametersOptions>(
 }
 
 export const [SandboxAssemblyProvider, useSandboxAssemblyContext] = constate<
-  SandboxAssemblyOptions<any>,
+  SandboxAssemblyOptions<any> & { children: React.ReactNode },
   SandboxAssemblyState,
   []
 >(useSandboxAssembly)
@@ -68,20 +70,7 @@ function useParts<ParamsOptions extends ParametersOptions>(
 
   const [assemblyParts, setAssemblyParts] = useState<DesignParts>([])
   useEffect(() => {
-    switch (assembly.type) {
-      case 'static':
-        setAssemblyParts(assembly.parts)
-        break
-      case 'parameterized': {
-        const parts = assembly.createParts(parameterValues, partVariants)
-        if (parts instanceof Promise) {
-          parts.then(setAssemblyParts)
-        } else {
-          setAssemblyParts(parts)
-        }
-        break
-      }
-    }
+    assembly.createParts(parameterValues, partVariants).then(setAssemblyParts)
   }, [assembly, parameterValues, partVariants])
 
   const [partCreators, setPartCreators] = useState<Array<PartCreator>>([])

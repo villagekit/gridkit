@@ -1,4 +1,3 @@
-import { useDesignContext } from '@villagekit/design'
 import { PartsGlForAll } from '@villagekit/part'
 import { useEffect } from 'react'
 import { Box3 } from 'three'
@@ -10,8 +9,14 @@ interface AssemblyGlProps {
 }
 
 export function AssemblyGl(props: AssemblyGlProps) {
+  const context = useSandboxContext()
+  if (context == null) return null
+
+  const { render, parameterValues } = context
+  if (render == null) return null
+
   return (
-    <SandboxAssemblyProvider>
+    <SandboxAssemblyProvider assembly={render} parameterValues={parameterValues}>
       <AssemblyGlWithContext {...props} />
     </SandboxAssemblyProvider>
   )

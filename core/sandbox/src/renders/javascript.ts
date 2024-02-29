@@ -3,9 +3,9 @@ import { useEffect, useState } from 'react'
 import { RenderOutput } from './'
 import { designAssemblySafeParse } from '@villagekit/design'
 
-export function useDesignAssemblyJavaScript(jsCode: string): RenderOutput {
-  const [outputRender, setOutputRender] = useState<RenderOutput['render']>(null)
-  const [outputError, setOutputError] = useState<RenderOutput['error']>(null)
+export function useDesignAssemblyJavaScript(jsCode: string): RenderOutput<any> {
+  const [outputRender, setOutputRender] = useState<RenderOutput<any>['render']>(null)
+  const [outputError, setOutputError] = useState<RenderOutput<any>['error']>(null)
 
   useDesignAssemblyJavaScriptInner(jsCode, { setOutputRender, setOutputError })
 
@@ -21,8 +21,8 @@ export function useDesignAssemblyJavaScriptInner(
     setOutputRender,
     setOutputError,
   }: {
-    setOutputRender: (render: RenderOutput['render']) => void
-    setOutputError: (error: RenderOutput['error']) => void
+    setOutputRender: (render: RenderOutput<any>['render']) => void
+    setOutputError: (error: RenderOutput<any>['error']) => void
   },
 ): void {
   useEffect(() => {

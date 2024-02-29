@@ -1,4 +1,4 @@
-import { DesignAssembly, DesignMeta, DesignParts } from '@villagekit/design'
+import { DesignAssemblyPlugins, DesignMeta, DesignParts } from '@villagekit/design'
 import {
   ExtractValuesFromParametersOptions,
   ParametersOptions,
@@ -18,10 +18,13 @@ export type DesignRenderAssembly<ParamsOptions extends ParametersOptions = never
   meta: DesignMeta
   parameters: ParamsOptions extends never ? null : ParamsOptions
   presets: ParamsOptions extends never ? null : Presets<ParamsOptions>
-  assembly: (
-    parameters: ExtractValuesFromParametersOptions<ParamsOptions>,
-    partVariants: PartVariantsByType,
-  ) => Promise<DesignParts>
+  createParts: ParamsOptions extends never
+    ? () => Promise<DesignParts>
+    : (
+        parameters: ExtractValuesFromParametersOptions<ParamsOptions>,
+        partVariants: PartVariantsByType,
+      ) => Promise<DesignParts>
+  plugins?: DesignAssemblyPlugins
 }
 export type DesignRender<ParamsOptions extends ParametersOptions = never> =
   DesignRenderAssembly<ParamsOptions>

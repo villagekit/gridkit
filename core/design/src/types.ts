@@ -22,7 +22,6 @@ export type DesignAssembly<ParamsOptions extends ParametersOptions = never> = (
   parameters: ExtractValuesFromParametersOptions<ParamsOptions>,
   partVariants: PartVariantsByType,
 ) => DesignParts
-
 export type DesignAssemblyPlugins = Array<AssemblyPlugin>
 
 /* utils */

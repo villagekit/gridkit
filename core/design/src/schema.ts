@@ -27,34 +27,40 @@ const designPartsSchema: z.ZodType<RecursiveArray<z.infer<typeof designPartSchem
 )
 
 export const designAssemblyStaticSchema = z.object({
-  type: z.literal('static'),
-  parts: designPartsSchema,
+  assembly: designPartsSchema,
 })
 
 export const designAssemblyParameterizedSchema = (presetsSchema: ZodSchema) =>
   z.object({
-    type: z.literal('parameterized'),
     parameters: parametersOptionsSchema,
     presets: presetsSchema,
-    createParts: z.function(),
+    assembly: z.function(),
   })
+
+const designAssemblyObjectSchema = z.object({
+  assembly: z.union([z.array(z.unknown()), z.function()]),
+})
 
 // TODO: fix
 // @ts-ignore
-export function designAssemblySafeParse(assembly: { type: 'parameterized' | 'static' }) {
-  if (assembly.type === 'static') {
+export function designAssemblySafeParse(assembly: unknown) {
+  const assemblyObjectParse = designAssemblyObjectSchema.safeParse(assembly)
+
+  if (!assemblyObjectParse.success) {
+    return assemblyObjectParse
+  }
+
+  if (typeof assemblyObjectParse.data.assembly !== 'function') {
     return designAssemblyStaticSchema.safeParse(assembly)
-  } else if (assembly.type === 'parameterized') {
-    const assemblyResult = designAssemblyParameterizedSchema(z.array(z.unknown())).safeParse(
-      assembly,
-    )
-    if (assemblyResult.success) {
-      const { parameters } = assemblyResult.data
-      // TODO: fix
-      // @ts-ignore
-      return designAssemblyParameterizedSchema(getPresetsSchema(parameters)).safeParse(assembly)
-    } else {
-      return assemblyResult
-    }
+  }
+
+  const assemblyResult = designAssemblyParameterizedSchema(z.array(z.unknown())).safeParse(assembly)
+  if (assemblyResult.success) {
+    const { parameters } = assemblyResult.data
+    // TODO: fix
+    // @ts-ignore
+    return designAssemblyParameterizedSchema(getPresetsSchema(parameters)).safeParse(assembly)
+  } else {
+    return assemblyResult
   }
 }
