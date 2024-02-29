@@ -5,16 +5,15 @@ import { TypeScriptEditor } from './TypeScriptEditor'
 interface ProductEditorProps {}
 
 export function ProductEditor(_props: ProductEditorProps) {
-  const product = useProductContext()
-  if (product == null) throw new Error('Missing product context')
-  const { assembly } = product
-  if (assembly == null) throw new Error('Missing product assembly context')
-  const { file } = assembly
-  const { type: fileType } = file
+  const context = useProductContext()
 
-  if (fileType === 'typescript') {
-    return <TypeScriptEditor productType="assembly" />
+  if (context == null) return null
+
+  const { type, language } = context.file
+
+  if (language === 'typescript') {
+    return <TypeScriptEditor productType={type} />
   }
 
-  throw new Error(`Unexpected product assembly file type: ${fileType}`)
+  throw new Error(`Unexpected product assembly file language: ${language}`)
 }

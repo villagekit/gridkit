@@ -13,16 +13,15 @@ import { CameraControls, CameraControlsRef } from './camera'
 import { SandboxControls } from './controls'
 import { SceneryGl } from './scenery'
 import { useDefaultSandboxControlSettings, useSaveSandboxControlSettings } from './settings'
-import { SandboxContext, SandboxProvider, useSandboxContext } from './context'
-import { DesignFile } from './types'
+import { SandboxContext, useSandboxContext } from './context'
 
 export { AssemblyInfo, AssemblySummary } from './assembly'
+export type { DesignFile, DesignFileAssembly } from './types'
+export { SandboxProvider, useSandboxContext } from './context'
 
 export type SandboxMode = 'default' | 'screenshot'
 
 export interface SandboxProps {
-  file: DesignFile
-  onLocationUpdate?: (location: Location) => void
   scale?: number
   mode?: SandboxMode
   isDebug?: boolean
@@ -31,15 +30,6 @@ export interface SandboxProps {
 }
 
 export function Sandbox(props: SandboxProps) {
-  const { file, onLocationUpdate, ...rest } = props
-  return (
-    <SandboxProvider file={file} onLocationUpdate={onLocationUpdate}>
-      <SandboxWithContext {...rest} />
-    </SandboxProvider>
-  )
-}
-
-function SandboxWithContext(props: Omit<SandboxProps, 'file'>) {
   const {
     scale,
     mode = 'default',

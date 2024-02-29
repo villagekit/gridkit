@@ -7,6 +7,7 @@ import {
   ParametersOptions,
   Presets,
 } from '@villagekit/parameters'
+import { SandboxAssemblyProvider } from './assembly/context'
 
 type ProviderProps = {
   children: React.ReactNode
@@ -48,22 +49,30 @@ export function SandboxProvider(props: SandboxOptions & ProviderProps) {
     parameterValues,
   }
 
-  return (
-    <SandboxContext.Provider value={state}>
-      {hasParameters && hasPresets ? (
-        <SandboxParameters
-          onLocationUpdate={onLocationUpdate}
-          parameters={parameters}
-          presets={presets}
-          setParameterValues={setParameterValues}
-        >
-          {children}
-        </SandboxParameters>
-      ) : (
-        children
-      )}
-    </SandboxContext.Provider>
-  )
+  const renderTyped =
+    render?.type === 'assembly' ? (
+      <SandboxAssemblyProvider assembly={render} parameterValues={parameterValues}>
+        {children}
+      </SandboxAssemblyProvider>
+    ) : (
+      children
+    )
+
+  const parameterized =
+    hasParameters && hasPresets ? (
+      <SandboxParameters
+        onLocationUpdate={onLocationUpdate}
+        parameters={parameters}
+        presets={presets}
+        setParameterValues={setParameterValues}
+      >
+        {renderTyped}
+      </SandboxParameters>
+    ) : (
+      renderTyped
+    )
+
+  return <SandboxContext.Provider value={state}>{parameterized}</SandboxContext.Provider>
 }
 
 type SandboxParametersProps<ParamsOptions extends ParametersOptions> = Pick<

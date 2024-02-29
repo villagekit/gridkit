@@ -10,7 +10,6 @@ import { javascript } from '@codemirror/lang-javascript'
 import { autocompletion } from '@codemirror/autocomplete'
 
 import type { ProductType } from '@/api'
-import { useEditorContext } from '@/context/editor'
 
 // @ts-ignore
 import typesDts from './types.d.ts?raw'
