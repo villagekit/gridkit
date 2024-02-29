@@ -12,7 +12,6 @@ import { map, uniq } from 'lodash-es'
 import pDebounce from 'p-debounce'
 import { useEffect, useMemo, useState } from 'react'
 import { Box3 } from 'three'
-
 import {
   AssemblyPlugin,
   DesignParts,
@@ -22,9 +21,9 @@ import {
 import { DesignAssembly } from '@villagekit/design'
 import constate from 'constate'
 
-type SandboxAssemblyOptions = {
+type SandboxAssemblyOptions<ParamsOptions extends ParametersOptions> = {
   assembly: DesignAssembly
-  parameterValues: ParametersOptions
+  parameterValues: ParamsOptions
 }
 
 type SandboxAssemblyState = {
@@ -34,7 +33,9 @@ type SandboxAssemblyState = {
   parts: Array<PartState>
 }
 
-function useSandboxAssembly(props: SandboxAssemblyOptions): SandboxAssemblyState {
+function useSandboxAssembly<ParamsOptions extends ParametersOptions>(
+  props: SandboxAssemblyOptions<ParamsOptions>,
+): SandboxAssemblyState {
   const { isLoading, parts } = useParts(props)
 
   const partValues = usePartValues(parts)
@@ -48,13 +49,19 @@ function useSandboxAssembly(props: SandboxAssemblyOptions): SandboxAssemblyState
   }
 }
 
-export const [SandboxAssemblyProvider, useSandboxAssemblyContext] = constate(useSandboxAssembly)
+export const [SandboxAssemblyProvider, useSandboxAssemblyContext] = constate<
+  SandboxAssemblyOptions<any>,
+  SandboxAssemblyState,
+  []
+>(useSandboxAssembly)
 
 type UsePartsValue = Pick<SandboxAssemblyState, 'isLoading' | 'parts'>
 
 const noPlugins: Array<AssemblyPlugin> = []
 
-function useParts(options: SandboxAssemblyOptions): UsePartsValue {
+function useParts<ParamsOptions extends ParametersOptions>(
+  options: SandboxAssemblyOptions<ParamsOptions>,
+): UsePartsValue {
   const { assembly, parameterValues } = options
 
   const partVariants = useMemo(() => getPartVariants(), [])

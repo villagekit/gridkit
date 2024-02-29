@@ -3,7 +3,6 @@ import './globals'
 import { ResizeObserver } from '@juggle/resize-observer'
 import { AdaptiveDpr, useContextBridge, useDetectGPU } from '@react-three/drei'
 import { Canvas, RootState } from '@react-three/fiber'
-import { DesignContext, useDesignContext } from '@villagekit/design'
 import { Box, useDisclosure } from '@villagekit/ui'
 import { Perf } from 'r3f-perf'
 import React, { useCallback, useMemo, useRef, useState } from 'react'
@@ -14,12 +13,16 @@ import { CameraControls, CameraControlsRef } from './camera'
 import { SandboxControls } from './controls'
 import { SceneryGl } from './scenery'
 import { useDefaultSandboxControlSettings, useSaveSandboxControlSettings } from './settings'
+import { SandboxContext, SandboxProvider, useSandboxContext } from './context'
+import { DesignFile } from './types'
 
 export { AssemblyInfo, AssemblySummary } from './assembly'
 
 export type SandboxMode = 'default' | 'screenshot'
 
 export interface SandboxProps {
+  file: DesignFile
+  onLocationUpdate?: (location: Location) => void
   scale?: number
   mode?: SandboxMode
   isDebug?: boolean
@@ -28,16 +31,15 @@ export interface SandboxProps {
 }
 
 export function Sandbox(props: SandboxProps) {
-  const designContext = useDesignContext()
-
-  if (designContext == null) {
-    throw new Error('Missing design context!')
-  }
-
-  return <SandboxWithAssemblyProvider {...props} />
+  const { file, onLocationUpdate, ...rest } = props
+  return (
+    <SandboxProvider file={file} onLocationUpdate={onLocationUpdate}>
+      <SandboxWithContext {...rest} />
+    </SandboxProvider>
+  )
 }
 
-function SandboxWithAssemblyProvider(props: Omit<SandboxProps, 'model'>) {
+function SandboxWithContext(props: Omit<SandboxProps, 'file'>) {
   const {
     scale,
     mode = 'default',
@@ -46,7 +48,7 @@ function SandboxWithAssemblyProvider(props: Omit<SandboxProps, 'model'>) {
     alwaysShowFullscreenControls = false,
   } = props
 
-  const { meta } = useDesignContext()
+  const context = useSandboxContext()
 
   const maxTiers = 3
   const gpu = useDetectGPU()
@@ -66,7 +68,7 @@ function SandboxWithAssemblyProvider(props: Omit<SandboxProps, 'model'>) {
   const containerRef = useRef<HTMLDivElement>(null)
   const cameraControlsRef = useRef<CameraControlsRef | null>(null)
 
-  const ContextBridge = useContextBridge(DesignContext)
+  const ContextBridge = useContextBridge(SandboxContext)
 
   const onCanvasCreated = useCallback((state: RootState) => {
     state.gl.toneMapping = ACESFilmicToneMapping
@@ -80,7 +82,7 @@ function SandboxWithAssemblyProvider(props: Omit<SandboxProps, 'model'>) {
     <Box
       id="sandbox-container"
       role="img"
-      aria-label={meta.label}
+      aria-label={context?.render?.meta?.label}
       ref={containerRef}
       sx={{
         ':hover, :focus-within': {
@@ -117,7 +119,7 @@ function SandboxWithAssemblyProvider(props: Omit<SandboxProps, 'model'>) {
       >
         <ContextBridge>
           <ContainerGl mode={mode} isDebug={isDebug}>
-            {meta != null && (
+            {
               <ContentGl
                 scale={scale}
                 mode={mode}
@@ -125,7 +127,7 @@ function SandboxWithAssemblyProvider(props: Omit<SandboxProps, 'model'>) {
                 shouldDisplayGrid={shouldDisplayGrid}
                 cameraControlsRef={cameraControlsRef}
               />
-            )}
+            }
           </ContainerGl>
         </ContextBridge>
       </Canvas>
@@ -178,6 +180,9 @@ interface ContentGlProps {
 function ContentGl(props: ContentGlProps) {
   const { scale = 1, mode, shouldAutoRotate, shouldDisplayGrid, cameraControlsRef } = props
 
+  const context = useSandboxContext()
+  const designType = context?.render?.type
+
   const gridLengthInMeters = 0.04
 
   const [boundingBox, setBoundingBox] = useState<Box3>(new Box3())
@@ -214,7 +219,7 @@ function ContentGl(props: ContentGlProps) {
         shouldAutoRotate={shouldAutoRotate}
       />
       <group scale={scale}>
-        <AssemblyGl setBoundingBox={handleBoundingBoxChange} />
+        {designType === 'assembly' ? <AssemblyGl setBoundingBox={handleBoundingBoxChange} /> : null}
       </group>
     </>
   )
