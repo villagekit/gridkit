@@ -10,7 +10,7 @@ import { ParameterControls } from '@villagekit/parameters'
 import { useProductContext } from '@/context/product'
 
 import { Loading } from './Loading'
-import { ProductEditor } from './editor/ProductEditor'
+import { ProductEditor } from './ProductEditor'
 
 export default function Product() {
   const product = useProductContext()

@@ -22,6 +22,7 @@ export function useDesignAssemblyTypeScript(tsCode: string): RenderOutput<any> {
       tsTransformOutput = transformSync(tsCode, {})
     } catch (error) {
       if (error instanceof Error || typeof error === 'string') {
+        console.error(error)
         setOutputError(error)
         return
       } else {

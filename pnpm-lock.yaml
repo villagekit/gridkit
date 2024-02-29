@@ -130,6 +130,9 @@ importers:
       codemirror-theme-catppuccin:
         specifier: ^0.3.0
         version: 0.3.0
+      comlink:
+        specifier: ^4.4.1
+        version: 4.4.1
       constate:
         specifier: ^3.3.2
         version: 3.3.2(react@18.2.0)
@@ -8329,6 +8332,10 @@ packages:
     dependencies:
       delayed-stream: 1.0.0
     dev: true
+
+  /comlink@4.4.1:
+    resolution: {integrity: sha512-+1dlx0aY5Jo1vHy/tSsIGpSkN4tS9rZSW8FIhG0JH/crs9wwweswIo/POr451r7bZww3hFbPAKnTpimzL/mm4Q==}
+    dev: false
 
   /commander@4.1.1:
     resolution: {integrity: sha512-NOKm8xhkzAjzFx8B2v5OAHT+u5pRQc2UCa2Vq9jYL/31o2wi9mxBA7LIFs3sV5VSC49z6pEhfbMULvShKj26WA==}

@@ -2,7 +2,7 @@ import { DesignParameters, DesignMeta, DesignAssembly, DesignPresets } from '@vi
 
 export const meta: DesignMeta = {
   id: 'chair',
-  name: 'Chair',
+  label: 'Chair',
   description:
     'A conventional 4 legged chair. Useful for sitting at a desk, table, or to help you reach that top shelf.',
   categories: ['seating'],
@@ -11,46 +11,46 @@ export const meta: DesignMeta = {
 export const parameters = {
   seatWidth: {
     label: 'Seat width',
-    max: 10,
-    min: 5,
-    step: 5,
+    shortId: 'sw',
     type: 'number',
-    queryParamId: 'sw',
+    min: 5,
+    max: 10,
+    step: 5,
   },
   seatDepth: {
     label: 'Seat depth',
-    max: 15,
-    min: 5,
+    shortId: 'sd',
     type: 'number',
-    queryParamId: 'sd',
+    min: 5,
+    max: 15,
   },
   seatHeight: {
-    helperText: 'The height from the ground to the top of the seat',
     label: 'Seat height',
-    max: 15,
-    min: 5,
+    description: 'The height from the ground to the top of the seat',
+    shortId: 'sh',
     type: 'number',
-    queryParamId: 'sh',
+    min: 5,
+    max: 15,
   },
   shouldIncludeBack: {
     label: 'Include back',
+    shortId: 'b',
     type: 'boolean',
-    queryParamId: 'b',
   },
   backHeight: {
-    helperText: 'The height from the seat to the top of the backrest',
     label: 'Back height',
+    description: 'The height from the seat to the top of the backrest',
+    shortId: 'bh',
+    type: 'number',
     max: 10,
     min: 5,
-    type: 'number',
-    queryParamId: 'bh',
   },
 } satisfies DesignParameters
 
 export const presets: DesignPresets<typeof parameters> = [
   {
     id: 'regular-with-back',
-    name: 'Regular With Back',
+    label: 'Regular With Back',
     values: {
       backHeight: 10,
       seatDepth: 10,
@@ -61,7 +61,7 @@ export const presets: DesignPresets<typeof parameters> = [
   },
   {
     id: 'regular',
-    name: 'Regular (Without Back)',
+    label: 'Regular (Without Back)',
     values: {
       backHeight: 10,
       seatDepth: 10,
