@@ -1,7 +1,12 @@
-import { getPresetsSchema, parametersOptionsSchema } from '@villagekit/parameters'
+import {
+  ParametersOptions,
+  extractValuesSchemaFromParametersOptions,
+  getPresetsSchema,
+  parametersOptionsSchema,
+} from '@villagekit/parameters'
 import { partSchema } from '@villagekit/part'
 
-import { ZodSchema, z } from 'zod'
+import { z } from 'zod'
 import { RecursiveArray } from '.'
 
 export const designCategorySchema = z.enum(['seating', 'tables', 'storage', 'office'])
@@ -30,12 +35,27 @@ export const designAssemblyStaticSchema = z.object({
   assembly: designPartsSchema,
 })
 
-export const designAssemblyParameterizedSchema = (presetsSchema: ZodSchema) =>
-  z.object({
+const partVariantsByTypeSchema = z.record(z.string(), z.record(z.any()))
+
+export const designAssemblyParameterizedSchema1 = z.object({
+  parameters: parametersOptionsSchema,
+  presets: z.array(z.unknown()),
+  assembly: z.function().args(z.unknown(), z.unknown()).returns(z.unknown()),
+})
+
+export function designAssemblyParameterizedSchema2<ParamsOptions extends ParametersOptions>(
+  parameters: ParamsOptions,
+) {
+  const parameterValuesSchema = extractValuesSchemaFromParametersOptions(parameters)
+  return z.object({
     parameters: parametersOptionsSchema,
-    presets: presetsSchema,
-    assembly: z.function(),
+    presets: getPresetsSchema(parameters),
+    assembly: z
+      .function()
+      .args(parameterValuesSchema, partVariantsByTypeSchema)
+      .returns(designPartsSchema),
   })
+}
 
 const designAssemblyObjectSchema = z.object({
   assembly: z.union([z.array(z.unknown()), z.function()]),
@@ -54,12 +74,12 @@ export function designAssemblySafeParse(assembly: unknown) {
     return designAssemblyStaticSchema.safeParse(assembly)
   }
 
-  const assemblyResult = designAssemblyParameterizedSchema(z.array(z.unknown())).safeParse(assembly)
+  const assemblyResult = designAssemblyParameterizedSchema1.safeParse(assembly)
   if (assemblyResult.success) {
     const { parameters } = assemblyResult.data
     // TODO: fix
     // @ts-ignore
-    return designAssemblyParameterizedSchema(getPresetsSchema(parameters)).safeParse(assembly)
+    return designAssemblyParameterizedSchema2(parameters).safeParse(assembly)
   } else {
     return assemblyResult
   }

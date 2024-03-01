@@ -36,6 +36,7 @@ export function DesignRendererAssemblyJavaScript(
         URL.revokeObjectURL(jsModuleUrl)
       } catch (error) {
         if (error instanceof Error || typeof error === 'string') {
+          console.error('eval', error)
           setError(error)
           return
         } else {
@@ -44,15 +45,17 @@ export function DesignRendererAssemblyJavaScript(
       }
 
       // validate module
-      if (jsModule.assembly == null) return
-      const assemblyResult = designAssemblySafeParse(jsModule.assembly)
+      if (jsModule == null) return
+      const assemblyResult = designAssemblySafeParse(jsModule)
 
       if (assemblyResult == null) return
       if (assemblyResult.success) {
         // TODO: fix
         // @ts-ignore
+        console.log('render', assemblyResult.data)
         setRender(assemblyResult.data)
       } else {
+        console.log('validate', assemblyResult.error)
         setError(assemblyResult.error)
       }
     })()

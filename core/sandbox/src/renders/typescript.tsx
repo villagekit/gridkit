@@ -20,14 +20,20 @@ export function DesignRendererAssemblyTypeScript(props: RendererProps<any> & { c
     let tsTransformOutput
     try {
       tsTransformOutput = transformSync(tsCode, {
+        jsc: {
+          parser: {
+            syntax: 'typescript',
+          },
+        },
         module: {
           type: 'es6',
           strict: true,
+          noInterop: true,
         },
       })
     } catch (error) {
       if (error instanceof Error || typeof error === 'string') {
-        console.error(error)
+        console.error('swc', error)
         setError(error)
         return
       } else {
