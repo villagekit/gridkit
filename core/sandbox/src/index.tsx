@@ -14,6 +14,7 @@ import { SandboxControls } from './controls'
 import { SceneryGl } from './scenery'
 import { useDefaultSandboxControlSettings, useSaveSandboxControlSettings } from './settings'
 import { SandboxContext, useSandboxContext } from './context'
+import { SandboxAssemblyContext } from './assembly/context'
 
 export { AssemblyInfo, AssemblySummary } from './assembly'
 export type { DesignFile, DesignFileAssembly } from './types'
@@ -58,7 +59,7 @@ export function Sandbox(props: SandboxProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const cameraControlsRef = useRef<CameraControlsRef | null>(null)
 
-  const ContextBridge = useContextBridge(SandboxContext)
+  const ContextBridge = useContextBridge(SandboxContext, SandboxAssemblyContext)
 
   const onCanvasCreated = useCallback((state: RootState) => {
     state.gl.toneMapping = ACESFilmicToneMapping

@@ -32,12 +32,14 @@ const designPartsSchema: z.ZodType<RecursiveArray<z.infer<typeof designPartSchem
 )
 
 export const designAssemblyStaticSchema = z.object({
+  meta: designMetaSchema,
   assembly: designPartsSchema,
 })
 
 const partVariantsByTypeSchema = z.record(z.string(), z.record(z.any()))
 
 export const designAssemblyParameterizedSchema1 = z.object({
+  meta: designMetaSchema,
   parameters: parametersOptionsSchema,
   presets: z.array(z.unknown()),
   assembly: z.function().args(z.unknown(), z.unknown()).returns(z.unknown()),
@@ -48,6 +50,7 @@ export function designAssemblyParameterizedSchema2<ParamsOptions extends Paramet
 ) {
   const parameterValuesSchema = extractValuesSchemaFromParametersOptions(parameters)
   return z.object({
+    meta: designMetaSchema,
     parameters: parametersOptionsSchema,
     presets: getPresetsSchema(parameters),
     assembly: z

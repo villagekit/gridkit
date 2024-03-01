@@ -10,7 +10,7 @@ import {
 } from '@villagekit/part'
 import { map, uniq } from 'lodash-es'
 import pDebounce from 'p-debounce'
-import { useEffect, useMemo, useState } from 'react'
+import { createContext, useContext, useEffect, useMemo, useState } from 'react'
 import { Box3 } from 'three'
 import {
   AssemblyPlugin,
@@ -51,11 +51,19 @@ function useSandboxAssembly<ParamsOptions extends ParametersOptions>(
   }
 }
 
-export const [SandboxAssemblyProvider, useSandboxAssemblyContext] = constate<
-  SandboxAssemblyOptions<any> & { children: React.ReactNode },
-  SandboxAssemblyState,
-  []
->(useSandboxAssembly)
+export const SandboxAssemblyContext = createContext<SandboxAssemblyState | null>(null)
+
+export function SandboxAssemblyProvider(
+  props: SandboxAssemblyOptions<any> & { children: React.ReactNode },
+) {
+  const { children, ...options } = props
+  const value = useSandboxAssembly(options)
+  return <SandboxAssemblyContext.Provider value={value}>{children}</SandboxAssemblyContext.Provider>
+}
+
+export function useSandboxAssemblyContext() {
+  return useContext(SandboxAssemblyContext)
+}
 
 type UsePartsValue = Pick<SandboxAssemblyState, 'isLoading' | 'parts'>
 

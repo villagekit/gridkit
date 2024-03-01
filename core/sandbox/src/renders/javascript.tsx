@@ -50,10 +50,33 @@ export function DesignRendererAssemblyJavaScript(
 
       if (assemblyResult == null) return
       if (assemblyResult.success) {
-        // TODO: fix
-        // @ts-ignore
         console.log('render', assemblyResult.data)
-        setRender(assemblyResult.data)
+        const { meta, assembly } = assemblyResult.data
+        if (typeof assembly === 'function') {
+          // TODO: fix
+          // @ts-ignore
+          const { parameters, presets } = assemblyResult.data
+          setRender({
+            type: 'assembly',
+            meta,
+            parameters,
+            presets,
+            // TODO: fix
+            // @ts-ignore
+            // createParts: assembly,
+            createParts: assembly,
+          })
+        } else {
+          setRender({
+            type: 'assembly',
+            meta,
+            parameters: null,
+            presets: null,
+            // TODO: fix
+            // @ts-ignore
+            createParts: () => assembly,
+          })
+        }
       } else {
         console.log('validate', assemblyResult.error)
         setError(assemblyResult.error)
