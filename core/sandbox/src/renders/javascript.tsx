@@ -1,30 +1,13 @@
-import { useEffect, useState } from 'react'
+import React, { useEffect } from 'react'
 
-import { RenderOutput } from './'
+import { RendererProps } from './'
 import { designAssemblySafeParse } from '@villagekit/design'
 
-export function useDesignAssemblyJavaScript(jsCode: string): RenderOutput<any> {
-  const [outputRender, setOutputRender] = useState<RenderOutput<any>['render']>(null)
-  const [outputError, setOutputError] = useState<RenderOutput<any>['error']>(null)
+export function DesignRendererAssemblyJavaScript(
+  props: RendererProps<any> & { code: string | null },
+) {
+  const { code: jsCode, setRender, setError } = props
 
-  useDesignAssemblyJavaScriptInner(jsCode, { setOutputRender, setOutputError })
-
-  return {
-    render: outputRender,
-    error: outputError,
-  }
-}
-
-export function useDesignAssemblyJavaScriptInner(
-  jsCode: string | null,
-  {
-    setOutputRender,
-    setOutputError,
-  }: {
-    setOutputRender: (render: RenderOutput<any>['render']) => void
-    setOutputError: (error: RenderOutput<any>['error']) => void
-  },
-): void {
   useEffect(() => {
     if (jsCode == null) return
     ;(async () => {
@@ -53,7 +36,7 @@ export function useDesignAssemblyJavaScriptInner(
         URL.revokeObjectURL(jsModuleUrl)
       } catch (error) {
         if (error instanceof Error || typeof error === 'string') {
-          setOutputError(error)
+          setError(error)
           return
         } else {
           throw error
@@ -68,10 +51,12 @@ export function useDesignAssemblyJavaScriptInner(
       if (assemblyResult.success) {
         // TODO: fix
         // @ts-ignore
-        setOutputRender(assemblyResult.data)
+        setRender(assemblyResult.data)
       } else {
-        setOutputError(assemblyResult.error)
+        setError(assemblyResult.error)
       }
     })()
-  }, [jsCode, setOutputRender, setOutputError])
+  }, [jsCode, setRender, setError])
+
+  return <React.Fragment />
 }

@@ -1,13 +1,15 @@
 import { createContext, useCallback, useContext, useEffect, useState } from 'react'
-import { useDesignRender } from './renders'
-import { DesignFile, DesignInstance } from './types'
 import {
   ExtractValuesFromParametersOptions,
   ParameterControlsContextProvider,
   ParametersOptions,
   Presets,
 } from '@villagekit/parameters'
+
 import { SandboxAssemblyProvider } from './assembly/context'
+import { RenderOutput, RenderError, DesignRenderer } from './renders'
+import { DesignFile } from '.'
+import { DesignInstance } from './types'
 
 type ProviderProps = {
   children: React.ReactNode
@@ -29,12 +31,11 @@ export function useSandboxContext() {
 export function SandboxProvider(props: SandboxOptions & ProviderProps) {
   const { file, onLocationUpdate, children } = props
 
-  const renderOutput = useDesignRender(file)
-  const render = renderOutput?.render
-  const renderError = renderOutput?.error
+  const [render, setRender] = useState<RenderOutput<any>>(null)
+  const [renderError, setRenderError] = useState<RenderError>(null)
 
-  const parameters = renderOutput.render?.parameters
-  const presets = renderOutput.render?.presets
+  const parameters = render?.parameters
+  const presets = render?.presets
   const hasParameters = parameters != null
   const hasPresets = presets != null
 
@@ -72,7 +73,12 @@ export function SandboxProvider(props: SandboxOptions & ProviderProps) {
       renderTyped
     )
 
-  return <SandboxContext.Provider value={state}>{parameterized}</SandboxContext.Provider>
+  return (
+    <SandboxContext.Provider value={state}>
+      <DesignRenderer file={file} setRender={setRender} setError={setRenderError} />
+      {parameterized}
+    </SandboxContext.Provider>
+  )
 }
 
 type SandboxParametersProps<ParamsOptions extends ParametersOptions> = Pick<

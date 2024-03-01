@@ -1,41 +1,43 @@
 import { useEffect, useState } from 'react'
 import initSwc, { transformSync } from '@swc/wasm-web'
 
-import { RenderOutput } from './'
-import { useDesignAssemblyJavaScriptInner } from './javascript'
+import { RendererProps } from './'
+import { DesignRendererAssemblyJavaScript } from './javascript'
 
-export function useDesignAssemblyTypeScript(tsCode: string): RenderOutput<any> {
+export function DesignRendererAssemblyTypeScript(props: RendererProps<any> & { code: string }) {
+  const { code: tsCode, setRender, setError } = props
+
   const [isSwcInitialized, setSwcInitialized] = useState(false)
   useEffect(() => {
     initSwc().then(() => setSwcInitialized(true))
   }, [])
 
   const [jsCode, setJsCode] = useState<string | null>(null)
-  const [outputRender, setOutputRender] = useState<RenderOutput<any>['render']>(null)
-  const [outputError, setOutputError] = useState<RenderOutput<any>['error']>(null)
 
   useEffect(() => {
     if (!isSwcInitialized) return
 
     let tsTransformOutput
     try {
-      tsTransformOutput = transformSync(tsCode, {})
+      tsTransformOutput = transformSync(tsCode, {
+        module: {
+          type: 'es6',
+          strict: true,
+        },
+      })
     } catch (error) {
       if (error instanceof Error || typeof error === 'string') {
         console.error(error)
-        setOutputError(error)
+        setError(error)
         return
       } else {
         throw error
       }
     }
     setJsCode(tsTransformOutput.code)
-  }, [tsCode, isSwcInitialized])
+  }, [tsCode, setError, isSwcInitialized])
 
-  useDesignAssemblyJavaScriptInner(jsCode, { setOutputRender, setOutputError })
-
-  return {
-    render: outputRender,
-    error: outputError,
-  }
+  return (
+    <DesignRendererAssemblyJavaScript code={jsCode} setRender={setRender} setError={setError} />
+  )
 }
