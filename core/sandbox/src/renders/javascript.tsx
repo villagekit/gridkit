@@ -10,6 +10,7 @@ export function DesignRendererAssemblyJavaScript(
 
   useEffect(() => {
     if (jsCode == null) return
+    console.log('code', jsCode)
     ;(async () => {
       const jsCodeWithoutImports = jsCode.replace(
         /import (.*) from [\"\']@villagekit\/design[\"\']/,

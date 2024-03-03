@@ -17,18 +17,25 @@ export function ProductEditor(_props: ProductEditorProps) {
 
 function EditorWithContext() {
   const productContext = useProductContext()
-  const { setCodeToLoad, setParentEl, setLanguageExtensions } = useEditorContext()
+  const { code: editorCode, setCodeToLoad, setParentEl, setLanguageExtensions } = useEditorContext()
 
+  const productCode = productContext?.file?.code
   useEffect(() => {
-    const code = productContext?.file?.code
-    if (code == null || setCodeToLoad == null) return
-    setCodeToLoad(code)
-  }, [productContext?.file?.code, setCodeToLoad])
+    if (productCode == null || setCodeToLoad == null) return
+    setCodeToLoad(productCode)
+  }, [productCode, setCodeToLoad])
 
+  const setProductCode = productContext?.setCode
   useEffect(() => {
-    if (productContext == null) return
-    const { language } = productContext.file
+    if (editorCode == null || setProductCode == null) return
+    // TODO remove
+    if (editorCode == '') return
+    setProductCode(editorCode)
+  }, [editorCode, setProductCode])
 
+  const language = productContext?.file?.language
+  useEffect(() => {
+    if (language == null) return
     if (language === 'typescript') {
       getTypeScriptExtensions().then((languageExtensions) => {
         setLanguageExtensions(languageExtensions)
@@ -36,7 +43,7 @@ function EditorWithContext() {
     } else {
       throw new Error(`Unexpected product assembly file language: ${language}`)
     }
-  }, [productContext?.file.language])
+  }, [language, setLanguageExtensions])
 
   const parentRef = useRef(null)
   useEffect(() => {

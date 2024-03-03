@@ -1,5 +1,6 @@
 import { autocompletion } from '@codemirror/autocomplete'
 import { javascript } from '@codemirror/lang-javascript'
+import { basicSetup } from 'codemirror'
 import {
   tsAutocompleteWorker,
   tsFacetWorker,
@@ -29,6 +30,7 @@ export async function getTypeScriptExtensions() {
   const path = 'index.ts'
 
   return [
+    basicSetup,
     javascript({
       typescript: true,
       jsx: false,

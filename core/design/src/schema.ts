@@ -25,11 +25,13 @@ export const designPartSchema = z.intersection(
   }),
 )
 
-const designPartsSchema: z.ZodType<RecursiveArray<z.infer<typeof designPartSchema>>> = z.lazy(
-  () => {
-    return z.array(z.union([designPartSchema, designPartsSchema]))
-  },
-)
+const designPartsSchema: z.ZodType<
+  RecursiveArray<z.infer<typeof designPartSchema> | false | undefined | null>
+> = z.lazy(() => {
+  return z.array(
+    z.union([designPartSchema, designPartsSchema, z.literal(false), z.undefined(), z.null()]),
+  )
+})
 
 export const designAssemblyStaticSchema = z.object({
   meta: designMetaSchema,

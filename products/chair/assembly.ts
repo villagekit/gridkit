@@ -1,4 +1,10 @@
-import { DesignParameters, DesignMeta, DesignAssembly, DesignPresets } from '@villagekit/design'
+import {
+  DesignParameters,
+  DesignMeta,
+  DesignAssembly,
+  DesignPresets,
+  DesignParts,
+} from '@villagekit/design'
 
 export const meta: DesignMeta = {
   id: 'chair',
@@ -144,5 +150,5 @@ export const assembly: DesignAssembly<typeof parameters> = (parameters) => {
       y: [0, seatDepth],
       z: seatHeight - 1,
     },
-  ]
+  ] satisfies DesignParts
 }

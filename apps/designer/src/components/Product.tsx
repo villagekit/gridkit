@@ -2,7 +2,7 @@ import '@villagekit/part-gridbeam'
 import '@villagekit/part-gridpanel'
 
 import React from 'react'
-import { AssemblyInfo, Sandbox, SandboxProvider, useSandboxContext } from '@villagekit/sandbox'
+import { AssemblyInfo, Sandbox, useSandboxContext } from '@villagekit/sandbox'
 import { Box, Flex, Heading, VStack } from '@villagekit/ui'
 import { Resplit } from 'react-resplit'
 import { ParameterControls } from '@villagekit/parameters'
