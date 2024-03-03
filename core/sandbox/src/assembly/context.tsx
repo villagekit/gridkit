@@ -18,7 +18,6 @@ import {
   generatePartsForPlugins,
   getPartCreatorsFromDesignParts,
 } from '@villagekit/design'
-import constate from 'constate'
 import { DesignRenderAssembly } from '../types'
 
 type SandboxAssemblyOptions<ParamsOptions extends ParametersOptions> = {
@@ -61,8 +60,12 @@ export function SandboxAssemblyProvider(
   return <SandboxAssemblyContext.Provider value={value}>{children}</SandboxAssemblyContext.Provider>
 }
 
-export function useSandboxAssemblyContext() {
-  return useContext(SandboxAssemblyContext)
+export function useSandboxAssemblyContext(): SandboxAssemblyState {
+  const context = useContext(SandboxAssemblyContext)
+  if (context == null) {
+    throw new Error('useSandboxAssemblyContext must be wrapped in SandboxAssemblyProvider')
+  }
+  return context
 }
 
 type UsePartsValue = Pick<SandboxAssemblyState, 'isLoading' | 'parts'>
@@ -78,6 +81,7 @@ function useParts<ParamsOptions extends ParametersOptions>(
 
   const [assemblyParts, setAssemblyParts] = useState<DesignParts>([])
   useEffect(() => {
+    if (parameterValues == null) return
     assembly.createParts(parameterValues, partVariants).then(setAssemblyParts)
   }, [assembly, parameterValues, partVariants])
 

@@ -64,7 +64,7 @@ export function DesignRendererAssemblyJavaScript(
             // TODO: fix
             // @ts-ignore
             // createParts: assembly,
-            createParts: assembly,
+            createParts: (...args) => Promise.resolve(assembly(...args)),
           })
         } else {
           setRender({
@@ -74,7 +74,7 @@ export function DesignRendererAssemblyJavaScript(
             presets: null,
             // TODO: fix
             // @ts-ignore
-            createParts: () => assembly,
+            createParts: () => Promise.resolve(assembly),
           })
         }
       } else {

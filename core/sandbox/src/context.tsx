@@ -20,12 +20,16 @@ type SandboxOptions = {
   onLocationUpdate?: (location: Location) => void
 }
 
-type SandboxState = DesignInstance<any> | null
+type SandboxState = DesignInstance<any>
 
 export const SandboxContext = createContext<SandboxState | null>(null)
 
-export function useSandboxContext() {
-  return useContext(SandboxContext)
+export function useSandboxContext(): SandboxState {
+  const context = useContext(SandboxContext)
+  if (context == null) {
+    throw new Error('useSandboxContext must be wrapped in SandboxProvider')
+  }
+  return context
 }
 
 export function SandboxProvider(props: SandboxOptions & ProviderProps) {

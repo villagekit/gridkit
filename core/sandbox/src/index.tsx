@@ -73,7 +73,7 @@ export function Sandbox(props: SandboxProps) {
     <Box
       id="sandbox-container"
       role="img"
-      aria-label={context?.render?.meta?.label}
+      aria-label={context.render?.meta?.label}
       ref={containerRef}
       sx={{
         ':hover, :focus-within': {
@@ -172,7 +172,7 @@ function ContentGl(props: ContentGlProps) {
   const { scale = 1, mode, shouldAutoRotate, shouldDisplayGrid, cameraControlsRef } = props
 
   const context = useSandboxContext()
-  const designType = context?.render?.type
+  const designType = context.render?.type
 
   const gridLengthInMeters = 0.04
 
