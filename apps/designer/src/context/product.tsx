@@ -1,7 +1,6 @@
 import { client } from '@/client'
 import { SandboxProvider, DesignFile } from '@villagekit/sandbox'
-import constate from 'constate'
-import { createContext, useContext, useEffect, useState } from 'react'
+import { createContext, useContext, useEffect } from 'react'
 import { useEditorContext } from './editor'
 
 type ProviderProps = {
@@ -13,7 +12,6 @@ export interface ProductOptions {
 }
 
 type ProductState = null | {
-  setCode: (code: string) => void
   file: DesignFile
 }
 
@@ -27,11 +25,12 @@ function useProduct(options: ProductOptions): ProductState {
     { enabled: productMetaQuery.isSuccess },
   )
 
-  const [code, setCode] = useState('')
+  const { code: editorCode, setCodeToLoad: setEditorCode } = useEditorContext()
+
   useEffect(() => {
     if (!productEntryQuery.isSuccess) return
-    setCode(productEntryQuery.data)
-  }, [productEntryQuery])
+    setEditorCode(productEntryQuery.data)
+  }, [productEntryQuery.isSuccess, productEntryQuery.data, setEditorCode])
 
   if (!productMetaQuery.isSuccess || !productEntryQuery.isSuccess) return null
 
@@ -46,10 +45,9 @@ function useProduct(options: ProductOptions): ProductState {
   if (language === 'unknown') throw new Error(`Unexpected product entry extension: ${entry}`)
 
   return {
-    setCode,
     file: {
       type,
-      code,
+      code: editorCode,
       language,
     },
   }

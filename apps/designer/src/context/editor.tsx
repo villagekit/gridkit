@@ -1,6 +1,6 @@
 import constate from 'constate'
 import { useColorModeValue } from '@villagekit/ui'
-import { createRef, useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { EditorState } from '@codemirror/state'
 import { EditorView, EditorViewConfig } from '@codemirror/view'
 import { Variant } from 'codemirror-theme-catppuccin'

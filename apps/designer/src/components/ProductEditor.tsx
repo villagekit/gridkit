@@ -8,30 +8,8 @@ import { getTypeScriptExtensions } from '@/editor/typescript'
 interface ProductEditorProps {}
 
 export function ProductEditor(_props: ProductEditorProps) {
-  return (
-    <EditorProvider>
-      <EditorWithContext />
-    </EditorProvider>
-  )
-}
-
-function EditorWithContext() {
   const productContext = useProductContext()
-  const { code: editorCode, setCodeToLoad, setParentEl, setLanguageExtensions } = useEditorContext()
-
-  const productCode = productContext?.file?.code
-  useEffect(() => {
-    if (productCode == null || setCodeToLoad == null) return
-    setCodeToLoad(productCode)
-  }, [productCode, setCodeToLoad])
-
-  const setProductCode = productContext?.setCode
-  useEffect(() => {
-    if (editorCode == null || setProductCode == null) return
-    // TODO remove
-    if (editorCode == '') return
-    setProductCode(editorCode)
-  }, [editorCode, setProductCode])
+  const { setParentEl, setLanguageExtensions } = useEditorContext()
 
   const language = productContext?.file?.language
   useEffect(() => {

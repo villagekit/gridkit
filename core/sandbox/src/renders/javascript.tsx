@@ -10,7 +10,6 @@ export function DesignRendererAssemblyJavaScript(
 
   useEffect(() => {
     if (jsCode == null) return
-    console.log('code', jsCode)
     ;(async () => {
       const jsCodeWithoutImports = jsCode.replace(
         /import (.*) from [\"\']@villagekit\/design[\"\']/,
@@ -78,8 +77,9 @@ export function DesignRendererAssemblyJavaScript(
             createParts: () => Promise.resolve(assembly),
           })
         }
+        setError(null)
       } else {
-        console.log('validate', assemblyResult.error)
+        console.error('validate', assemblyResult.error)
         setError(assemblyResult.error)
       }
     })()
