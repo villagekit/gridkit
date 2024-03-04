@@ -55,6 +55,7 @@
     "@villagekit/sandbox": "workspace:^",
     "@villagekit/ui": "workspace:^",
     "@villagekit/util-math": "workspace:^",
+    "@xstate/react": "^4.1.0",
     "add": "^2.0.6",
     "codemirror": "^6.0.1",
     "codemirror-theme-catppuccin": "^0.3.0",
@@ -69,6 +70,7 @@
     "react-resplit": "^1.2.0",
     "smol-toml": "^1.1.4",
     "three": "^0.161.0",
+    "xstate": "^5.9.1",
     "zod": "^3.22.4"
   }
 }
