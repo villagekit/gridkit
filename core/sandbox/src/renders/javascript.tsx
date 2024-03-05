@@ -49,7 +49,6 @@ export const javascriptAssemblyRenderer = fromCallback<RenderInputEvent>(
 
       if (assemblyResult == null) return
       if (assemblyResult.success) {
-        console.log('render', assemblyResult.data)
         const { meta, assembly } = assemblyResult.data
         if (typeof assembly === 'function') {
           // TODO: fix

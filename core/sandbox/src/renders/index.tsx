@@ -1,9 +1,8 @@
-import { ParametersOptions } from '@villagekit/parameters'
 import { assign, sendTo, setup, ActorRefFrom } from 'xstate'
-import React, { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useMachine } from '@xstate/react'
 
-import { DesignFile, DesignRender } from '../types'
+import { DesignFile, DesignRender, DesignRenderError, DesignRenderOutput } from '../types'
 import { javascriptAssemblyRenderer } from './javascript'
 import { typescriptAssemblyRenderer } from './typescript'
 
@@ -12,19 +11,15 @@ export type RenderInputEvent = {
   code: string
 }
 
-export type RenderOutput<ParamsOptions extends ParametersOptions> =
-  DesignRender<ParamsOptions> | null
-export type RenderError = string | Error | null
+export function useDesignRender(options: {
+  file: DesignFile
+}) {
+  const { file } = options
 
-export type RendererProps<ParamsOptions extends ParametersOptions> = {
-  setRender: (render: RenderOutput<ParamsOptions>) => void
-  setError: (error: RenderError) => void
-}
-
-export function useDesignRenderer<ParamsOptions extends ParametersOptions>(
-  props: RendererProps<ParamsOptions> & { file: DesignFile },
-) {
-  const { file, setRender, setError } = props
+  const [render, setRender] = useState<DesignRender>({
+    output: null,
+    error: null,
+  })
 
   const [state, send] = useMachine(rendererMachine)
 
@@ -41,9 +36,11 @@ export function useDesignRenderer<ParamsOptions extends ParametersOptions>(
   }, [send, file])
 
   useEffect(() => {
-    setRender(state.context.output)
-    setError(state.context.error)
-  }, [state, setRender, setError])
+    const { output, error } = state.context
+    setRender({ output, error })
+  }, [state])
+
+  return render
 }
 
 export const rendererMachine = setup({
@@ -55,8 +52,8 @@ export const rendererMachine = setup({
             ActorRefFrom<typeof javascriptAssemblyRenderer>,
             ActorRefFrom<typeof typescriptAssemblyRenderer>,
           ]
-      output: RenderOutput<any>
-      error: RenderError
+      output: DesignRenderOutput<any>
+      error: DesignRenderError
     }
     events:
       | {
@@ -69,11 +66,11 @@ export const rendererMachine = setup({
         }
       | {
           type: 'renderer.success'
-          output: RenderOutput<any>
+          output: DesignRenderOutput<any>
         }
       | {
           type: 'renderer.failure'
-          error: RenderError
+          error: DesignRenderError
         }
   },
 }).createMachine({

@@ -26,13 +26,17 @@ export type DesignRenderAssembly<ParamsOptions extends ParametersOptions = never
       ) => Promise<DesignParts>
   plugins?: DesignAssemblyPlugins
 }
-export type DesignRender<ParamsOptions extends ParametersOptions = never> =
-  DesignRenderAssembly<ParamsOptions>
+export type DesignRenderOutput<ParamsOptions extends ParametersOptions> =
+  DesignRenderAssembly<ParamsOptions> | null
+export type DesignRenderError = string | Error | null
+export type DesignRender = {
+  output: DesignRenderOutput<any>
+  error: DesignRenderError
+}
 
 export type DesignInstance<ParamsOptions extends ParametersOptions = never> = {
   file: DesignFile
-  render: DesignRender<ParametersOptions> | null
-  renderError: string | Error | null
+  render: DesignRender
   parameterValues: ParamsOptions extends never
     ? null
     : ExtractValuesFromParametersOptions<ParamsOptions>

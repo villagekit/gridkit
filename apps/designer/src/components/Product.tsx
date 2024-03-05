@@ -74,11 +74,13 @@ function ProductAssemblyGl() {
 
   if (context == null) return <Loading />
 
-  const { renderError } = context
-  if (renderError != null)
+  const {
+    render: { error },
+  } = context
+  if (error != null)
     return (
       <Box as="code">
-        <Box as="pre">{renderError instanceof Error ? renderError.message : renderError}</Box>
+        <Box as="pre">{error instanceof Error ? error.message : error}</Box>
       </Box>
     )
 
@@ -90,15 +92,19 @@ function ProductAssemblyGl() {
 }
 
 function ProductAssemblyTitle() {
-  const context = useSandboxContext()
+  const {
+    render: { output },
+  } = useSandboxContext()
 
-  return <Heading as="h2">{context?.render?.meta?.label}</Heading>
+  return <Heading as="h2">{output?.meta?.label}</Heading>
 }
 
 function ProductAssemblyDetails() {
-  const context = useSandboxContext()
+  const {
+    render: { output },
+  } = useSandboxContext()
 
-  if (context?.render?.type !== 'assembly') return <Loading />
+  if (output?.type !== 'assembly') return <Loading />
 
   return (
     <>

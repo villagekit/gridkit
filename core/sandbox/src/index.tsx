@@ -39,7 +39,7 @@ export function Sandbox(props: SandboxProps) {
     alwaysShowFullscreenControls = false,
   } = props
 
-  const context = useSandboxContext()
+  const { render } = useSandboxContext()
 
   const maxTiers = 3
   const gpu = useDetectGPU()
@@ -73,7 +73,7 @@ export function Sandbox(props: SandboxProps) {
     <Box
       id="sandbox-container"
       role="img"
-      aria-label={context.render?.meta?.label}
+      aria-label={render.output?.meta?.label}
       ref={containerRef}
       sx={{
         ':hover, :focus-within': {
@@ -171,8 +171,8 @@ interface ContentGlProps {
 function ContentGl(props: ContentGlProps) {
   const { scale = 1, mode, shouldAutoRotate, shouldDisplayGrid, cameraControlsRef } = props
 
-  const context = useSandboxContext()
-  const designType = context.render?.type
+  const { render } = useSandboxContext()
+  const designType = render.output?.type
 
   const gridLengthInMeters = 0.04
 

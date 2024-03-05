@@ -55,9 +55,9 @@
   },
   "devDependencies": {
     "@storybook/react": "^7.6.3",
-    "@villagekit/tsconfig": "workspace:*",
     "@villagekit/part-gridbeam": "workspace:*",
     "@villagekit/part-gridpanel": "workspace:*",
+    "@villagekit/tsconfig": "workspace:*",
     "tsup": "^8.0.1",
     "typescript": "^5.2.2"
   }

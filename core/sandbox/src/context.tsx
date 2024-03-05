@@ -3,13 +3,13 @@ import {
   ExtractValuesFromParametersOptions,
   ParameterControlsContextProvider,
   ParametersOptions,
+  ParametersValues,
   Presets,
 } from '@villagekit/parameters'
 
 import { SandboxAssemblyProvider } from './assembly/context'
-import { RenderOutput, RenderError, useDesignRenderer } from './renders'
-import { DesignFile } from '.'
-import { DesignInstance } from './types'
+import { useDesignRender } from './renders'
+import { DesignFile, DesignInstance } from './types'
 
 type ProviderProps = {
   children: React.ReactNode
@@ -35,30 +35,26 @@ export function useSandboxContext(): SandboxState {
 export function SandboxProvider(props: SandboxOptions & ProviderProps) {
   const { file, onLocationUpdate, children } = props
 
-  const [render, setRender] = useState<RenderOutput<any>>(null)
-  const [renderError, setRenderError] = useState<RenderError>(null)
+  const render = useDesignRender({ file })
 
-  useDesignRenderer({ file, setRender, setError: setRenderError })
-
-  const parameters = render?.parameters
-  const presets = render?.presets
+  const parameters = render.output?.parameters
+  const presets = render.output?.presets
   const hasParameters = parameters != null
   const hasPresets = presets != null
 
-  const [parameterValues, setParameterValues] = useState<object | null>(null)
+  const [parameterValues, setParameterValues] = useState<ParametersValues | null>(null)
 
   const state = {
     file,
     render,
-    renderError,
     parameters,
     presets,
     parameterValues,
   }
 
   const renderTyped =
-    render?.type === 'assembly' ? (
-      <SandboxAssemblyProvider assembly={render} parameterValues={parameterValues}>
+    render.output?.type === 'assembly' ? (
+      <SandboxAssemblyProvider assembly={render.output} parameterValues={parameterValues}>
         {children}
       </SandboxAssemblyProvider>
     ) : (
