@@ -1,49 +1,65 @@
-import { useEffect, useState } from 'react'
 import initSwc, { transformSync } from '@swc/wasm-web'
+import { fromCallback, createActor } from 'xstate'
 
-import { RendererProps } from './'
-import { DesignRendererAssemblyJavaScript } from './javascript'
+import { RenderInputEvent } from './'
+import { javascriptAssemblyRenderer } from './javascript'
 
-export function DesignRendererAssemblyTypeScript(props: RendererProps<any> & { code: string }) {
-  const { code: tsCode, setRender, setError } = props
+export const typescriptAssemblyRenderer = fromCallback<RenderInputEvent>(
+  ({ sendBack, receive }) => {
+    console.log('invoke ts')
 
-  const [isSwcInitialized, setSwcInitialized] = useState(false)
-  useEffect(() => {
-    initSwc().then(() => setSwcInitialized(true))
-  }, [])
+    const actor = createActor(javascriptAssemblyRenderer)
+    actor.start()
 
-  const [jsCode, setJsCode] = useState<string | null>(null)
+    const swcInitialized = initSwc()
 
-  useEffect(() => {
-    if (!isSwcInitialized) return
+    receive((event) => {
+      console.log('handle ts')
+      handleCode(event.code)
+    })
 
-    let tsTransformOutput
-    try {
-      tsTransformOutput = transformSync(tsCode, {
-        jsc: {
-          parser: {
-            syntax: 'typescript',
-          },
-        },
-        module: {
-          type: 'es6',
-          strict: true,
-          noInterop: true,
-        },
-      })
-    } catch (error) {
-      if (error instanceof Error || typeof error === 'string') {
-        console.error('swc', error)
-        setError(error)
-        return
-      } else {
-        throw error
-      }
+    actor.on('renderer.success', sendBack)
+    actor.on('renderer.failure', sendBack)
+
+    return () => {
+      console.log('cleanup ts')
+      actor.stop()
     }
-    setJsCode(tsTransformOutput.code)
-  }, [tsCode, setError, isSwcInitialized])
 
-  return (
-    <DesignRendererAssemblyJavaScript code={jsCode} setRender={setRender} setError={setError} />
-  )
-}
+    async function handleCode(tsCode: string) {
+      await swcInitialized
+
+      let tsTransformOutput
+      try {
+        tsTransformOutput = transformSync(tsCode, {
+          jsc: {
+            parser: {
+              syntax: 'typescript',
+            },
+          },
+          module: {
+            type: 'es6',
+            strict: true,
+            noInterop: true,
+          },
+        })
+      } catch (error) {
+        if (error instanceof Error || typeof error === 'string') {
+          console.error('swc', error)
+          sendBack({
+            type: 'renderer.failure',
+            error,
+          })
+          return
+        } else {
+          throw error
+        }
+      }
+
+      actor.send({
+        type: 'render',
+        code: tsTransformOutput.code,
+      })
+    }
+  },
+)
