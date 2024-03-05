@@ -36,16 +36,14 @@ export const typescriptAssemblyRenderer = fromCallback<
         },
       })
     } catch (error) {
-      if (error instanceof Error || typeof error === 'string') {
-        console.error('swc', error)
-        sendBack({
-          type: 'renderer.failure',
-          error,
-        })
-        return
-      } else {
-        throw error
-      }
+      sendBack({
+        type: 'renderer.failure',
+        renderError: {
+          type: 'typescript.transform',
+          error: error,
+        },
+      })
+      return
     }
 
     javascriptAssemblyRenderer.send({

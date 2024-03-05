@@ -2,7 +2,7 @@ import { assign, sendTo, setup, ActorRefFrom } from 'xstate'
 import { useEffect, useState } from 'react'
 import { useMachine } from '@xstate/react'
 
-import { DesignFile, DesignRender, DesignRenderError, DesignRenderOutput } from '../types'
+import { DesignFile, DesignRender, DesignRenderError } from '../types'
 import { javascriptAssemblyRenderer } from './javascript'
 import { typescriptAssemblyRenderer } from './typescript'
 
@@ -16,10 +16,8 @@ export function useDesignRender(options: {
 }) {
   const { file } = options
 
-  const [render, setRender] = useState<DesignRender>({
-    output: null,
-    error: null,
-  })
+  const [render, setRender] = useState<DesignRender<any>>(null)
+  const [renderError, setRenderError] = useState<DesignRenderError>(null)
 
   const [state, send] = useMachine(rendererMachine)
 
@@ -36,11 +34,12 @@ export function useDesignRender(options: {
   }, [send, file])
 
   useEffect(() => {
-    const { output, error } = state.context
-    setRender({ output, error })
+    const { render, renderError } = state.context
+    setRender(render)
+    setRenderError(renderError)
   }, [state])
 
-  return render
+  return { render, renderError }
 }
 
 export const rendererMachine = setup({
@@ -52,8 +51,8 @@ export const rendererMachine = setup({
             ActorRefFrom<typeof javascriptAssemblyRenderer>,
             ActorRefFrom<typeof typescriptAssemblyRenderer>,
           ]
-      output: DesignRenderOutput<any>
-      error: DesignRenderError
+      render: DesignRender<any>
+      renderError: DesignRenderError
     }
     events:
       | {
@@ -66,19 +65,19 @@ export const rendererMachine = setup({
         }
       | {
           type: 'renderer.success'
-          output: DesignRenderOutput<any>
+          render: DesignRender<any>
         }
       | {
           type: 'renderer.failure'
-          error: DesignRenderError
+          renderError: DesignRenderError
         }
   },
 }).createMachine({
   id: 'renderer',
   context: {
     rendererRefs: null,
-    output: null,
-    error: null,
+    render: null,
+    renderError: null,
   },
   entry: assign({
     rendererRefs: ({ spawn }) => {
@@ -111,13 +110,13 @@ export const rendererMachine = setup({
     },
     'renderer.success': {
       actions: assign({
-        output: ({ event }) => event.output,
-        error: null,
+        render: ({ event }) => event.render,
+        renderError: null,
       }),
     },
     'renderer.failure': {
       actions: assign({
-        error: ({ event }) => event.error,
+        renderError: ({ event }) => event.renderError,
       }),
     },
   },

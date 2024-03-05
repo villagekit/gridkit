@@ -5,6 +5,7 @@ import {
   Presets,
 } from '@villagekit/parameters'
 import { PartVariantsByType } from '@villagekit/part'
+import { ValidationError } from 'zod-validation-error'
 
 export type DesignFileAssembly = {
   type: 'assembly'
@@ -26,17 +27,28 @@ export type DesignRenderAssembly<ParamsOptions extends ParametersOptions = never
       ) => Promise<DesignParts>
   plugins?: DesignAssemblyPlugins
 }
-export type DesignRenderOutput<ParamsOptions extends ParametersOptions> =
-  DesignRenderAssembly<ParamsOptions> | null
-export type DesignRenderError = string | Error | null
-export type DesignRender = {
-  output: DesignRenderOutput<any>
-  error: DesignRenderError
-}
+export type DesignRender<ParamsOptions extends ParametersOptions> =
+  null | DesignRenderAssembly<ParamsOptions>
+
+export type DesignRenderError =
+  | null
+  | {
+      type: 'typescript.transform'
+      error: string
+    }
+  | {
+      type: 'javascript.evaluate'
+      error: Error
+    }
+  | {
+      type: 'javascript.validate'
+      error: ValidationError
+    }
 
 export type DesignInstance<ParamsOptions extends ParametersOptions = never> = {
   file: DesignFile
-  render: DesignRender
+  render: DesignRender<ParamsOptions>
+  renderError: DesignRenderError
   parameterValues: ParamsOptions extends never
     ? null
     : ExtractValuesFromParametersOptions<ParamsOptions>

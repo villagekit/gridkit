@@ -74,15 +74,29 @@ function ProductAssemblyGl() {
 
   if (context == null) return <Loading />
 
-  const {
-    render: { error },
-  } = context
-  if (error != null)
-    return (
-      <Box as="code">
-        <Box as="pre">{error instanceof Error ? error.message : error}</Box>
-      </Box>
-    )
+  const { renderError } = context
+  if (renderError != null) {
+    switch (renderError.type) {
+      case 'typescript.transform':
+        return (
+          <Box as="code">
+            <Box as="pre">{renderError.error}</Box>
+          </Box>
+        )
+      case 'javascript.evaluate':
+        return (
+          <Box as="code">
+            <Box as="pre">{renderError.error.message}</Box>
+          </Box>
+        )
+      case 'javascript.validate':
+        return (
+          <Box as="code">
+            <Box as="pre">{renderError.error.message}</Box>
+          </Box>
+        )
+    }
+  }
 
   return (
     <React.Suspense fallback={<Loading />}>
@@ -92,19 +106,15 @@ function ProductAssemblyGl() {
 }
 
 function ProductAssemblyTitle() {
-  const {
-    render: { output },
-  } = useSandboxContext()
+  const { render } = useSandboxContext()
 
-  return <Heading as="h2">{output?.meta?.label}</Heading>
+  return <Heading as="h2">{render?.meta?.label}</Heading>
 }
 
 function ProductAssemblyDetails() {
-  const {
-    render: { output },
-  } = useSandboxContext()
+  const { render } = useSandboxContext()
 
-  if (output?.type !== 'assembly') return <Loading />
+  if (render?.type !== 'assembly') return <Loading />
 
   return (
     <>

@@ -35,10 +35,10 @@ export function useSandboxContext(): SandboxState {
 export function SandboxProvider(props: SandboxOptions & ProviderProps) {
   const { file, onLocationUpdate, children } = props
 
-  const render = useDesignRender({ file })
+  const { render, renderError } = useDesignRender({ file })
 
-  const parameters = render.output?.parameters
-  const presets = render.output?.presets
+  const parameters = render?.parameters
+  const presets = render?.presets
   const hasParameters = parameters != null
   const hasPresets = presets != null
 
@@ -47,14 +47,15 @@ export function SandboxProvider(props: SandboxOptions & ProviderProps) {
   const state = {
     file,
     render,
+    renderError,
     parameters,
     presets,
     parameterValues,
   }
 
   const renderTyped =
-    render.output?.type === 'assembly' ? (
-      <SandboxAssemblyProvider assembly={render.output} parameterValues={parameterValues}>
+    render?.type === 'assembly' ? (
+      <SandboxAssemblyProvider assembly={render} parameterValues={parameterValues}>
         {children}
       </SandboxAssemblyProvider>
     ) : (

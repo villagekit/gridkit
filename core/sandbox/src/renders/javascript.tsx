@@ -1,6 +1,7 @@
 import { fromCallback } from 'xstate'
 import { RenderInputEvent } from './'
 import { designAssemblySafeParse } from '@villagekit/design'
+import { fromZodError } from 'zod-validation-error'
 
 export const javascriptAssemblyRenderer = fromCallback<RenderInputEvent>(
   ({ sendBack, receive }) => {
@@ -35,12 +36,11 @@ export const javascriptAssemblyRenderer = fromCallback<RenderInputEvent>(
         jsModule = await import(/* @vite-ignore */ jsModuleUrl)
         URL.revokeObjectURL(jsModuleUrl)
       } catch (error) {
-        console.error('eval', error)
-        if (error instanceof Error || typeof error === 'string') {
-          sendBack({ type: 'renderer.failure', error })
-        } else {
-          throw error
-        }
+        sendBack({
+          type: 'renderer.failure',
+          renderError: { type: 'javascript.evaluate', error },
+        })
+        return
       }
 
       // validate module
@@ -56,7 +56,7 @@ export const javascriptAssemblyRenderer = fromCallback<RenderInputEvent>(
           const { parameters, presets } = assemblyResult.data
           sendBack({
             type: 'renderer.success',
-            output: {
+            render: {
               type: 'assembly' as const,
               meta,
               parameters,
@@ -70,7 +70,7 @@ export const javascriptAssemblyRenderer = fromCallback<RenderInputEvent>(
         } else {
           sendBack({
             type: 'renderer.success',
-            output: {
+            render: {
               type: 'assembly' as const,
               meta,
               parameters: null,
@@ -83,10 +83,12 @@ export const javascriptAssemblyRenderer = fromCallback<RenderInputEvent>(
         }
       } else {
         const error = assemblyResult.error
-        console.error('validate', error)
         sendBack({
           type: 'renderer.failure',
-          error,
+          renderError: {
+            type: 'javascript.validate',
+            error: fromZodError(error),
+          },
         })
       }
     }
