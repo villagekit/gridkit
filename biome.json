@@ -23,7 +23,8 @@
     "enabled": true,
     "rules": {
       "complexity": {
-        "useLiteralKeys": "off"
+        "useLiteralKeys": "off",
+        "noBannedTypes": "off"
       },
       "recommended": true,
       "suspicious": {
