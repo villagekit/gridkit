@@ -1,7 +1,5 @@
 import { fromCallback } from 'xstate'
 import { RenderInputEvent } from './'
-import { designAssemblySafeParse } from '@villagekit/design'
-import { fromZodError } from 'zod-validation-error'
 
 export const javascriptAssemblyRenderer = fromCallback<RenderInputEvent>(
   ({ sendBack, receive }) => {
@@ -43,54 +41,21 @@ export const javascriptAssemblyRenderer = fromCallback<RenderInputEvent>(
         return
       }
 
-      // validate module
       if (jsModule == null) return
-      const assemblyResult = designAssemblySafeParse(jsModule)
-
-      if (assemblyResult == null) return
-      if (assemblyResult.success) {
-        const { meta, assembly } = assemblyResult.data
-        if (typeof assembly === 'function') {
-          // TODO: fix
-          // @ts-ignore
-          const { parameters, presets } = assemblyResult.data
-          sendBack({
-            type: 'renderer.success',
-            render: {
-              type: 'assembly' as const,
-              meta,
-              parameters,
-              presets,
-              // TODO: fix
-              // @ts-ignore
-              // createParts: assembly,
-              createParts: (...args) => Promise.resolve(assembly(...args)),
-            },
-          })
-        } else {
-          sendBack({
-            type: 'renderer.success',
-            render: {
-              type: 'assembly' as const,
-              meta,
-              parameters: null,
-              presets: null,
-              // TODO: fix
-              // @ts-ignore
-              createParts: () => Promise.resolve(assembly),
-            },
-          })
-        }
-      } else {
-        const error = assemblyResult.error
-        sendBack({
-          type: 'renderer.failure',
-          renderError: {
-            type: 'javascript.validate',
-            error: fromZodError(error),
-          },
-        })
-      }
+      const { meta, parameters, presets, assembly } = jsModule
+      sendBack({
+        type: 'renderer.success',
+        render: {
+          type: 'assembly' as const,
+          meta,
+          parameters,
+          presets,
+          assembly:
+            typeof assembly === 'function'
+              ? (...args: Array<any>) => Promise.resolve(assembly(...args))
+              : () => Promise.resolve(assembly),
+        },
+      })
     }
   },
 )

@@ -3,7 +3,7 @@ import '@villagekit/part-gridpanel'
 
 import React from 'react'
 import { AssemblyInfo, Sandbox, useSandboxContext } from '@villagekit/sandbox'
-import { Box, Flex, Heading, VStack } from '@villagekit/ui'
+import { Box, Flex, HStack, Heading, List, ListItem, VStack } from '@villagekit/ui'
 import { Resplit } from 'react-resplit'
 import { ParameterControls } from '@villagekit/parameters'
 
@@ -74,7 +74,8 @@ function ProductAssemblyGl() {
 
   if (context == null) return <Loading />
 
-  const { renderError } = context
+  const { renderError, validationErrors } = context
+
   if (renderError != null) {
     switch (renderError.type) {
       case 'typescript.transform':
@@ -96,6 +97,24 @@ function ProductAssemblyGl() {
           </Box>
         )
     }
+  }
+
+  if (Object.values(validationErrors).filter((v) => v != null).length > 0) {
+    return (
+      <List>
+        {Object.entries(validationErrors).map(
+          ([key, error]) =>
+            error != null && (
+              <ListItem key={key}>
+                <HStack sx={{ alignItems: 'flex-start' }}>
+                  <Box sx={{ fontWeight: 'bold' }}>{key} :</Box>
+                  <Box>{error.message}</Box>
+                </HStack>
+              </ListItem>
+            ),
+        )}
+      </List>
+    )
   }
 
   return (

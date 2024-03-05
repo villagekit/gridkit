@@ -19,7 +19,7 @@ export type DesignRenderAssembly<ParamsOptions extends ParametersOptions = never
   meta: DesignMeta
   parameters: ParamsOptions extends never ? null : ParamsOptions
   presets: ParamsOptions extends never ? null : Presets<ParamsOptions>
-  createParts: ParamsOptions extends never
+  assembly: ParamsOptions extends never
     ? () => Promise<DesignParts>
     : (
         parameters: ExtractValuesFromParametersOptions<ParamsOptions>,
@@ -45,10 +45,16 @@ export type DesignRenderError =
       error: ValidationError
     }
 
+export type DesignValidationError = ValidationError | null
+export type DesignValidationKey = keyof NonNullable<DesignRender<any>>
+export type DesignValidationErrors = Partial<Record<DesignValidationKey, DesignValidationError>>
+export type ExtendDesignValidationErrors = (errors: DesignValidationErrors) => void
+
 export type DesignInstance<ParamsOptions extends ParametersOptions = never> = {
   file: DesignFile
   render: DesignRender<ParamsOptions>
   renderError: DesignRenderError
+  validationErrors: DesignValidationErrors
   parameterValues: ParamsOptions extends never
     ? null
     : ExtractValuesFromParametersOptions<ParamsOptions>
