@@ -26,6 +26,9 @@
         "useLiteralKeys": "off",
         "noBannedTypes": "off"
       },
+      "style": {
+        "noNonNullAssertion": "off"
+      },
       "recommended": true,
       "suspicious": {
         "noExplicitAny": "off",

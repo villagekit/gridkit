@@ -1,5 +1,5 @@
 import { ParametersOptions } from '@villagekit/parameters'
-import { assign, sendTo, setup } from 'xstate'
+import { assign, sendTo, setup, ActorRefFrom } from 'xstate'
 import React, { useEffect } from 'react'
 import { useMachine } from '@xstate/react'
 
@@ -51,6 +51,12 @@ export function DesignRenderer<ParamsOptions extends ParametersOptions>(
 export const rendererMachine = setup({
   types: {} as {
     context: {
+      rendererRefs:
+        | null
+        | [
+            ActorRefFrom<typeof javascriptAssemblyRenderer>,
+            ActorRefFrom<typeof typescriptAssemblyRenderer>,
+          ]
       output: RenderOutput<any>
       error: RenderError
     }
@@ -72,17 +78,29 @@ export const rendererMachine = setup({
           error: RenderError
         }
   },
-  actors: {
-    javascriptAssemblyRenderer,
-    typescriptAssemblyRenderer,
-  },
 }).createMachine({
   id: 'renderer',
   context: {
+    rendererRefs: null,
     output: null,
     error: null,
   },
-  invoke: [{ src: 'javascriptAssemblyRenderer' }, { src: 'typescriptAssemblyRenderer' }],
+  entry: assign({
+    rendererRefs: ({ spawn }) => {
+      // @ts-ignore
+      const javascriptAssemblyRendererRef = spawn(javascriptAssemblyRenderer, {
+        id: 'javascriptAssemblyRenderer',
+      })
+      // @ts-ignore
+      const typescriptAssemblyRendererRef = spawn(typescriptAssemblyRenderer, {
+        id: 'typescriptAssemblyRenderer',
+        input: {
+          javascriptAssemblyRenderer: javascriptAssemblyRendererRef,
+        },
+      })
+      return [javascriptAssemblyRendererRef, typescriptAssemblyRendererRef]
+    },
+  }),
   on: {
     'renderer.render.javascript': {
       actions: sendTo('javascriptAssemblyRenderer', ({ event }) => ({

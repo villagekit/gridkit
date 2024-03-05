@@ -4,18 +4,13 @@ import { designAssemblySafeParse } from '@villagekit/design'
 
 export const javascriptAssemblyRenderer = fromCallback<RenderInputEvent>(
   ({ sendBack, receive }) => {
-    console.log('invoke js')
-
     receive((event) => {
       handleCode(event.code)
     })
 
-    return () => {
-      console.log('cleanup js')
-    }
+    return () => {}
 
     async function handleCode(jsCode: string) {
-      console.log('handle js')
       const jsCodeWithoutImports = jsCode.replace(
         /import (.*) from [\"\']@villagekit\/design[\"\']/,
         'const $1 = villagekit.design',
