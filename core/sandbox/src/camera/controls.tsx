@@ -18,7 +18,7 @@ import {
 } from 'three'
 
 import type { SandboxMode } from '../'
-import { machine } from './machine'
+import { createMachine } from './machine'
 
 const ROT = 2 * Math.PI
 
@@ -61,7 +61,10 @@ export const CameraControls = forwardRef<CameraControlsRef, CameraControlsProps>
   function CameraControls(props, ref) {
     const { boundingBox, mode, shouldAutoRotate } = props
 
-    const actorMachine = useMemo(() => machine(mode === 'screenshot' ? 'off' : 'auto'), [mode])
+    const actorMachine = useMemo(
+      () => createMachine(mode === 'screenshot' ? 'off' : 'auto'),
+      [mode],
+    )
     const actor = useActorRef(actorMachine)
 
     const isControlEnabled = true
@@ -178,7 +181,7 @@ export const CameraControls = forwardRef<CameraControlsRef, CameraControlsProps>
 )
 
 interface AutoRotateOptions {
-  actor: ReturnType<typeof useActorRef<ReturnType<typeof machine>>>
+  actor: ReturnType<typeof useActorRef<ReturnType<typeof createMachine>>>
   shouldAutoRotate: boolean
   controls: CameraControlsType
   mode: SandboxMode

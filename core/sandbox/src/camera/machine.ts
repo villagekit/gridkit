@@ -4,7 +4,7 @@ const timeBeforeAutoRotation = 5000
 const maxAutoRotationSpeed = 0.5
 const autoRotationAcceleration = 0.1
 
-export function machine(initialState = 'auto') {
+export function createMachine(initialState = 'auto') {
   return setup({
     types: {} as {
       context: {
