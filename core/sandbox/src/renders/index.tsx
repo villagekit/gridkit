@@ -21,9 +21,9 @@ export type RendererProps<ParamsOptions extends ParametersOptions> = {
   setError: (error: RenderError) => void
 }
 
-export function DesignRenderer<ParamsOptions extends ParametersOptions>(
+export function useDesignRenderer<ParamsOptions extends ParametersOptions>(
   props: RendererProps<ParamsOptions> & { file: DesignFile },
-): React.ReactNode {
+) {
   const { file, setRender, setError } = props
 
   const [state, send] = useMachine(rendererMachine)
@@ -44,8 +44,6 @@ export function DesignRenderer<ParamsOptions extends ParametersOptions>(
     setRender(state.context.output)
     setError(state.context.error)
   }, [state, setRender, setError])
-
-  return <React.Fragment />
 }
 
 export const rendererMachine = setup({

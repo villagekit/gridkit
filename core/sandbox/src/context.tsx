@@ -7,7 +7,7 @@ import {
 } from '@villagekit/parameters'
 
 import { SandboxAssemblyProvider } from './assembly/context'
-import { RenderOutput, RenderError, DesignRenderer } from './renders'
+import { RenderOutput, RenderError, useDesignRenderer } from './renders'
 import { DesignFile } from '.'
 import { DesignInstance } from './types'
 
@@ -37,6 +37,8 @@ export function SandboxProvider(props: SandboxOptions & ProviderProps) {
 
   const [render, setRender] = useState<RenderOutput<any>>(null)
   const [renderError, setRenderError] = useState<RenderError>(null)
+
+  useDesignRenderer({ file, setRender, setError: setRenderError })
 
   const parameters = render?.parameters
   const presets = render?.presets
@@ -77,12 +79,7 @@ export function SandboxProvider(props: SandboxOptions & ProviderProps) {
       renderTyped
     )
 
-  return (
-    <SandboxContext.Provider value={state}>
-      <DesignRenderer file={file} setRender={setRender} setError={setRenderError} />
-      {parameterized}
-    </SandboxContext.Provider>
-  )
+  return <SandboxContext.Provider value={state}>{parameterized}</SandboxContext.Provider>
 }
 
 type SandboxParametersProps<ParamsOptions extends ParametersOptions> = Pick<
