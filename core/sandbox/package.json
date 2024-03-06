@@ -41,6 +41,7 @@
     "camera-controls": "^1.37.3",
     "comlink": "^4.4.1",
     "constate": "^3.3.2",
+    "debounceify": "^1.1.0",
     "dnum": "^2.9.0",
     "lodash-es": "^4.17.21",
     "p-debounce": "^4.0.0",

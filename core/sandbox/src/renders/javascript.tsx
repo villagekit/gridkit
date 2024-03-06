@@ -10,18 +10,19 @@ import {
   DesignParametersValues,
   DesignPartVariantsByType,
 } from '@villagekit/design'
+import debounceify from 'debounceify'
 
 type AssemblyEvaluator = {
-  evaluateModule: (code: string) => {
+  evaluateModule: (code: string) => Promise<{
     meta: DesignMeta
     parameters: DesignParameters | null
     presets: DesignPresets<any> | null
     assembly: DesignParts | null
-  }
+  }>
   evaluateAssembly: (
     parameters: DesignParametersValues,
     partVariants: DesignPartVariantsByType,
-  ) => DesignParts
+  ) => Promise<DesignParts>
 }
 
 export const javascriptAssemblyRenderer = fromCallback<RenderInputEvent>(
@@ -43,13 +44,21 @@ export const javascriptAssemblyRenderer = fromCallback<RenderInputEvent>(
 
     async function handleCode(jsCode: string) {
       await hasLoadedEvaluator
-      const evaluator = Comlink.wrap<AssemblyEvaluator>(
+
+      const evaluatorRaw = Comlink.wrap<AssemblyEvaluator>(
         Comlink.windowEndpoint(evaluatorIframe.contentWindow!),
       )
+      const evaluator: AssemblyEvaluator = {
+        evaluateModule: debounceify((code) => evaluatorRaw.evaluateModule(code)),
+        evaluateAssembly: debounceify((parameters, partVariants) =>
+          evaluatorRaw.evaluateAssembly(parameters, partVariants),
+        ),
+      }
 
       let jsModule
       try {
         jsModule = await evaluator.evaluateModule(jsCode)
+        console.log('module', jsModule)
       } catch (error) {
         sendBack({
           type: 'renderer.failure',
@@ -96,24 +105,15 @@ const createEvaulatorIframe = () => {
   const iframe = document.createElement('iframe')
   iframe.title = 'Village Kit Evaluator'
   iframe.sandbox.add('allow-scripts')
+  iframe.sandbox.add('allow-same-origin')
   iframe.style.display = 'none'
-  iframe.srcdoc = createEvaluatorDoc()
+  iframe.srcdoc = createEvaluatorIframeSrc()
   return iframe
 }
 
-const createEvaluatorDoc = () =>
-  `
-<!doctype html>
-<script type="importmap">
-{
-  "imports": {
-    "comlink": "${comlinkDataUrl}",
-    "@villagekit/design": "data:,${encodeURI('')}"
-  }
-}
-</script>
-<script type="module">
-  import * as Comlink from "comlink"
+const createEvaulatorWorkerSrc = () => `
+  // web workers don't yet support importmaps
+  import * as Comlink from "${comlinkDataUrl}"
 
   let mod = null
 
@@ -145,7 +145,30 @@ const createEvaluatorDoc = () =>
     evaluateAssembly,
   }
 
-  Comlink.expose(exports, Comlink.windowEndpoint(self.parent))
+  Comlink.expose(exports)
+`
+
+const createEvaluatorIframeSrc = () =>
+  `
+<!doctype html>
+<script type="importmap">
+{
+  "imports": {
+    "comlink": "${comlinkDataUrl}",
+    "@villagekit/design": "data:,${encodeURI('')}"
+  }
+}
+</script>
+<script type="module">
+  import * as Comlink from "comlink"
+
+  const workerCode = \`${createEvaulatorWorkerSrc()}\`
+  const workerUrl = URL.createObjectURL(
+    new Blob([workerCode], { type: 'text/javascript' })
+  )
+  const workerObj = new Worker(workerUrl, { type: 'module' })
+  const worker = Comlink.wrap(workerObj)
+  Comlink.expose(worker, Comlink.windowEndpoint(self.parent))
 </script>
 </html>
 `
