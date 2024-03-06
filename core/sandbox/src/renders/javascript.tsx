@@ -1,6 +1,27 @@
 import { fromCallback } from 'xstate'
 import { RenderInputEvent } from './'
 import * as Comlink from 'comlink'
+import {
+  DesignMeta,
+  DesignParameters,
+  DesignParts,
+  DesignPresets,
+  DesignParametersValues,
+  DesignPartVariantsByType,
+} from '@villagekit/design'
+
+type AssemblyEvaluator = {
+  evaluateModule: (code: string) => {
+    meta: DesignMeta
+    parameters: DesignParameters | null
+    presets: DesignPresets<any> | null
+    assembly: DesignParts | null
+  }
+  evaluateAssembly: (
+    parameters: DesignParametersValues,
+    partVariants: DesignPartVariantsByType,
+  ) => DesignParts
+}
 
 export const javascriptAssemblyRenderer = fromCallback<RenderInputEvent>(
   ({ sendBack, receive }) => {
@@ -21,11 +42,12 @@ export const javascriptAssemblyRenderer = fromCallback<RenderInputEvent>(
 
     async function handleCode(jsCode: string) {
       await hasLoadedEvaluator
-      const evaluator = Comlink.wrap(Comlink.windowEndpoint(evaluatorIframe.contentWindow!))
+      const evaluator = Comlink.wrap<AssemblyEvaluator>(
+        Comlink.windowEndpoint(evaluatorIframe.contentWindow!),
+      )
 
       let jsModule
       try {
-        // @ts-ignore
         jsModule = await evaluator.evaluateModule(jsCode)
       } catch (error) {
         sendBack({
@@ -47,11 +69,14 @@ export const javascriptAssemblyRenderer = fromCallback<RenderInputEvent>(
           presets,
           assembly:
             assembly == null
-              ? async (...args: Array<any>) => {
+              ? async (
+                  parameters: DesignParametersValues,
+                  partVariants: DesignPartVariantsByType,
+                ) => {
                   try {
-                    // @ts-ignore
-                    return await evaluator.evaluateMethod('assembly', args)
+                    return await evaluator.evaluateAssembly(parameters, partVariants)
                   } catch (error) {
+                    console.error(error)
                     sendBack({
                       type: 'renderer.failure',
                       renderError: { type: 'javascript.evaluate', error },
@@ -81,13 +106,13 @@ const createEvaluatorDoc = () =>
 <script type="importmap">
 {
   "imports": {
-    "@villagekit/design": "./villagekit-design.js"
+    "comlink": "https://unpkg.com/comlink@4.4.1/dist/esm/comlink.mjs",
+    "@villagekit/design": "data:,${encodeURI('')}"
   }
 }
 </script>
-<script type="module" src="./villagekit-design.js"></script>
 <script type="module">
-  import * as Comlink from "https://unpkg.com/comlink@4.4.1/dist/esm/comlink.mjs";
+  import * as Comlink from "comlink"
 
   let mod = null
 
@@ -101,22 +126,22 @@ const createEvaluatorDoc = () =>
       URL.revokeObjectURL(modUrl)
     }
 
-    let result = {}
-    for (const key in mod) {
-      const value = mod[key]
-      if (typeof value === 'function') continue
-      result[key] = value
+    const { meta, parameters, presets, assembly } = mod
+    return {
+      meta,
+      parameters,
+      presets,
+      assembly: typeof assembly === 'function' ? null : assembly
     }
-    return result
   }
 
-  function evaluateMethod(method, args) {
-    return mod[method](...args)
+  function evaluateAssembly(parameters, partVariants) {
+    return mod.assembly(parameters, partVariants)
   }
 
   const exports = {
     evaluateModule,
-    evaluateMethod,
+    evaluateAssembly,
   }
 
   Comlink.expose(exports, Comlink.windowEndpoint(self.parent))
