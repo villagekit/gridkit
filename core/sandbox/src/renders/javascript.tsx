@@ -32,6 +32,13 @@ export const javascriptAssemblyRenderer = fromCallback<RenderInputEvent>(
     const hasLoadedEvaluator = new Promise((resolve) => {
       evaluatorIframe.onload = resolve
     })
+    evaluatorIframe.contentWindow?.addEventListener('error', (error) => {
+      console.error('iframeee', error)
+    })
+
+    const evaluator = Comlink.wrap<AssemblyEvaluator>(
+      Comlink.windowEndpoint(evaluatorIframe.contentWindow!),
+    )
 
     receive((event) => {
       handleCode(event.code)
@@ -43,39 +50,6 @@ export const javascriptAssemblyRenderer = fromCallback<RenderInputEvent>(
 
     async function handleCode(jsCode: string) {
       await hasLoadedEvaluator
-
-      const evaluatorRaw = Comlink.wrap<AssemblyEvaluator>(
-        Comlink.windowEndpoint(evaluatorIframe.contentWindow!),
-      )
-      let moduleEvaluation: undefined | ReturnType<AssemblyEvaluator['evaluateModule']> = undefined
-      let assemblyEvaluation: undefined | ReturnType<AssemblyEvaluator['evaluateAssembly']> =
-        undefined
-      const evaluator: AssemblyEvaluator = {
-        evaluateModule: async (code) => {
-          if (assemblyEvaluation) {
-            await assemblyEvaluation
-          }
-          if (moduleEvaluation) return moduleEvaluation
-          try {
-            moduleEvaluation = evaluatorRaw.evaluateModule(code)
-            return await moduleEvaluation
-          } finally {
-            moduleEvaluation = undefined
-          }
-        },
-        evaluateAssembly: async (parameters, partVariants) => {
-          if (moduleEvaluation) {
-            await moduleEvaluation
-          }
-          if (assemblyEvaluation) return assemblyEvaluation
-          try {
-            assemblyEvaluation = evaluatorRaw.evaluateAssembly(parameters, partVariants)
-            return await assemblyEvaluation
-          } finally {
-            assemblyEvaluation = undefined
-          }
-        },
-      }
 
       let jsModule
       try {
@@ -189,7 +163,12 @@ const createEvaluatorIframeSrc = () =>
   )
   const workerObj = new Worker(workerUrl, { type: 'module' })
   const worker = Comlink.wrap(workerObj)
+
   Comlink.expose(worker, Comlink.windowEndpoint(self.parent))
+
+  workerObj.addEventListener('error', (error) => {
+    console.error('worker', error)
+  })
 </script>
 </html>
 `
