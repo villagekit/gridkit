@@ -10,7 +10,7 @@ import {
   DesignParametersValues,
   DesignPartVariantsByType,
 } from '@villagekit/design'
-import debounceify from 'debounceify'
+import pDebounce from 'p-debounce'
 
 type AssemblyEvaluator = {
   evaluateModule: (code: string) => Promise<{
@@ -49,8 +49,8 @@ export const javascriptAssemblyRenderer = fromCallback<RenderInputEvent>(
         Comlink.windowEndpoint(evaluatorIframe.contentWindow!),
       )
       const evaluator: AssemblyEvaluator = {
-        evaluateModule: debounceify((code) => evaluatorRaw.evaluateModule(code)),
-        evaluateAssembly: debounceify((parameters, partVariants) =>
+        evaluateModule: pDebounce.promise((code) => evaluatorRaw.evaluateModule(code)),
+        evaluateAssembly: pDebounce.promise((parameters, partVariants) =>
           evaluatorRaw.evaluateAssembly(parameters, partVariants),
         ),
       }
@@ -58,7 +58,6 @@ export const javascriptAssemblyRenderer = fromCallback<RenderInputEvent>(
       let jsModule
       try {
         jsModule = await evaluator.evaluateModule(jsCode)
-        console.log('module', jsModule)
       } catch (error) {
         sendBack({
           type: 'renderer.failure',
