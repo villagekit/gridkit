@@ -10,7 +10,6 @@ import {
   DesignParametersValues,
   DesignPartVariantsByType,
 } from '@villagekit/design'
-import pDebounce from 'p-debounce'
 
 type AssemblyEvaluator = {
   evaluateModule: (code: string) => Promise<{
@@ -48,11 +47,34 @@ export const javascriptAssemblyRenderer = fromCallback<RenderInputEvent>(
       const evaluatorRaw = Comlink.wrap<AssemblyEvaluator>(
         Comlink.windowEndpoint(evaluatorIframe.contentWindow!),
       )
+      let moduleEvaluation: undefined | ReturnType<AssemblyEvaluator['evaluateModule']> = undefined
+      let assemblyEvaluation: undefined | ReturnType<AssemblyEvaluator['evaluateAssembly']> =
+        undefined
       const evaluator: AssemblyEvaluator = {
-        evaluateModule: pDebounce.promise((code) => evaluatorRaw.evaluateModule(code)),
-        evaluateAssembly: pDebounce.promise((parameters, partVariants) =>
-          evaluatorRaw.evaluateAssembly(parameters, partVariants),
-        ),
+        evaluateModule: async (code) => {
+          if (assemblyEvaluation) {
+            await assemblyEvaluation
+          }
+          if (moduleEvaluation) return moduleEvaluation
+          try {
+            moduleEvaluation = evaluatorRaw.evaluateModule(code)
+            return await moduleEvaluation
+          } finally {
+            moduleEvaluation = undefined
+          }
+        },
+        evaluateAssembly: async (parameters, partVariants) => {
+          if (moduleEvaluation) {
+            await moduleEvaluation
+          }
+          if (assemblyEvaluation) return assemblyEvaluation
+          try {
+            assemblyEvaluation = evaluatorRaw.evaluateAssembly(parameters, partVariants)
+            return await assemblyEvaluation
+          } finally {
+            assemblyEvaluation = undefined
+          }
+        },
       }
 
       let jsModule
