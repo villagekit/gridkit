@@ -478,6 +478,9 @@ importers:
       camera-controls:
         specifier: ^1.37.3
         version: 1.38.2(three@0.161.0)
+      comlink:
+        specifier: ^4.4.1
+        version: 4.4.1
       constate:
         specifier: ^3.3.2
         version: 3.3.2(react@18.2.0)
