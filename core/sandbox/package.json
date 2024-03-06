@@ -20,7 +20,8 @@
     "./dist/globals.js"
   ],
   "scripts": {
-    "build:pkg": "tsup src --dts",
+    "build:comlink": "node ./scripts/generate-comlink-dataurl.cjs",
+    "build:pkg": "npm run build:comlink && tsup src --dts",
     "lint": "biome lint ."
   },
   "dependencies": {

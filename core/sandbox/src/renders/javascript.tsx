@@ -1,6 +1,7 @@
 import { fromCallback } from 'xstate'
 import { RenderInputEvent } from './'
 import * as Comlink from 'comlink'
+import { comlinkDataUrl } from '../comlink'
 import {
   DesignMeta,
   DesignParameters,
@@ -106,7 +107,7 @@ const createEvaluatorDoc = () =>
 <script type="importmap">
 {
   "imports": {
-    "comlink": "https://unpkg.com/comlink@4.4.1/dist/esm/comlink.mjs",
+    "comlink": "${comlinkDataUrl}",
     "@villagekit/design": "data:,${encodeURI('')}"
   }
 }
