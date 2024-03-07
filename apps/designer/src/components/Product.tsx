@@ -86,8 +86,15 @@ function ProductAssemblyGl() {
         )
       case 'javascript.evaluate':
         return (
-          <Box as="code">
-            <Box as="pre">{renderError.error.message}</Box>
+          <Box>
+            {renderError.error.message}
+            <Box>
+              {renderError.error.stack.map((frame) => (
+                <Box>
+                  at line {frame.line}, column {frame.column}, function {frame.name}
+                </Box>
+              ))}
+            </Box>
           </Box>
         )
       case 'javascript.validate':

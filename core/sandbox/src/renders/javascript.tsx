@@ -10,6 +10,8 @@ import {
   DesignParametersValues,
   DesignPartVariantsByType,
 } from '@villagekit/design'
+import { AnyMap, TraceMap, originalPositionFor } from '@jridgewell/trace-mapping'
+import { parseStackTrace } from 'errorstacks'
 
 type AssemblyEvaluator = {
   evaluateModule: (code: string) => Promise<{
@@ -48,14 +50,13 @@ export const javascriptAssemblyRenderer = fromCallback<RenderInputEvent>(
     async function handleCode(jsCode: string) {
       await hasLoadedEvaluator
 
+      const traceMap = getTraceMap(jsCode)
+
       let jsModule
       try {
         jsModule = await evaluator.evaluateModule(jsCode)
       } catch (error) {
-        sendBack({
-          type: 'renderer.failure',
-          renderError: { type: 'javascript.evaluate', error },
-        })
+        sendEvaluationError(error)
         return
       }
 
@@ -77,16 +78,27 @@ export const javascriptAssemblyRenderer = fromCallback<RenderInputEvent>(
             try {
               return await evaluator.evaluateAssembly(parameters, partVariants)
             } catch (error) {
-              console.error(error)
-              sendBack({
-                type: 'renderer.failure',
-                renderError: { type: 'javascript.evaluate', error },
-              })
+              sendEvaluationError(error)
               return []
             }
           },
         },
       })
+
+      function sendEvaluationError(error: unknown) {
+        console.error('error', error)
+        const tracedError =
+          error instanceof Error
+            ? traceError(error, traceMap)
+            : { message: String(error), stack: [] }
+        sendBack({
+          type: 'renderer.failure',
+          renderError: {
+            type: 'javascript.evaluate',
+            error: tracedError,
+          },
+        })
+      }
     }
   },
 )
@@ -165,3 +177,42 @@ const createEvaluatorIframeSrc = () =>
 </script>
 </html>
 `
+
+function getTraceMap(code: string) {
+  const sourceMapLine = code.substring(code.lastIndexOf('\n', code.length - 1) + 1, code.length)
+  const sourceMapData = sourceMapLine.substring(sourceMapLine.indexOf(',') + 1)
+  const sourceMapContent = atob(sourceMapData)
+  const traceMap = new AnyMap(sourceMapContent)
+  return traceMap
+}
+
+function traceError(error: Error, traceMap: TraceMap) {
+  const message = error.message
+
+  if (error.stack == null) {
+    return { message, stack: [] }
+  }
+
+  let stack = parseStackTrace(error.stack)
+
+  console.log('stack', stack)
+
+  const lastStackIndex =
+    stack.findIndex((frame) => frame.name.startsWith('Proxy.')) || error.stack.length
+  stack = stack.slice(0, lastStackIndex)
+
+  const tracedStack = stack.map((frame) => {
+    const { name, line, column } = frame
+    const originalPosition = originalPositionFor(traceMap, { line, column })
+    return {
+      name,
+      line: originalPosition.line || line,
+      column: originalPosition.column || column,
+    }
+  })
+
+  return {
+    message,
+    stack: tracedStack,
+  }
+}

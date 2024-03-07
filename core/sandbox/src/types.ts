@@ -30,6 +30,11 @@ export type DesignRenderAssembly<ParamsOptions extends ParametersOptions = never
 export type DesignRender<ParamsOptions extends ParametersOptions> =
   null | DesignRenderAssembly<ParamsOptions>
 
+export type DesignRenderErrorStackFrame = {
+  name: string
+  line: number
+  column: number
+}
 export type DesignRenderError =
   | null
   | {
@@ -38,7 +43,10 @@ export type DesignRenderError =
     }
   | {
       type: 'javascript.evaluate'
-      error: Error
+      error: {
+        message: string
+        stack: Array<DesignRenderErrorStackFrame>
+      }
     }
   | {
       type: 'javascript.validate'

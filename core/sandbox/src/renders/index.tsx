@@ -9,7 +9,6 @@ import { typescriptAssemblyRenderer } from './typescript'
 export type RenderInputEvent = {
   type: 'render'
   code: string
-  map?: string
 }
 
 export function useDesignRender(options: {

@@ -34,6 +34,7 @@ export const typescriptAssemblyRenderer = fromCallback<
           strict: true,
           noInterop: true,
         },
+        sourceMaps: 'inline',
       })
     } catch (error) {
       sendBack({
@@ -49,7 +50,6 @@ export const typescriptAssemblyRenderer = fromCallback<
     javascriptAssemblyRenderer.send({
       type: 'render',
       code: tsTransformOutput.code,
-      map: tsTransformOutput.map,
     })
   }
 })
