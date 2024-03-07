@@ -29,22 +29,19 @@ export const javascriptAssemblyRenderer = fromCallback<RenderInputEvent>(
     const evaluatorIframe = createEvaulatorIframe()
     document.body.appendChild(evaluatorIframe)
 
-    const hasLoadedEvaluator = new Promise((resolve) => {
-      evaluatorIframe.onload = resolve
-    })
-    evaluatorIframe.contentWindow?.addEventListener('error', (error) => {
-      console.error('iframeee', error)
-    })
-
     const evaluator = Comlink.wrap<AssemblyEvaluator>(
       Comlink.windowEndpoint(evaluatorIframe.contentWindow!),
     )
+    const hasLoadedEvaluator = new Promise((resolve) => {
+      evaluatorIframe.onload = resolve
+    })
 
     receive((event) => {
       handleCode(event.code)
     })
 
     return () => {
+      evaluator[Comlink.releaseProxy]()
       document.body.removeChild(evaluatorIframe)
     }
 
@@ -165,10 +162,6 @@ const createEvaluatorIframeSrc = () =>
   const worker = Comlink.wrap(workerObj)
 
   Comlink.expose(worker, Comlink.windowEndpoint(self.parent))
-
-  workerObj.addEventListener('error', (error) => {
-    console.error('worker', error)
-  })
 </script>
 </html>
 `
