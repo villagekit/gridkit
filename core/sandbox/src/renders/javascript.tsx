@@ -60,7 +60,8 @@ export const javascriptAssemblyRenderer = fromCallback<RenderInputEvent>(
       }
 
       if (jsModule == null) return
-      const { meta, parameters, presets, assembly } = jsModule
+
+      const { meta, parameters, presets } = jsModule
 
       sendBack({
         type: 'renderer.success',
@@ -69,24 +70,21 @@ export const javascriptAssemblyRenderer = fromCallback<RenderInputEvent>(
           meta,
           parameters,
           presets,
-          assembly:
-            assembly == null
-              ? async (
-                  parameters: DesignParametersValues,
-                  partVariants: DesignPartVariantsByType,
-                ) => {
-                  try {
-                    return await evaluator.evaluateAssembly(parameters, partVariants)
-                  } catch (error) {
-                    console.error(error)
-                    sendBack({
-                      type: 'renderer.failure',
-                      renderError: { type: 'javascript.evaluate', error },
-                    })
-                    return []
-                  }
-                }
-              : async () => assembly,
+          assembly: async (
+            parameters: DesignParametersValues,
+            partVariants: DesignPartVariantsByType,
+          ) => {
+            try {
+              return await evaluator.evaluateAssembly(parameters, partVariants)
+            } catch (error) {
+              console.error(error)
+              sendBack({
+                type: 'renderer.failure',
+                renderError: { type: 'javascript.evaluate', error },
+              })
+              return []
+            }
+          },
         },
       })
     }
@@ -120,16 +118,18 @@ const createEvaulatorWorkerSrc = () => `
     }
 
     const { meta, parameters, presets, assembly } = mod
+
     return {
       meta,
       parameters,
       presets,
-      assembly: typeof assembly === 'function' ? null : assembly
     }
   }
 
   function evaluateAssembly(parameters, partVariants) {
-    return mod.assembly(parameters, partVariants)
+    return typeof mod.assembly === 'function'
+      ? mod.assembly(parameters, partVariants)
+      : mod.assembly
   }
 
   const exports = {
