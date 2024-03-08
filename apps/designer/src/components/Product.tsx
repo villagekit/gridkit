@@ -19,6 +19,7 @@ import { Loading } from './Loading'
 import { ProductEditor } from './ProductEditor'
 import Ansi from '@curvenote/ansi-to-react'
 import { MdChevronRight } from 'react-icons/md'
+import useFitText from 'use-fit-text-new'
 
 export default function Product() {
   const product = useProductContext()
@@ -197,8 +198,11 @@ type ErrorBoxProps = {
 function ErrorBox(props: ErrorBoxProps) {
   const { children } = props
 
+  const { fontSize, ref } = useFitText()
+
   return (
     <Box
+      ref={ref}
       sx={{
         backgroundColor: 'red.100',
         height: '100%',
@@ -207,6 +211,7 @@ function ErrorBox(props: ErrorBoxProps) {
         flexDirection: 'column',
         justifyContent: 'center',
         alignItems: 'center',
+        fontSize,
       }}
     >
       {children}

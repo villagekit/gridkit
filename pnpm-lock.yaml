@@ -172,6 +172,9 @@ importers:
       three:
         specifier: ^0.150.1
         version: 0.150.1
+      use-fit-text-new:
+        specifier: ^3.0.0
+        version: 3.0.0(react@18.2.0)
       xstate:
         specifier: ^5.9.1
         version: 5.9.1
@@ -14151,6 +14154,14 @@ packages:
   /use-debounce@7.0.1(react@18.2.0):
     resolution: {integrity: sha512-fOrzIw2wstbAJuv8PC9Vg4XgwyTLEOdq4y/Z3IhVl8DAE4svRcgyEUvrEXu+BMNgMoc3YND6qLT61kkgEKXh7Q==}
     engines: {node: '>= 10.0.0'}
+    peerDependencies:
+      react: '>=16.8.0'
+    dependencies:
+      react: 18.2.0
+    dev: false
+
+  /use-fit-text-new@3.0.0(react@18.2.0):
+    resolution: {integrity: sha512-uw6qv8ZbXilwfF1znesMjLjmCNeIRsbbRztM1V2BqsBYJFKto3478AuJGNsvoYlR7pVWd8LhS/nbB6sOnXA93w==}
     peerDependencies:
       react: '>=16.8.0'
     dependencies:
