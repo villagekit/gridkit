@@ -21,7 +21,6 @@ import {
 } from '@villagekit/design'
 
 import { DesignRenderAssembly, ExtendDesignValidationErrors } from '../types'
-import { fromZodError } from 'zod-validation-error'
 
 type SandboxAssemblyOptions<ParamsOptions extends ParametersOptions> = {
   assembly: DesignRenderAssembly<ParamsOptions>
@@ -92,8 +91,7 @@ function useParts<ParamsOptions extends ParametersOptions>(
         setAssemblyParts(result.data)
         extendValidationErrors({ assembly: null })
       } else {
-        const error = fromZodError(result.error)
-        extendValidationErrors({ assembly: error })
+        extendValidationErrors({ assembly: result.error })
       }
     })
   }, [assembly, parameterValues, partVariants, extendValidationErrors])

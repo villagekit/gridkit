@@ -1,15 +1,16 @@
 import '@villagekit/part-gridbeam'
 import '@villagekit/part-gridpanel'
 
-import React from 'react'
+import React, { useMemo } from 'react'
 import {
   AssemblyInfo,
   Sandbox,
   useSandboxContext,
   DesignRenderError,
   DesignValidationErrors,
+  DesignValidationError,
 } from '@villagekit/sandbox'
-import { Box, Flex, HStack, Heading, List, ListIcon, ListItem, VStack } from '@villagekit/ui'
+import { Box, Flex, HStack, Heading, List, ListIcon, ListItem, Text, VStack } from '@villagekit/ui'
 import { Resplit } from 'react-resplit'
 import { ParameterControls } from '@villagekit/parameters'
 
@@ -20,6 +21,7 @@ import { ProductEditor } from './ProductEditor'
 import Ansi from '@curvenote/ansi-to-react'
 import { MdChevronRight } from 'react-icons/md'
 import useFitText from 'use-fit-text-new'
+import { toStructuredError } from 'zod-structured-error'
 
 export default function Product() {
   const product = useProductContext()
@@ -130,34 +132,33 @@ function RenderErrorDisplay(props: RenderErrorDisplayProps) {
   switch (renderError.type) {
     case 'typescript.transform':
       inner = (
-        <Box as="code">
-          <Box as="pre">
-            <Ansi>{renderError.error}</Ansi>
+        <>
+          <Heading as={'h3'}>Error: TypeScript</Heading>
+          <Box as="code">
+            <Box as="pre">
+              <Ansi>{renderError.error}</Ansi>
+            </Box>
           </Box>
-        </Box>
+        </>
       )
       break
     case 'javascript.evaluate':
       inner = (
-        <Box>
-          <Box sx={{ fontWeight: 'bold' }}>{renderError.error.message}</Box>
-          <List>
-            {renderError.error.stack.map((frame) => (
-              <ListItem>
-                <ListIcon as={MdChevronRight} />
-                at line {frame.line}, column {frame.column}
-                {frame.name !== '' && <>, function {frame.name}</>}
-              </ListItem>
-            ))}
-          </List>
-        </Box>
-      )
-      break
-    case 'javascript.validate':
-      inner = (
-        <Box as="code">
-          <Box as="pre">{renderError.error.message}</Box>
-        </Box>
+        <>
+          <Heading as={'h3'}>Error: JavaScript</Heading>
+          <Box>
+            <Box sx={{ fontWeight: 'bold' }}>{renderError.error.message}</Box>
+            <List>
+              {renderError.error.stack.map((frame) => (
+                <ListItem>
+                  <ListIcon as={MdChevronRight} />
+                  at line {frame.line}, column {frame.column}
+                  {frame.name !== '' && <>, function {frame.name}</>}
+                </ListItem>
+              ))}
+            </List>
+          </Box>
+        </>
       )
       break
   }
@@ -174,20 +175,52 @@ function ValidationErrorsDisplay(props: ValidationErrorsDisplayProps) {
 
   return (
     <ErrorBox>
+      <Heading as={'h3'}>Error: Validation</Heading>
       <List>
         {Object.entries(validationErrors).map(
           ([key, error]) =>
             error != null && (
               <ListItem key={key}>
-                <HStack sx={{ alignItems: 'flex-start' }}>
-                  <Box sx={{ fontWeight: 'bold' }}>{key} :</Box>
-                  <Box>{error.message}</Box>
-                </HStack>
+                <Text as="span" sx={{ fontWeight: 'bold' }}>
+                  {key}
+                </Text>
+                <ValidationErrorDisplay validationError={error} />
               </ListItem>
             ),
         )}
       </List>
     </ErrorBox>
+  )
+}
+
+type ValidationErrorDisplayProps = {
+  validationError: NonNullable<DesignValidationError>
+}
+
+function ValidationErrorDisplay(props: ValidationErrorDisplayProps) {
+  const { validationError } = props
+
+  const structuredError = useMemo(() => {
+    return toStructuredError(validationError, { grouping: 'array' })
+  }, [validationError])
+
+  return (
+    <List>
+      {Object.entries(structuredError).map(([key, errors]) => (
+        <ListItem key={key} sx={{ marginLeft: 2 }}>
+          <ListIcon as={MdChevronRight} />
+          <Text as="span">{key || '.'}</Text>
+          <List>
+            {(errors as Array<string>).map((error) => (
+              <ListItem key={error} sx={{ marginLeft: 2 }}>
+                <ListIcon as={MdChevronRight} />
+                {error}
+              </ListItem>
+            ))}
+          </List>
+        </ListItem>
+      ))}
+    </List>
   )
 }
 

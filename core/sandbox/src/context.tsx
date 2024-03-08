@@ -23,7 +23,6 @@ import {
   designParametersSchema,
   getDesignPresetsSchema,
 } from '@villagekit/design'
-import { fromZodError } from 'zod-validation-error'
 
 type ProviderProps = {
   children: React.ReactNode
@@ -175,5 +174,5 @@ function validateRenderKey(
 ): DesignValidationError {
   const result = schema.safeParse(render[key])
   if (result.success) return null
-  return fromZodError(result.error)
+  return result.error
 }

@@ -5,7 +5,7 @@ import {
   Presets,
 } from '@villagekit/parameters'
 import { PartVariantsByType } from '@villagekit/part'
-import { ValidationError } from 'zod-validation-error'
+import { ZodError } from 'zod'
 
 export type DesignFileAssembly = {
   type: 'assembly'
@@ -48,12 +48,8 @@ export type DesignRenderError =
         stack: Array<DesignRenderErrorStackFrame>
       }
     }
-  | {
-      type: 'javascript.validate'
-      error: ValidationError
-    }
 
-export type DesignValidationError = ValidationError | null
+export type DesignValidationError = ZodError | null
 export type DesignValidationKey = keyof NonNullable<DesignRender<any>>
 export type DesignValidationErrors = Partial<Record<DesignValidationKey, DesignValidationError>>
 export type ExtendDesignValidationErrors = (errors: DesignValidationErrors) => void

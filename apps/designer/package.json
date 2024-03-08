@@ -73,6 +73,7 @@
     "three": "^0.150.1",
     "use-fit-text-new": "^3.0.0",
     "xstate": "^5.9.1",
-    "zod": "^3.22.4"
+    "zod": "^3.22.4",
+    "zod-structured-error": "^1.0.0"
   }
 }
