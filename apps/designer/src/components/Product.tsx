@@ -2,8 +2,14 @@ import '@villagekit/part-gridbeam'
 import '@villagekit/part-gridpanel'
 
 import React from 'react'
-import { AssemblyInfo, Sandbox, useSandboxContext } from '@villagekit/sandbox'
-import { Box, Flex, HStack, Heading, List, ListItem, VStack } from '@villagekit/ui'
+import {
+  AssemblyInfo,
+  Sandbox,
+  useSandboxContext,
+  DesignRenderError,
+  DesignValidationErrors,
+} from '@villagekit/sandbox'
+import { Box, Flex, HStack, Heading, List, ListIcon, ListItem, VStack } from '@villagekit/ui'
 import { Resplit } from 'react-resplit'
 import { ParameterControls } from '@villagekit/parameters'
 
@@ -11,6 +17,8 @@ import { useProductContext } from '@/context/product'
 
 import { Loading } from './Loading'
 import { ProductEditor } from './ProductEditor'
+import Ansi from '@curvenote/ansi-to-react'
+import { MdChevronRight } from 'react-icons/md'
 
 export default function Product() {
   const product = useProductContext()
@@ -45,6 +53,20 @@ function ProductAssembly() {
 }
 
 function ProductAssemblyViewer() {
+  const context = useSandboxContext()
+
+  if (context == null) return <Loading />
+
+  const { renderError, validationErrors } = context
+
+  if (renderError != null) {
+    return <RenderErrorDisplay renderError={renderError} />
+  }
+
+  if (Object.values(validationErrors).filter((v) => v != null).length > 0) {
+    return <ValidationErrorsDisplay validationErrors={validationErrors} />
+  }
+
   return (
     <Resplit.Root direction="vertical" asChild>
       <Flex sx={{ flexDirection: 'column', width: '100%', height: '100%' }}>
@@ -70,60 +92,6 @@ function ProductAssemblyViewer() {
 }
 
 function ProductAssemblyGl() {
-  const context = useSandboxContext()
-
-  if (context == null) return <Loading />
-
-  const { renderError, validationErrors } = context
-
-  if (renderError != null) {
-    switch (renderError.type) {
-      case 'typescript.transform':
-        return (
-          <Box as="code">
-            <Box as="pre">{renderError.error}</Box>
-          </Box>
-        )
-      case 'javascript.evaluate':
-        return (
-          <Box>
-            {renderError.error.message}
-            <Box>
-              {renderError.error.stack.map((frame) => (
-                <Box>
-                  at line {frame.line}, column {frame.column}, function {frame.name}
-                </Box>
-              ))}
-            </Box>
-          </Box>
-        )
-      case 'javascript.validate':
-        return (
-          <Box as="code">
-            <Box as="pre">{renderError.error.message}</Box>
-          </Box>
-        )
-    }
-  }
-
-  if (Object.values(validationErrors).filter((v) => v != null).length > 0) {
-    return (
-      <List>
-        {Object.entries(validationErrors).map(
-          ([key, error]) =>
-            error != null && (
-              <ListItem key={key}>
-                <HStack sx={{ alignItems: 'flex-start' }}>
-                  <Box sx={{ fontWeight: 'bold' }}>{key} :</Box>
-                  <Box>{error.message}</Box>
-                </HStack>
-              </ListItem>
-            ),
-        )}
-      </List>
-    )
-  }
-
   return (
     <React.Suspense fallback={<Loading />}>
       <Sandbox showParameterControls />
@@ -147,5 +115,101 @@ function ProductAssemblyDetails() {
       <ParameterControls />
       <AssemblyInfo />
     </>
+  )
+}
+
+type RenderErrorDisplayProps = {
+  renderError: NonNullable<DesignRenderError>
+}
+
+function RenderErrorDisplay(props: RenderErrorDisplayProps) {
+  const { renderError } = props
+
+  let inner
+  switch (renderError.type) {
+    case 'typescript.transform':
+      inner = (
+        <Box as="code">
+          <Box as="pre">
+            <Ansi>{renderError.error}</Ansi>
+          </Box>
+        </Box>
+      )
+      break
+    case 'javascript.evaluate':
+      inner = (
+        <Box>
+          <Box sx={{ fontWeight: 'bold' }}>{renderError.error.message}</Box>
+          <List>
+            {renderError.error.stack.map((frame) => (
+              <ListItem>
+                <ListIcon as={MdChevronRight} />
+                at line {frame.line}, column {frame.column}
+                {frame.name !== '' && <>, function {frame.name}</>}
+              </ListItem>
+            ))}
+          </List>
+        </Box>
+      )
+      break
+    case 'javascript.validate':
+      inner = (
+        <Box as="code">
+          <Box as="pre">{renderError.error.message}</Box>
+        </Box>
+      )
+      break
+  }
+
+  return <ErrorBox>{inner}</ErrorBox>
+}
+
+type ValidationErrorsDisplayProps = {
+  validationErrors: DesignValidationErrors
+}
+
+function ValidationErrorsDisplay(props: ValidationErrorsDisplayProps) {
+  const { validationErrors } = props
+
+  return (
+    <ErrorBox>
+      <List>
+        {Object.entries(validationErrors).map(
+          ([key, error]) =>
+            error != null && (
+              <ListItem key={key}>
+                <HStack sx={{ alignItems: 'flex-start' }}>
+                  <Box sx={{ fontWeight: 'bold' }}>{key} :</Box>
+                  <Box>{error.message}</Box>
+                </HStack>
+              </ListItem>
+            ),
+        )}
+      </List>
+    </ErrorBox>
+  )
+}
+
+type ErrorBoxProps = {
+  children: React.ReactNode
+}
+
+function ErrorBox(props: ErrorBoxProps) {
+  const { children } = props
+
+  return (
+    <Box
+      sx={{
+        backgroundColor: 'red.100',
+        height: '100%',
+        width: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center',
+      }}
+    >
+      {children}
+    </Box>
   )
 }

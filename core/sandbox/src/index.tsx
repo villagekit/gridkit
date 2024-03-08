@@ -17,7 +17,7 @@ import { SandboxContext, useSandboxContext } from './context'
 import { SandboxAssemblyContext } from './assembly/context'
 
 export { AssemblyInfo, AssemblySummary } from './assembly'
-export type { DesignFile, DesignFileAssembly } from './types'
+export type * from './types'
 export { SandboxProvider, useSandboxContext } from './context'
 
 export type SandboxMode = 'default' | 'screenshot'

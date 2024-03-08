@@ -14,7 +14,8 @@ import { AnyMap, TraceMap, originalPositionFor } from '@jridgewell/trace-mapping
 import { parseStackTrace } from 'errorstacks'
 
 type AssemblyEvaluator = {
-  evaluateModule: (code: string) => Promise<{
+  loadModule: (code: string) => Promise<string>
+  evaluateModule: () => Promise<{
     meta: DesignMeta
     parameters: DesignParameters | null
     presets: DesignPresets<any> | null
@@ -52,9 +53,11 @@ export const javascriptAssemblyRenderer = fromCallback<RenderInputEvent>(
 
       const traceMap = getTraceMap(jsCode)
 
+      const moduleUrl = await evaluator.loadModule(jsCode)
+
       let jsModule
       try {
-        jsModule = await evaluator.evaluateModule(jsCode)
+        jsModule = await evaluator.evaluateModule()
       } catch (error) {
         sendEvaluationError(error)
         return
@@ -89,7 +92,7 @@ export const javascriptAssemblyRenderer = fromCallback<RenderInputEvent>(
         console.error('error', error)
         const tracedError =
           error instanceof Error
-            ? traceError(error, traceMap)
+            ? traceError(error, moduleUrl, traceMap)
             : { message: String(error), stack: [] }
         sendBack({
           type: 'renderer.failure',
@@ -117,19 +120,25 @@ const createEvaulatorWorkerSrc = () => `
   // web workers don't yet support importmaps
   import * as Comlink from "${comlinkDataUrl}"
 
-  let mod = null
+  let moduleUrl = null
+  let module = null
 
-  async function evaluateModule(code) {
-    const modUrl = URL.createObjectURL(
-      new Blob([code], { type: 'text/javascript' }),
-    )
-    try {
-      mod = await import(modUrl)
-    } finally {
-      URL.revokeObjectURL(modUrl)
+  function loadModule(code) {
+    if (moduleUrl != null) {
+      URL.revokeObjectURL(moduleUrl)
     }
 
-    const { meta, parameters, presets, assembly } = mod
+    moduleUrl = URL.createObjectURL(
+      new Blob([code], { type: 'text/javascript' }),
+    )
+
+    return moduleUrl
+  }
+
+  async function evaluateModule() {
+    module = await import(moduleUrl)
+
+    const { meta, parameters, presets, assembly } = module
 
     return {
       meta,
@@ -139,12 +148,13 @@ const createEvaulatorWorkerSrc = () => `
   }
 
   function evaluateAssembly(parameters, partVariants) {
-    return typeof mod.assembly === 'function'
-      ? mod.assembly(parameters, partVariants)
-      : mod.assembly
+    return typeof module.assembly === 'function'
+      ? module.assembly(parameters, partVariants)
+      : module.assembly
   }
 
   const exports = {
+    loadModule,
     evaluateModule,
     evaluateAssembly,
   }
@@ -186,7 +196,7 @@ function getTraceMap(code: string) {
   return traceMap
 }
 
-function traceError(error: Error, traceMap: TraceMap) {
+function traceError(error: Error, moduleUrl: string, traceMap: TraceMap) {
   const message = error.message
 
   if (error.stack == null) {
@@ -195,11 +205,10 @@ function traceError(error: Error, traceMap: TraceMap) {
 
   let stack = parseStackTrace(error.stack)
 
-  console.log('stack', stack)
-
-  const lastStackIndex =
-    stack.findIndex((frame) => frame.name.startsWith('Proxy.')) || error.stack.length
-  stack = stack.slice(0, lastStackIndex)
+  const lastStackIndex = stack.findIndex((frame) => frame.fileName === moduleUrl)
+  if (lastStackIndex !== -1) {
+    stack = stack.slice(0, lastStackIndex + 1)
+  }
 
   const tracedStack = stack.map((frame) => {
     const { name, line, column } = frame
