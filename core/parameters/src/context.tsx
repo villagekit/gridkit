@@ -1,4 +1,3 @@
-import { isEqual } from 'lodash-es'
 import { parse as parseQueryString } from 'query-string'
 import React, {
   ChangeEvent,
@@ -23,8 +22,223 @@ import {
 } from 'serialize-query-params'
 import { useDebouncedCallback } from 'use-debounce'
 
-import { Presets } from './presets'
-import { ExtractValuesFromParametersOptions, ParameterOptions, ParametersOptions } from './values'
+import { Preset, Presets } from './presets'
+import {
+  ExtractValuesFromParametersOptions,
+  ParameterOptions,
+  ParametersOptions,
+  ParametersValues,
+} from './values'
+import { assign, fromCallback, setup } from 'xstate'
+import { intersection } from 'lodash-es'
+
+// xstate notes
+//
+// parameter controls machine
+// - input
+//   - parameters
+//   - presets
+//  - emitted
+//    - change
+//    - location-update
+// - context
+//   - currentPresetId
+//   - currentParameterValues
+//   - showControls
+//   - setShowControls
+//   - changePreset
+//   - changeCustomValues
+//
+// parameter values machine
+// - parallel state: parameter value machine
+
+const updateQueryParamsActor = fromCallback(({ input, receive }) => {
+  receive(event => {
+  })
+
+  return () => {}
+})
+
+const parametersMachine = setup({
+  types: {} as {
+    input: {
+      parameters: ParametersOptions
+      presets: Presets<any>
+    }
+    context: {
+      parameters: ParametersOptions
+      presets: Presets<any>
+      queryParameterDefinitions: QueryParamConfigMap
+      presetId: string | null
+      parametersValues: ParametersValues | null
+      showControls: boolean
+    }
+    events:
+      | {
+          type: 'changeInput'
+          parameters: ParametersOptions
+          presets: Presets<any>
+        }
+      | {
+          type: 'changePresetId'
+          presetId: string
+        }
+      | {
+          type: 'changeParametersValues'
+          parametersValues: ParametersValues
+        }
+      | {
+          type: 'toggleControls'
+        }
+    emitted:
+      | {
+          type: 'change'
+          presetId: string
+          parametersValues: ParametersValues
+        }
+      | {
+          type: 'locationUpdate'
+        }
+    actions: {
+      type: 'calculateQueryParameterDefinitions'
+    }
+  },
+}).createMachine({
+  state: {
+    loading: {
+    },
+    loaded: {
+      invoke: {
+        src:
+      }
+    }
+  }
+  context: ({ input }) => {
+    const { parameters, presets } = input
+    assertPresets(parameters, presets)
+    const defaultPreset = presets[0]
+    const queryParameterDefinitions = calculateQueryParameterDefinitions(parameters, defaultPreset)
+    return {
+      parameters,
+      presets,
+      presetId: defaultPreset.id,
+      queryParameterDefinitions,
+      parametersValues: null,
+      showControls: false,
+    }
+  },
+  on: {
+    changeInput: {
+      actions: assign(({ context, event }) => {
+        const { parameters, presets } = event
+        assertPresets(parameters, presets)
+        const defaultPreset = presets[0]
+        const queryParameterDefinitions = calculateQueryParameterDefinitions(
+          parameters,
+          defaultPreset,
+        )
+        return {
+          ...context,
+          parameters,
+          presets,
+          queryParameterDefinitions,
+        }
+      }),
+    },
+    changePresetId: {
+      actions: assign(({ context, event }) => {
+      })
+    }
+  },
+})
+
+function assertPresets<ParamsOptions extends ParametersOptions>(
+  parameters: ParamsOptions,
+  presets: Presets<any>,
+): asserts presets is Presets<ParamsOptions> {
+  const paramKeys = Object.keys(parameters)
+  const presetKeys = Object.keys(presets[0].values)
+  if (
+    !(
+      paramKeys.length === presetKeys.length &&
+      intersection(paramKeys, presetKeys).length === paramKeys.length
+    )
+  ) {
+    throw new Error('presets are not valid for parameters')
+  }
+}
+
+function calculateQueryParameterDefinitions<ParamsOptions extends ParametersOptions>(
+  parameters: ParamsOptions,
+  defaultPreset: Preset<ParamsOptions>,
+): QueryParamConfigMap {
+  const queryPresetConfig = {
+    preset: withDefault(StringParam, defaultPreset.id),
+  }
+
+  const queryParamConfigForParameter = (parameterKey: string, parameter: ParameterOptions) => {
+    switch (parameter.type) {
+      case 'boolean':
+        return withDefault(BooleanParam, defaultPreset.values[parameterKey] as boolean)
+      case 'choice':
+        return withDefault(StringParam, defaultPreset.values[parameterKey] as string)
+      case 'number':
+        return withDefault(NumberParam, defaultPreset.values[parameterKey] as number)
+    }
+  }
+
+  const queryParamsConfig = Object.keys(parameters).reduce<QueryParamConfigMap>(
+    (sofar, parameterKey) => {
+      const parameter = parameters[parameterKey]
+      if (parameter === undefined) throw new Error('parameter is undefined')
+
+      sofar[parameter.shortId || parameterKey] = queryParamConfigForParameter(
+        parameterKey,
+        parameter,
+      )
+
+      return sofar
+    },
+    {},
+  )
+
+  return {
+    ...queryPresetConfig,
+    ...queryParamsConfig,
+  }
+}
+
+function mapValuesToQueryValueMap<ParamsOptions extends ParametersOptions>(
+  parameters: ParamsOptions,
+  values: ExtractValuesFromParametersOptions<ParamsOptions>,
+): DecodedValueMap<QueryParamConfigMap> {
+  return Object.keys(parameters).reduce<DecodedValueMap<QueryParamConfigMap>>(
+    (sofar, parameterKey) => {
+      const parameter = parameters[parameterKey]
+      if (parameter === undefined) throw new Error('parameter is undefined')
+
+      sofar[parameter.shortId || parameterKey] = values[parameterKey]
+      return sofar
+    },
+    {},
+  )
+}
+
+function mapQueryValueMapToValues<ParamsOptions extends ParametersOptions>(
+  parameters: ParamsOptions,
+  values: DecodedValueMap<QueryParamConfigMap>,
+): ExtractValuesFromParametersOptions<ParamsOptions> {
+  return Object.keys(parameters).reduce<DecodedValueMap<QueryParamConfigMap>>(
+    (sofar, parameterKey) => {
+      const parameter = parameters[parameterKey]
+      if (parameter === undefined) throw new Error('parameter is undefined')
+
+      sofar[parameterKey] = values[parameter.shortId || parameterKey]
+      return sofar
+    },
+    {},
+  ) as ExtractValuesFromParametersOptions<ParamsOptions>
+}
 
 export interface ParameterControlsContextProps<ParamsOptions extends ParametersOptions,> {
   parameters: ParamsOptions
@@ -101,75 +315,6 @@ function useParameters<ParamsOptions extends ParametersOptions>(
 
     onChange(currentPresetId, currentValues)
   }, [onChange, currentPresetId, currentValues])
-
-  const queryParameterDefinitions: QueryParamConfigMap = useMemo(() => {
-    const queryPresetConfig = {
-      preset: withDefault(StringParam, defaultPreset.id),
-    }
-
-    const queryParamConfigForParameter = (parameterKey: string, parameter: ParameterOptions) => {
-      switch (parameter.type) {
-        case 'boolean':
-          return withDefault(BooleanParam, defaultPreset.values[parameterKey] as boolean)
-        case 'choice':
-          return withDefault(StringParam, defaultPreset.values[parameterKey] as string)
-        case 'number':
-          return withDefault(NumberParam, defaultPreset.values[parameterKey] as number)
-      }
-    }
-
-    const queryParamsConfig = Object.keys(parameters).reduce<QueryParamConfigMap>(
-      (sofar, parameterKey) => {
-        const parameter = parameters[parameterKey]
-        if (parameter === undefined) throw new Error('parameter is undefined')
-
-        sofar[parameter.shortId || parameterKey] = queryParamConfigForParameter(
-          parameterKey,
-          parameter,
-        )
-
-        return sofar
-      },
-      {},
-    )
-
-    return {
-      ...queryPresetConfig,
-      ...queryParamsConfig,
-    }
-  }, [parameters, defaultPreset])
-
-  const mapValuesToQueryValueMap = useCallback(
-    (values: CustomValues) => {
-      return Object.keys(parameters).reduce<DecodedValueMap<QueryParamConfigMap>>(
-        (sofar, parameterKey) => {
-          const parameter = parameters[parameterKey]
-          if (parameter === undefined) throw new Error('parameter is undefined')
-
-          sofar[parameter.shortId || parameterKey] = values[parameterKey]
-          return sofar
-        },
-        {},
-      )
-    },
-    [parameters],
-  )
-
-  const mapQueryValueMapToValues = useCallback(
-    (values: DecodedValueMap<QueryParamConfigMap>) => {
-      return Object.keys(parameters).reduce<DecodedValueMap<QueryParamConfigMap>>(
-        (sofar, parameterKey) => {
-          const parameter = parameters[parameterKey]
-          if (parameter === undefined) throw new Error('parameter is undefined')
-
-          sofar[parameterKey] = values[parameter.shortId || parameterKey]
-          return sofar
-        },
-        {},
-      ) as CustomValues
-    },
-    [parameters],
-  )
 
   const getQueryParamsValues = useCallback(() => {
     const urlParams = parseQueryString(location.search)
