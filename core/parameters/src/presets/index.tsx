@@ -49,7 +49,7 @@ export function getPresetsSchema<ParamsOptions extends ParametersOptions>(
 }
 
 export interface PresetControlsProps<ParamsOptions extends ParametersOptions> {
-  currentPresetId: Preset<ParamsOptions>['id']
+  presetId: Preset<ParamsOptions>['id']
   presets: Presets<ParamsOptions>
   onPresetChange: (preset: Preset<ParamsOptions>['id']) => void
 }
@@ -57,7 +57,7 @@ export interface PresetControlsProps<ParamsOptions extends ParametersOptions> {
 export const PresetControls = memo(function PresetControls<
   ParamsOptions extends ParametersOptions,
 >(props: PresetControlsProps<ParamsOptions>) {
-  const { currentPresetId, presets, onPresetChange } = props
+  const { presetId, presets, onPresetChange } = props
 
   const handlePresetChange = useCallback(
     (ev: ChangeEvent<HTMLSelectElement>) => {
@@ -70,7 +70,7 @@ export const PresetControls = memo(function PresetControls<
     <FormControl id="preset" role="group">
       <FormLabel>Preset</FormLabel>
 
-      <Select role="menuitem" value={currentPresetId} onChange={handlePresetChange}>
+      <Select role="menuitem" value={presetId} onChange={handlePresetChange}>
         {presets.map((preset) => (
           <option key={preset.id} value={preset.id}>
             {preset.label}

@@ -3,9 +3,9 @@ export * from './presets'
 export * from './values'
 
 import { FormControl, FormLabel, HStack, Switch, VStack } from '@villagekit/ui'
-import React from 'react'
+import React, { useCallback } from 'react'
 
-import { useParameterControlsContext } from './context'
+import { useParametersContext } from './context'
 import { ParameterControlsInternalContextProvider } from './internal-context'
 import { PresetControls } from './presets'
 import { ParameterValueControls } from './values'
@@ -17,30 +17,29 @@ export interface ParameterControlsProps {
 export function ParameterControls(props: ParameterControlsProps) {
   const { containerRef } = props
 
-  const context = useParameterControlsContext()
-
-  if (context == null) return null
-
   const {
     parameters,
     presets,
-    currentPresetId,
-    currentValues,
+    presetId,
+    parametersValues,
     showControls,
-    handleSetShowControls,
-    handlePresetChange,
-    handleCustomValuesChange,
-  } = context
+    setShowControls,
+    updatePresetId,
+    updateParametersValues,
+  } = useParametersContext()
+
+  const handleShowControlsChange = useCallback(
+    (ev: React.ChangeEvent<HTMLInputElement>) => {
+      setShowControls(ev.target.checked)
+    },
+    [setShowControls],
+  )
 
   return (
     <ParameterControlsInternalContextProvider containerRef={containerRef}>
       <VStack role="menubar" spacing="4" sx={{ width: '100%' }}>
         <HStack alignItems="baseline" spacing="4" sx={{ width: '100%' }}>
-          <PresetControls
-            currentPresetId={currentPresetId}
-            presets={presets}
-            onPresetChange={handlePresetChange}
-          />
+          <PresetControls presetId={presetId} presets={presets} onPresetChange={updatePresetId} />
 
           <FormControl sx={{ flex: 0 }}>
             <FormLabel htmlFor="show-controls">Controls</FormLabel>
@@ -51,17 +50,17 @@ export function ParameterControls(props: ParameterControlsProps) {
               aria-haspopup="menu"
               aria-expanded={showControls}
               isChecked={showControls}
-              onChange={handleSetShowControls}
+              onChange={handleShowControlsChange}
               sx={{ marginTop: 2.5 }}
             />
           </FormControl>
         </HStack>
 
-        {showControls && currentValues != null && (
+        {showControls && parametersValues != null && (
           <ParameterValueControls
             parameters={parameters}
-            values={currentValues}
-            onChange={handleCustomValuesChange}
+            values={parametersValues}
+            onChange={updateParametersValues}
           />
         )}
       </VStack>

@@ -1,7 +1,8 @@
 import { createActorContext } from '@xstate/react'
 
 import { MachineInput, parametersMachine } from './machine'
-import React, { useEffect } from 'react'
+import React, { useCallback, useEffect } from 'react'
+import { ParametersValues } from '.'
 
 const ParametersMachineContext = createActorContext(parametersMachine)
 
@@ -12,21 +13,77 @@ export function ParametersProvider(props: ParametersProviderProps) {
 
   return (
     <ParametersMachineContext.Provider options={{ input }}>
-      <HandleInputChange input={input} />
+      <UpdateInput input={input} />
       {children}
     </ParametersMachineContext.Provider>
   )
 }
 
-function HandleInputChange(props: { input: MachineInput }) {
+function UpdateInput(props: { input: MachineInput }) {
   const { input } = props
   const actorRef = ParametersMachineContext.useActorRef()
 
   useEffect(() => {
     actorRef.send({ type: 'updateInput', ...input })
-  }, [input])
+  }, [actorRef, input])
 
   return <React.Fragment />
 }
 
-export function useParameters
+export function useParametersContext() {
+  return {
+    parameters: useParameters(),
+    presets: usePresets(),
+    presetId: usePresetId(),
+    parametersValues: useParametersValues(),
+    showControls: useShowControls(),
+    setShowControls: useSetShowControls(),
+    updatePresetId: useUpdatePresetId(),
+    updateParametersValues: useUpdateParametersValues(),
+  }
+}
+
+export function useParameters() {
+  return ParametersMachineContext.useSelector(({ context }) => context.parameters)
+}
+
+export function usePresets() {
+  return ParametersMachineContext.useSelector(({ context }) => context.presets)
+}
+
+export function usePresetId() {
+  return ParametersMachineContext.useSelector(({ context }) => context.presetId)
+}
+
+export function useParametersValues() {
+  return ParametersMachineContext.useSelector(({ context }) => context.parametersValues)
+}
+
+export function useShowControls() {
+  return ParametersMachineContext.useSelector(({ context }) => context.showControls)
+}
+
+export function useSetShowControls() {
+  const actorRef = ParametersMachineContext.useActorRef()
+  return useCallback(
+    (showControls: boolean) => actorRef.send({ type: 'setShowControls', showControls }),
+    [actorRef],
+  )
+}
+
+export function useUpdatePresetId() {
+  const actorRef = ParametersMachineContext.useActorRef()
+  return useCallback(
+    (presetId: string) => actorRef.send({ type: 'updatePresetId', presetId }),
+    [actorRef],
+  )
+}
+
+export function useUpdateParametersValues() {
+  const actorRef = ParametersMachineContext.useActorRef()
+  return useCallback(
+    (parametersValues: ParametersValues) =>
+      actorRef.send({ type: 'updateParametersValues', parametersValues }),
+    [actorRef],
+  )
+}
