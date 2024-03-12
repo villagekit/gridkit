@@ -29,51 +29,68 @@ import {
   ParametersOptions,
   ParametersValues,
 } from './values'
-import { assign, fromCallback, setup } from 'xstate'
-import { intersection } from 'lodash-es'
+import { assign, fromCallback, fromTransition, setup } from 'xstate'
+import { debounce, intersection, isEqual } from 'lodash-es'
 
-// xstate notes
-//
-// parameter controls machine
-// - input
-//   - parameters
-//   - presets
-//  - emitted
-//    - change
-//    - location-update
-// - context
-//   - currentPresetId
-//   - currentParameterValues
-//   - showControls
-//   - setShowControls
-//   - changePreset
-//   - changeCustomValues
-//
-// parameter values machine
-// - parallel state: parameter value machine
+type Input = {
+  parameters: ParametersOptions
+  presets: Presets<any>
+}
 
-const updateQueryParamsActor = fromCallback(({ input, receive }) => {
-  receive(event => {
-  })
+type UpdateQueryParamsEvent = {
+  type: 'update'
+  presetId: string | null
+  parametersValues: ParametersValues | null
+}
 
-  return () => {}
-})
+type UpdateQueryParamsInput = Input & {
+  onLocationUpdate: (location: Location) => void
+}
 
-const parametersMachine = setup({
-  types: {} as {
-    input: {
-      parameters: ParametersOptions
-      presets: Presets<any>
+const updateQueryParamsActor = fromCallback<UpdateQueryParamsEvent, UpdateQueryParamsInput>(
+  ({ input, receive }) => {
+    const { parameters, presets, onLocationUpdate } = input
+    assertPresets(parameters, presets)
+
+    const defaultPreset = presets[0]
+    const queryParameterDefinitions = calculateQueryParameterDefinitions(parameters, defaultPreset)
+
+    const handleUpdateDebounced = debounce(handleUpdate, 1000, { leading: false, trailing: true })
+
+    receive(handleUpdateDebounced)
+
+    return () => {}
+
+    function handleUpdate(event: UpdateQueryParamsEvent) {
+      const { presetId, parametersValues } = event
+
+      if (parametersValues === null) return
+
+      const urlParams = encodeQueryParams(queryParameterDefinitions, {
+        preset: presetId,
+        ...(presetId === null ? mapValuesToQueryValueMap(parameters, parametersValues) : {}),
+      })
+
+      const { presetId: currentQueryPresetId, values: currentQueryValues } = getQueryParamsValues(
+        parameters,
+        queryParameterDefinitions,
+      )
+
+      if (presetId !== currentQueryPresetId || !isEqual(parametersValues, currentQueryValues)) {
+        const nextLocation = updateLocation(urlParams, location)
+        onLocationUpdate(nextLocation)
+      }
     }
-    context: {
-      parameters: ParametersOptions
-      presets: Presets<any>
-      queryParameterDefinitions: QueryParamConfigMap
-      presetId: string | null
-      parametersValues: ParametersValues | null
-      showControls: boolean
-    }
-    events:
+  },
+)
+
+type ParamsState<ParamsOptions extends ParametersOptions> = {
+  parameters: ParamsOptions,
+  presets: Presets<ParamsOptions>
+  presetId: string | null
+  parametersValues: ParametersValues | null
+}
+type ParamsStateEvent =
       | {
           type: 'changeInput'
           parameters: ParametersOptions
@@ -87,6 +104,39 @@ const parametersMachine = setup({
           type: 'changeParametersValues'
           parametersValues: ParametersValues
         }
+type ParamsStateInput = Input
+
+const paramsStateActor = fromTransition<ParamsState<any>, ParamsStateEvent, any, ParamsStateInput>((state, event) => {
+switch (event.type) {
+case 'changeInput': {
+const { presetId } 
+const { parameters, presets } = event
+const defaultPresetId = presets[0]
+return { ...state, parameters, presets }
+}
+
+case 'changePresetId':
+case 'changeParametersValues':
+}
+return state
+
+}, ({ input: { parameters, presets } }) => ({
+parameters, presets, presetId: null, parametersValues: null
+
+})
+
+const parametersMachine = setup({
+  types: {} as {
+    input: Input
+    context: {
+      parameters: ParametersOptions
+      presets: Presets<any>
+      queryParameterDefinitions: QueryParamConfigMap
+      presetId: string | null
+      parametersValues: ParametersValues | null
+      showControls: boolean
+    }
+    events: ParamsStateEvent
       | {
           type: 'toggleControls'
         }
@@ -103,16 +153,18 @@ const parametersMachine = setup({
       type: 'calculateQueryParameterDefinitions'
     }
   },
+  actors: {
+    updateQueryParams: updateQueryParamsActor,
+  },
 }).createMachine({
   state: {
-    loading: {
-    },
+    loading: {},
     loaded: {
       invoke: {
-        src:
-      }
-    }
-  }
+        src: 'updateQueryParams',
+      },
+    },
+  },
   context: ({ input }) => {
     const { parameters, presets } = input
     assertPresets(parameters, presets)
@@ -146,9 +198,8 @@ const parametersMachine = setup({
       }),
     },
     changePresetId: {
-      actions: assign(({ context, event }) => {
-      })
-    }
+      actions: assign(({ context, event }) => {}),
+    },
   },
 })
 
@@ -238,6 +289,18 @@ function mapQueryValueMapToValues<ParamsOptions extends ParametersOptions>(
     },
     {},
   ) as ExtractValuesFromParametersOptions<ParamsOptions>
+}
+
+function getQueryParamsValues<ParamsOptions extends ParametersOptions>(
+  parameters: ParamsOptions,
+  queryParameterDefinitions: QueryParamConfigMap,
+) {
+  const urlParams = parseQueryString(location.search)
+  const queryValues = decodeQueryParams(queryParameterDefinitions, urlParams)
+
+  const { preset: presetId, ...queryParameterValues } = queryValues
+
+  return { presetId, values: mapQueryValueMapToValues(parameters, queryParameterValues) }
 }
 
 export interface ParameterControlsContextProps<ParamsOptions extends ParametersOptions,> {
