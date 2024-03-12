@@ -57,6 +57,15 @@ function UpdateInput(props: MachineInput) {
   return <React.Fragment />
 }
 
+export function useHasParameters() {
+  try {
+    ParametersMachineContext.useActorRef()
+    return true
+  } catch (err) {
+    return false
+  }
+}
+
 export function useParameters() {
   return ParametersMachineContext.useSelector(({ context }) => context.parameters)
 }

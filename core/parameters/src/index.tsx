@@ -5,7 +5,7 @@ export * from './values'
 import { FormControl, FormLabel, HStack, Switch, VStack } from '@villagekit/ui'
 import React, { useCallback } from 'react'
 
-import { useSetShowControls, useShowControls } from './context'
+import { useHasParameters, useSetShowControls, useShowControls } from './context'
 import { ParameterControlsInternalContextProvider } from './internal-context'
 import { PresetControls } from './presets'
 import { ParameterValueControls } from './values'
@@ -16,6 +16,10 @@ export interface ParameterControlsProps {
 
 export function ParameterControls(props: ParameterControlsProps) {
   const { containerRef } = props
+
+  const hasParameters = useHasParameters()
+
+  if (!hasParameters) return null
 
   return (
     <ParameterControlsInternalContextProvider containerRef={containerRef}>
