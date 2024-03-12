@@ -1,11 +1,5 @@
-import { createContext, useCallback, useContext, useEffect, useState } from 'react'
-import {
-  ExtractValuesFromParametersOptions,
-  ParametersProvider,
-  ParametersOptions,
-  ParametersValues,
-  Presets,
-} from '@villagekit/parameters'
+import React, { createContext, useCallback, useContext, useEffect, useState } from 'react'
+import { ParametersProvider, ParametersValues } from '@villagekit/parameters'
 
 import { SandboxAssemblyProvider } from './assembly/context'
 import { useDesignRender } from './renders'
@@ -54,8 +48,6 @@ export function SandboxProvider(props: SandboxOptions & ProviderProps) {
 
   const parameters = render?.parameters
   const presets = render?.presets
-  const hasParameters = parameters != null
-  const hasPresets = presets != null
 
   const [validationErrors, setValidationErrors] = useState({})
   const extendValidationErrors = useCallback((nextValidationErrors: DesignValidationErrors) => {
@@ -90,60 +82,17 @@ export function SandboxProvider(props: SandboxOptions & ProviderProps) {
       children
     )
 
-  const parameterized =
-    hasParameters && hasPresets ? (
-      <SandboxParameters
-        onLocationUpdate={onLocationUpdate}
+  return (
+    <SandboxContext.Provider value={state}>
+      <ParametersProvider
         parameters={parameters}
         presets={presets}
-        setParameterValues={setParameterValues}
+        onParametersValuesUpdate={setParameterValues}
+        onLocationUpdate={onLocationUpdate}
       >
         {renderTyped}
-      </SandboxParameters>
-    ) : (
-      renderTyped
-    )
-
-  return <SandboxContext.Provider value={state}>{parameterized}</SandboxContext.Provider>
-}
-
-type SandboxParametersProps<ParamsOptions extends ParametersOptions> = Pick<
-  SandboxOptions,
-  'onLocationUpdate'
-> &
-  ProviderProps & {
-    parameters: ParamsOptions
-    presets: Presets<ParamsOptions>
-    setParameterValues: (
-      parameterValues: ExtractValuesFromParametersOptions<ParamsOptions> | null,
-    ) => void
-  }
-
-function SandboxParameters<ParamsOptions extends ParametersOptions>(
-  props: SandboxParametersProps<ParamsOptions>,
-) {
-  const { onLocationUpdate, parameters, presets, setParameterValues, children } = props
-
-  useEffect(() => {
-    setParameterValues(presets[0].values)
-  }, [setParameterValues, presets])
-
-  const handleParamValuesChange = useCallback(
-    (_presetId: string, values: ExtractValuesFromParametersOptions<ParamsOptions> | null) => {
-      setParameterValues(values)
-    },
-    [setParameterValues],
-  )
-
-  return (
-    <ParametersProvider
-      parameters={parameters}
-      presets={presets}
-      onChange={handleParamValuesChange}
-      onLocationUpdate={onLocationUpdate}
-    >
-      {children}
-    </ParametersProvider>
+      </ParametersProvider>
+    </SandboxContext.Provider>
   )
 }
 

@@ -133,7 +133,7 @@ export const parametersMachine = setup({
       presets: Presets<any>
       onLocationUpdate?: OnLocationUpdate
       presetId: string | null
-      parametersValues: ParametersValues | null
+      parametersValues: ParametersValues
       showControls: boolean
     }
     events:
@@ -166,7 +166,7 @@ export const parametersMachine = setup({
       presets,
       onLocationUpdate,
       presetId: defaultPreset.id,
-      parametersValues: null,
+      parametersValues: defaultPreset.values,
       showControls: false,
     }
   },
@@ -176,6 +176,8 @@ export const parametersMachine = setup({
         assign(({ context, event }) => {
           const { parameters, presets, onLocationUpdate } = event
           assertPresets(parameters, presets)
+          // TODO assert presetId?
+          // TODO assert parametersValues?
           return {
             ...context,
             parameters,

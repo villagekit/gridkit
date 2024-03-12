@@ -6,26 +6,53 @@ import { ParametersValues } from '.'
 
 const ParametersMachineContext = createActorContext(parametersMachine)
 
-type ParametersProviderProps = MachineInput & { children: React.ReactNode }
+type Optional<T> = { [K in keyof T]: T[K] | null | undefined }
+type ParametersProviderProps = Omit<MachineInput, 'parameters' | 'presets'> &
+  Optional<Pick<MachineInput, 'parameters' | 'presets'>> & {
+    onParametersValuesUpdate: (parametersValues: ParametersValues) => void
+    children: React.ReactNode
+  }
 
 export function ParametersProvider(props: ParametersProviderProps) {
-  const { children, ...input } = props
+  const { children, parameters, presets, onParametersValuesUpdate, onLocationUpdate } = props
+
+  if (parameters == null) return children
+  if (presets == null) return children
+
+  const input = { parameters, presets, onLocationUpdate }
 
   return (
     <ParametersMachineContext.Provider options={{ input }}>
-      <UpdateInput input={input} />
+      <UpdateInput {...input} />
+      <NotifyContextChange useValue={useParametersValues} onChange={onParametersValuesUpdate} />
       {children}
     </ParametersMachineContext.Provider>
   )
 }
 
-function UpdateInput(props: { input: MachineInput }) {
-  const { input } = props
+type NotifyContextChangeProps<T> = {
+  useValue: () => T
+  onChange: (value: T) => void
+}
+
+function NotifyContextChange<T>(props: NotifyContextChangeProps<T>) {
+  const { useValue, onChange } = props
+
+  const value = useValue()
+  useEffect(() => {
+    onChange(value)
+  }, [onChange, value])
+
+  return <React.Fragment />
+}
+
+function UpdateInput(props: MachineInput) {
+  const { parameters, presets, onLocationUpdate } = props
   const actorRef = ParametersMachineContext.useActorRef()
 
   useEffect(() => {
-    actorRef.send({ type: 'updateInput', ...input })
-  }, [actorRef, input])
+    actorRef.send({ type: 'updateInput', parameters, presets, onLocationUpdate })
+  }, [actorRef, parameters, presets, onLocationUpdate])
 
   return <React.Fragment />
 }
