@@ -1,7 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useState } from 'react'
 import {
   ExtractValuesFromParametersOptions,
-  ParameterControlsContextProvider,
+  ParametersProvider,
   ParametersOptions,
   ParametersValues,
   Presets,
@@ -136,14 +136,14 @@ function SandboxParameters<ParamsOptions extends ParametersOptions>(
   )
 
   return (
-    <ParameterControlsContextProvider
+    <ParametersProvider
       parameters={parameters}
       presets={presets}
       onChange={handleParamValuesChange}
       onLocationUpdate={onLocationUpdate}
     >
       {children}
-    </ParameterControlsContextProvider>
+    </ParametersProvider>
   )
 }
 

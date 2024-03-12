@@ -25,7 +25,7 @@ export type OnLocationUpdate = (location: Location) => void
 export type MachineInput = {
   parameters: ParametersOptions
   presets: Presets<any>
-  onLocationUpdate: OnLocationUpdate
+  onLocationUpdate?: OnLocationUpdate
 }
 
 type UpdatePresetIdEvent = {
@@ -41,9 +41,8 @@ type UpdateInputEvent = { type: 'updateInput' } & MachineInput
 type UpdateEvent = UpdateStateEvent | UpdateInputEvent
 
 const queryParamsActor = fromCallback<UpdateEvent, MachineInput>(({ input, receive, sendBack }) => {
-  let currentOnLocationUpdate: OnLocationUpdate
+  let currentOnLocationUpdate: OnLocationUpdate | undefined
   let currentParameters: ParametersOptions
-  let currentPresets: Presets<typeof currentParameters>
   let queryParameterDefinitions: QueryParamConfigMap
 
   setupInput(input)
@@ -76,7 +75,6 @@ const queryParamsActor = fromCallback<UpdateEvent, MachineInput>(({ input, recei
 
     assertPresets(parameters, presets)
     currentParameters = parameters
-    currentPresets = presets
 
     const defaultPreset = presets[0]
     queryParameterDefinitions = calculateQueryParameterDefinitions(parameters, defaultPreset)
@@ -105,8 +103,10 @@ const queryParamsActor = fromCallback<UpdateEvent, MachineInput>(({ input, recei
       }
     }
 
-    const nextLocation = updateLocation(urlParams, location)
-    currentOnLocationUpdate(nextLocation)
+    if (currentOnLocationUpdate != null) {
+      const nextLocation = updateLocation(urlParams, location)
+      currentOnLocationUpdate(nextLocation)
+    }
   }
 
   function loadQueryParams() {
@@ -131,7 +131,7 @@ export const parametersMachine = setup({
     context: {
       parameters: ParametersOptions
       presets: Presets<any>
-      onLocationUpdate: OnLocationUpdate
+      onLocationUpdate?: OnLocationUpdate
       presetId: string | null
       parametersValues: ParametersValues | null
       showControls: boolean

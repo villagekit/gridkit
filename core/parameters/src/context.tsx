@@ -30,19 +30,6 @@ function UpdateInput(props: { input: MachineInput }) {
   return <React.Fragment />
 }
 
-export function useParametersContext() {
-  return {
-    parameters: useParameters(),
-    presets: usePresets(),
-    presetId: usePresetId(),
-    parametersValues: useParametersValues(),
-    showControls: useShowControls(),
-    setShowControls: useSetShowControls(),
-    updatePresetId: useUpdatePresetId(),
-    updateParametersValues: useUpdateParametersValues(),
-  }
-}
-
 export function useParameters() {
   return ParametersMachineContext.useSelector(({ context }) => context.parameters)
 }
