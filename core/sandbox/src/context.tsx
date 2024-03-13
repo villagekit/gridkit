@@ -1,9 +1,15 @@
-import React, { createContext, useCallback, useContext, useEffect, useState } from 'react'
-import { ParametersProvider, ParametersValues } from '@villagekit/parameters'
+import { ParametersProvider, type ParametersValues } from '@villagekit/parameters'
+import type React from 'react'
+import { createContext, useCallback, useContext, useEffect, useState } from 'react'
 
+import {
+  designMetaSchema,
+  designParametersSchema,
+  getDesignPresetsSchema,
+} from '@villagekit/design'
 import { SandboxAssemblyProvider } from './assembly/context'
 import { useDesignRender } from './renders'
-import {
+import type {
   DesignFile,
   DesignInstance,
   DesignRender,
@@ -12,11 +18,6 @@ import {
   DesignValidationKey,
   ExtendDesignValidationErrors,
 } from './types'
-import {
-  designMetaSchema,
-  designParametersSchema,
-  getDesignPresetsSchema,
-} from '@villagekit/design'
 
 type ProviderProps = {
   children: React.ReactNode

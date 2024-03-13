@@ -1,9 +1,9 @@
-import constate from 'constate'
+import type { EditorState } from '@codemirror/state'
+import { EditorView, type EditorViewConfig } from '@codemirror/view'
 import { useColorModeValue } from '@villagekit/ui'
+import type { Variant } from 'codemirror-theme-catppuccin'
+import constate from 'constate'
 import { useCallback, useEffect, useState } from 'react'
-import { EditorState } from '@codemirror/state'
-import { EditorView, EditorViewConfig } from '@codemirror/view'
-import { Variant } from 'codemirror-theme-catppuccin'
 
 import { CodeMirror, updateCode, updateLanguageExtensions, updateTheme } from '@/editor'
 

@@ -2,7 +2,7 @@ import { SizeMarkerX, SizeMarkerY } from '@villagekit/part-base-grid'
 import { useTheme } from '@villagekit/ui'
 
 import { getEveryHolePosition } from '../helpers'
-import { GridPanelHoles } from '../types'
+import type { GridPanelHoles } from '../types'
 
 const GRID_SPACING = 40
 

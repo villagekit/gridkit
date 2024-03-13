@@ -1,8 +1,8 @@
 'use client'
 
-import { Text as BaseText, TextProps as BaseTextProps } from '@chakra-ui/react'
+import { Text as BaseText, type TextProps as BaseTextProps } from '@chakra-ui/react'
 
-import { BaseProps } from '../types.js'
+import type { BaseProps } from '../types.js'
 
 export interface TextProps extends BaseProps {
   as?: BaseTextProps['as']

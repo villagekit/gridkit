@@ -1,7 +1,7 @@
 import { Box3 } from 'three'
 
 import { getPartModule } from './modules'
-import {
+import type {
   FasteningPoint,
   PartCreator,
   PartGlValue,

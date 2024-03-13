@@ -1,7 +1,7 @@
 'use client'
 
-import { Button as BaseButton, ButtonProps as BaseButtonProps } from '@chakra-ui/react'
-import { Dict } from '@chakra-ui/utils'
+import { Button as BaseButton, type ButtonProps as BaseButtonProps } from '@chakra-ui/react'
+import type { Dict } from '@chakra-ui/utils'
 import { forwardRef } from 'react'
 
 import { transparentize } from '../utility.js'

@@ -1,8 +1,8 @@
 import constate from 'constate'
 import { useEffect, useMemo, useState } from 'react'
 
-import { Workspace } from './workspaces'
 import { client } from '@/client'
+import type { Workspace } from './workspaces'
 
 export interface WorkspaceOptions {
   workspace: Workspace

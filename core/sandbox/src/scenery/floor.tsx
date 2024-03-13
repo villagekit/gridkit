@@ -1,4 +1,4 @@
-import { ReactThreeFiber } from '@react-three/fiber'
+import type { ReactThreeFiber } from '@react-three/fiber'
 import { useMemo } from 'react'
 import { Color, Vector2, Vector3 } from 'three'
 

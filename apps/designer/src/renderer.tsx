@@ -2,11 +2,11 @@ import React from 'react'
 import { createRoot } from 'react-dom/client'
 
 import { AppLayout } from '@/components/Layout'
-import WorkspaceSelector from '@/components/WorkspaceSelector'
-import { WorkspaceLayout } from '@/components/WorkspaceLayout'
 import Product from '@/components/Product'
-import { useWorkspacesContext } from '@/context/workspaces'
+import { WorkspaceLayout } from '@/components/WorkspaceLayout'
+import WorkspaceSelector from '@/components/WorkspaceSelector'
 import { useWorkspaceContext } from '@/context/workspace'
+import { useWorkspacesContext } from '@/context/workspaces'
 
 const rootElement = document.getElementById('root')
 

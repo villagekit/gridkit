@@ -3,7 +3,7 @@
 import { FaInfoCircle } from 'react-icons/fa/index.js'
 
 import { Box, Icon, Tooltip, useMobileFriendlyTooltip } from '../index.js'
-import { TooltipProps } from './Tooltip.js'
+import type { TooltipProps } from './Tooltip.js'
 
 export interface InfoTooltipProps extends Partial<TooltipProps> {
   label: React.ReactNode

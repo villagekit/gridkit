@@ -1,27 +1,27 @@
 import '@villagekit/part-gridbeam'
 import '@villagekit/part-gridpanel'
 
-import React, { useMemo } from 'react'
+import { ParameterControls } from '@villagekit/parameters'
 import {
   AssemblyInfo,
+  type DesignRenderError,
+  type DesignValidationError,
+  type DesignValidationErrors,
   Sandbox,
   useSandboxContext,
-  DesignRenderError,
-  DesignValidationErrors,
-  DesignValidationError,
 } from '@villagekit/sandbox'
-import { Box, Flex, HStack, Heading, List, ListIcon, ListItem, Text, VStack } from '@villagekit/ui'
+import { Box, Flex, Heading, List, ListIcon, ListItem, Text, VStack } from '@villagekit/ui'
+import React, { type ReactElement, useMemo } from 'react'
 import { Resplit } from 'react-resplit'
-import { ParameterControls } from '@villagekit/parameters'
 
 import { useProductContext } from '@/context/product'
 
-import { Loading } from './Loading'
-import { ProductEditor } from './ProductEditor'
 import Ansi from '@curvenote/ansi-to-react'
 import { MdChevronRight } from 'react-icons/md'
 import useFitText from 'use-fit-text-new'
 import { toStructuredError } from 'zod-structured-error'
+import { Loading } from './Loading'
+import { ProductEditor } from './ProductEditor'
 
 export default function Product() {
   const product = useProductContext()
@@ -128,7 +128,7 @@ type RenderErrorDisplayProps = {
 function RenderErrorDisplay(props: RenderErrorDisplayProps) {
   const { renderError } = props
 
-  let inner
+  let inner: ReactElement
   switch (renderError.type) {
     case 'typescript.transform':
       inner = (

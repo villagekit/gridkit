@@ -2,7 +2,7 @@
 
 import { forwardRef } from 'react'
 
-import { IconButton, IconButtonProps, Link, LinkProps } from '..//index.js'
+import { IconButton, type IconButtonProps, Link, type LinkProps } from '..//index.js'
 
 export interface LinkIconButtonProps
   extends Omit<IconButtonProps, 'isDisabled'>,

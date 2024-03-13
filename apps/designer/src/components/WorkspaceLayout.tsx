@@ -10,12 +10,12 @@ import {
   Tooltip,
   VStack,
 } from '@villagekit/ui'
-import { Resplit } from 'react-resplit'
 import { useMemo } from 'react'
 import { FaChevronRight } from 'react-icons/fa'
+import { Resplit } from 'react-resplit'
 
 import { useWorkspaceContext } from '@/context/workspace'
-import { Workspace, useWorkspacesContext } from '@/context/workspaces'
+import { type Workspace, useWorkspacesContext } from '@/context/workspaces'
 
 interface WorkspaceLayoutProps {
   children: React.ReactNode
