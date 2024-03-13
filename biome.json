@@ -3,7 +3,9 @@
   "vcs": {
     "enabled": true,
     "clientKind": "git",
-    "useIgnoreFile": true
+    "useIgnoreFile": true,
+    "root": "./",
+    "defaultBranch": "main"
   },
   "files": {
     "ignore": ["./apps/designer/src/editor/types.d.ts"]
