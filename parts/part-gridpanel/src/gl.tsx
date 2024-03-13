@@ -18,7 +18,6 @@ import {
   Quaternion,
   Vector3,
 } from 'three'
-
 import { getEveryHolePosition } from './helpers'
 import type { GridPanelGlValue } from './types'
 

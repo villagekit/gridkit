@@ -1,7 +1,7 @@
 'use client'
 
 import { Box, type BoxProps, type SystemStyleObject } from '@chakra-ui/react'
-import type { BaseProps } from '../types.js'
+import type { BaseProps } from '../types'
 
 const focusStyle = {
   borderColor: 'outlineColor',

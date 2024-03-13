@@ -1,8 +1,7 @@
 'use client'
 
 import { forwardRef } from 'react'
-
-import { Button, type ButtonProps, Link, type LinkProps } from '..//index.js'
+import { Button, type ButtonProps, Link, type LinkProps } from '../'
 
 export type LinkButtonProps = Omit<ButtonProps, 'isDisabled'> & Omit<LinkProps, 'variant'>
 

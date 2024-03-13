@@ -1,5 +1,4 @@
 import { registerPartModule } from '@villagekit/part'
-
 import { type GridBeamCreator, calculateState } from './creators'
 import { PartsGl } from './gl'
 import {

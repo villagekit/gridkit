@@ -24,7 +24,6 @@ import {
   FaUndoAlt,
 } from 'react-icons/fa'
 import screenfull from 'screenfull'
-
 import { AssemblyInfo } from '../assembly'
 import type { CameraControlsRef } from '../camera'
 import { ControlsContextProvider } from './context'

@@ -16,7 +16,6 @@ import {
   Vector3,
   Vector4,
 } from 'three'
-
 import type { SandboxMode } from '../'
 import { createMachine } from './machine'
 

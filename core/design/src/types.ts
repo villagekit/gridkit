@@ -6,7 +6,6 @@ import type {
 } from '@villagekit/parameters'
 import type { PartCreator, PartVariantsByType } from '@villagekit/part'
 import type { z } from 'zod'
-
 import type { AssemblyPlugin } from './plugins'
 import type { designCategorySchema, designMetaSchema } from './schema'
 

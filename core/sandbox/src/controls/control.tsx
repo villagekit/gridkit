@@ -1,7 +1,6 @@
 import { Box, type SystemStyleObject } from '@villagekit/ui'
 import type React from 'react'
 import { useMemo } from 'react'
-
 import { useControlsContext } from './context'
 
 interface ControlProps {

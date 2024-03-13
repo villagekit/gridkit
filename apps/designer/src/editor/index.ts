@@ -3,7 +3,6 @@ import { Compartment, EditorState } from '@codemirror/state'
 import { EditorView, type EditorViewConfig } from '@codemirror/view'
 import { basicSetup } from 'codemirror'
 import { type Variant, catppuccin } from 'codemirror-theme-catppuccin'
-
 import { createIdler } from './idle'
 import { createDiagnosticGutterTheme, createDiagnosticTheme } from './theme'
 

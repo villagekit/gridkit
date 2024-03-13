@@ -10,7 +10,7 @@ import {
   type LinkOverlayProps,
   Stack,
   Text,
-} from '..//index.js'
+} from '../'
 
 export interface LinkCardProps {
   as?: HoverCardProps['as']

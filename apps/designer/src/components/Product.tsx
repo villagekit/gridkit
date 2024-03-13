@@ -1,6 +1,8 @@
 import '@villagekit/part-gridbeam'
 import '@villagekit/part-gridpanel'
 
+import { useProductContext } from '@/context/product'
+import Ansi from '@curvenote/ansi-to-react'
 import { ParameterControls } from '@villagekit/parameters'
 import {
   AssemblyInfo,
@@ -12,12 +14,8 @@ import {
 } from '@villagekit/sandbox'
 import { Box, Flex, Heading, List, ListIcon, ListItem, Text, VStack } from '@villagekit/ui'
 import React, { type ReactElement, useMemo } from 'react'
-import { Resplit } from 'react-resplit'
-
-import { useProductContext } from '@/context/product'
-
-import Ansi from '@curvenote/ansi-to-react'
 import { MdChevronRight } from 'react-icons/md'
+import { Resplit } from 'react-resplit'
 import useFitText from 'use-fit-text-new'
 import { toStructuredError } from 'zod-structured-error'
 import { Loading } from './Loading'

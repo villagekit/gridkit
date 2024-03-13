@@ -1,7 +1,6 @@
 import { FormControl, Switch as SwitchComponent } from '@villagekit/ui'
 import { type ChangeEvent, useCallback } from 'react'
 import { BooleanParam } from 'serialize-query-params'
-
 import { z } from 'zod'
 import { Label } from '../components/label'
 import { type BaseProps, baseOptionsSchema } from './base'

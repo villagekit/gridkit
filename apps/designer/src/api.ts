@@ -1,7 +1,6 @@
 import { constants, access, mkdir, readFile, readdir, writeFile } from 'node:fs/promises'
 import { basename, join } from 'node:path'
 import { initTRPC } from '@trpc/server'
-import { DesignFile } from '@villagekit/sandbox'
 import { app, dialog } from 'electron'
 import { camelCase, kebabCase } from 'lodash-es'
 import { parse as parseToml, stringify as stringifyToml } from 'smol-toml'

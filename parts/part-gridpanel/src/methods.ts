@@ -9,7 +9,6 @@ import {
 import { convert, meter } from '@villagekit/util-units'
 import generateKey, { sorted as generateKeySorted } from 'deadbeef'
 import { Box3, Vector3 } from 'three'
-
 import type { GridPanelGlValue, GridPanelState, GridPanelSummaryValue } from './types'
 
 export function calculateGlValue(state: GridPanelState): GridPanelGlValue {

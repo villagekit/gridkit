@@ -2,7 +2,6 @@ import { useActorRef, useSelector } from '@xstate/react'
 import type React from 'react'
 import { createContext, useCallback, useContext, useEffect } from 'react'
 import type { ActorRefFrom, SnapshotFrom } from 'xstate'
-
 import { type ParametersInput, parametersMachine } from './machine'
 import type { ParametersValues } from './values'
 

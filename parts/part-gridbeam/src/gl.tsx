@@ -10,7 +10,6 @@ import {
   MeshBasicMaterial,
   Object3D,
 } from 'three'
-
 import type { GridBeamGlValue } from './types'
 
 export function PartsGl(props: PartsGlProps<GridBeamGlValue>) {

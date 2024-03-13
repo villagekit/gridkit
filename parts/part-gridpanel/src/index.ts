@@ -1,5 +1,4 @@
 import { registerPartModule } from '@villagekit/part'
-
 import { type GridPanelCreator, calculateState } from './creators'
 import { PartsGl } from './gl'
 import {

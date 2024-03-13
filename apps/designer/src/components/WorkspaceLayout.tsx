@@ -1,3 +1,5 @@
+import { useWorkspaceContext } from '@/context/workspace'
+import { type Workspace, useWorkspacesContext } from '@/context/workspaces'
 import {
   Box,
   Button,
@@ -13,9 +15,6 @@ import {
 import { useMemo } from 'react'
 import { FaChevronRight } from 'react-icons/fa'
 import { Resplit } from 'react-resplit'
-
-import { useWorkspaceContext } from '@/context/workspace'
-import { type Workspace, useWorkspacesContext } from '@/context/workspaces'
 
 interface WorkspaceLayoutProps {
   children: React.ReactNode

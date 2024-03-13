@@ -1,8 +1,7 @@
 import { FormControl, FormLabel, Select } from '@villagekit/ui'
+import { find } from 'lodash-es'
 import { type ChangeEvent, useCallback } from 'react'
 import { z } from 'zod'
-
-import { find } from 'lodash-es'
 import {
   type ExtractValuesFromParametersOptions,
   type ParametersOptions,

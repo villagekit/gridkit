@@ -19,7 +19,6 @@ import { map, uniq } from 'lodash-es'
 import pDebounce from 'p-debounce'
 import { createContext, useContext, useEffect, useMemo, useState } from 'react'
 import type { Box3 } from 'three'
-
 import type { DesignRenderAssembly, ExtendDesignValidationErrors } from '../types'
 
 type SandboxAssemblyOptions<ParamsOptions extends ParametersOptions> = {

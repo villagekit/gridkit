@@ -1,11 +1,10 @@
+import { CodeMirror, updateCode, updateLanguageExtensions, updateTheme } from '@/editor'
 import type { EditorState } from '@codemirror/state'
 import { EditorView, type EditorViewConfig } from '@codemirror/view'
 import { useColorModeValue } from '@villagekit/ui'
 import type { Variant } from 'codemirror-theme-catppuccin'
 import constate from 'constate'
 import { useCallback, useEffect, useState } from 'react'
-
-import { CodeMirror, updateCode, updateLanguageExtensions, updateTheme } from '@/editor'
 
 function useEditor() {
   const [parentEl, setParentEl] = useState<HTMLDivElement | null>(null)

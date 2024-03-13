@@ -4,7 +4,6 @@
     "enabled": true,
     "clientKind": "git",
     "useIgnoreFile": true,
-    "root": "./",
     "defaultBranch": "main"
   },
   "files": {

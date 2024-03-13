@@ -1,3 +1,4 @@
+import { debounce, intersection, isEqual } from 'lodash-es'
 import { parse as parseQueryString } from 'query-string'
 import {
   BooleanParam,
@@ -11,8 +12,6 @@ import {
   updateLocation,
   withDefault,
 } from 'serialize-query-params'
-
-import { debounce, intersection, isEqual } from 'lodash-es'
 import { assign, fromCallback, sendTo, setup } from 'xstate'
 import type { Preset, Presets } from './presets'
 import type {

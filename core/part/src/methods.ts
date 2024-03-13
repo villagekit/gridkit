@@ -1,5 +1,4 @@
 import { Box3 } from 'three'
-
 import { getPartModule } from './modules'
 import type {
   FasteningPoint,

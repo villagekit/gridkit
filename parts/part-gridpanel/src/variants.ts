@@ -1,5 +1,4 @@
 import { millimeter } from '@villagekit/util-units'
-
 import type { GridPanelVariant } from './types'
 
 export const gridPanelVariants: Record<string, GridPanelVariant> = {

@@ -2,8 +2,7 @@
 
 import { Textarea as BaseTextarea, type TextareaProps as BaseTextareaProps } from '@chakra-ui/react'
 import { forwardRef } from 'react'
-
-import { useTheme } from '../hooks/useTheme.js'
+import { useTheme } from '../hooks/useTheme'
 
 export interface TextareaProps
   extends Pick<

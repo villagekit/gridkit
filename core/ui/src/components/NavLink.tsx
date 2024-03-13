@@ -3,7 +3,7 @@
 import { useStyleConfig } from '@chakra-ui/react'
 import { type KeyboardEvent, forwardRef } from 'react'
 
-import { Link, type LinkProps } from '..//index.js'
+import { Link, type LinkProps } from '../'
 
 export interface NavLinkProps
   extends Pick<LinkProps, 'as' | 'href' | 'isExternal' | 'onClick' | 'children'> {

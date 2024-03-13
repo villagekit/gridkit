@@ -1,5 +1,4 @@
 import type { PartCreator } from '@villagekit/part'
-
 import type { DesignParts, RecursiveArray } from './types'
 
 export function getPartCreatorsFromDesignParts(parts: DesignParts): Array<PartCreator> {

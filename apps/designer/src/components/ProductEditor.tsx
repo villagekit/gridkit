@@ -1,9 +1,8 @@
-import { Box } from '@villagekit/ui'
-import { useEffect, useRef } from 'react'
-
 import { useEditorContext } from '@/context/editor'
 import { useProductContext } from '@/context/product'
 import { getTypeScriptExtensions } from '@/editor/typescript'
+import { Box } from '@villagekit/ui'
+import { useEffect, useRef } from 'react'
 
 interface ProductEditorProps {}
 

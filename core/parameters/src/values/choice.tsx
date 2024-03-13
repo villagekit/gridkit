@@ -2,7 +2,6 @@ import { FormControl, Select as SelectComponent } from '@villagekit/ui'
 import { map } from 'lodash-es'
 import { type ChangeEvent, useCallback } from 'react'
 import { StringParam } from 'serialize-query-params'
-
 import { z } from 'zod'
 import { Label } from '../components/label'
 import { type BaseProps, baseOptionsSchema } from './base'

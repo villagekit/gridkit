@@ -1,6 +1,5 @@
 import initSwc, { type Output as TransformOutput, transformSync } from '@swc/wasm-web'
 import { type ActorRefFrom, fromCallback } from 'xstate'
-
 import type { RenderInputEvent } from './'
 import type { javascriptAssemblyRenderer } from './javascript'
 

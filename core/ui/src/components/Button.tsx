@@ -3,8 +3,7 @@
 import { Button as BaseButton, type ButtonProps as BaseButtonProps } from '@chakra-ui/react'
 import type { Dict } from '@chakra-ui/utils'
 import { forwardRef } from 'react'
-
-import { transparentize } from '../utility.js'
+import { transparentize } from '../utility'
 
 export interface ButtonProps
   extends Pick<

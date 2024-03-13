@@ -1,5 +1,4 @@
 import { type ZodDiscriminatedUnionOption, z } from 'zod'
-
 import { partModules } from './modules'
 import type { PartCreator } from './types'
 

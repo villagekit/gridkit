@@ -1,6 +1,5 @@
 import { useMemo } from 'react'
-
-import { useTheme } from './useTheme.js'
+import { useTheme } from './useTheme'
 
 export const sizeNames = [
   'full',

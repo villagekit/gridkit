@@ -9,7 +9,6 @@ import {
 } from '@valtown/codemirror-ts'
 import type { WorkerShape } from '@valtown/codemirror-ts/worker'
 import { basicSetup } from 'codemirror'
-
 import * as Comlink from 'comlink'
 
 const innerWorker = new Worker(

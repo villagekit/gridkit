@@ -8,7 +8,6 @@ import { Perf } from 'r3f-perf'
 import type React from 'react'
 import { useCallback, useMemo, useRef, useState } from 'react'
 import { ACESFilmicToneMapping, Box3, PCFSoftShadowMap, Vector3, sRGBEncoding } from 'three'
-
 import { AssemblyGl } from './assembly'
 import { SandboxAssemblyContext } from './assembly/context'
 import { CameraControls, type CameraControlsRef } from './camera'
