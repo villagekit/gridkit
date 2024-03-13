@@ -8,7 +8,8 @@
     "dev:app": "turbo dev:app --concurrency 1000",
     "dev": "pnpm run '/^dev:.*/'",
     "lint": "turbo lint",
-    "format": "biome check --apply ."
+    "format": "biome check --apply .",
+    "test": "turbo test"
   },
   "devDependencies": {
     "@biomejs/biome": "^1.6.1",
