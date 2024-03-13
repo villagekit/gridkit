@@ -19,7 +19,10 @@
   "scripts": {
     "deps": "depcheck",
     "build:pkg": "tsup src",
-    "lint": "biome check ."
+    "lint": "biome check .",
+    "test": "vitest run"
   },
-  "dependencies": {}
+  "devDependencies": {
+    "vitest": "^1.3.1"
+  }
 }

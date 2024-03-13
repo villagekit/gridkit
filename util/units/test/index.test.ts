@@ -1,4 +1,6 @@
-import { convert, inch, meter, millimeter } from './'
+import { describe, expect, test } from 'vitest'
+
+import { convert, inch, meter, millimeter } from '../'
 
 describe('convert', () => {
   test('meters to meters', () => {
