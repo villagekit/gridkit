@@ -1,14 +1,14 @@
 import { createActorContext } from '@xstate/react'
 
-import { MachineInput, parametersMachine } from './machine'
+import { ParametersInput, parametersMachine } from './machine'
 import React, { useCallback, useEffect } from 'react'
 import { ParametersValues } from '.'
 
 const ParametersMachineContext = createActorContext(parametersMachine)
 
 type Optional<T> = { [K in keyof T]: T[K] | null | undefined }
-type ParametersProviderProps = Omit<MachineInput, 'parameters' | 'presets'> &
-  Optional<Pick<MachineInput, 'parameters' | 'presets'>> & {
+type ParametersProviderProps = Omit<ParametersInput, 'parameters' | 'presets'> &
+  Optional<Pick<ParametersInput, 'parameters' | 'presets'>> & {
     onParametersValuesUpdate: (parametersValues: ParametersValues) => void
     children: React.ReactNode
   }
@@ -46,7 +46,7 @@ function NotifyContextChange<T>(props: NotifyContextChangeProps<T>) {
   return <React.Fragment />
 }
 
-function UpdateInput(props: MachineInput) {
+function UpdateInput(props: ParametersInput) {
   const { parameters, presets, onLocationUpdate } = props
   const actorRef = ParametersMachineContext.useActorRef()
 

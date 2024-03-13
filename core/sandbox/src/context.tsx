@@ -39,8 +39,10 @@ export function useSandboxContext(): SandboxState {
   return context
 }
 
+const defaultOnLocationUpdate = (location: Location) => console.log('location', location)
+
 export function SandboxProvider(props: SandboxOptions & ProviderProps) {
-  const { file, onLocationUpdate, children } = props
+  const { file, onLocationUpdate = defaultOnLocationUpdate, children } = props
 
   const { render, renderError } = useDesignRender({ file })
 
