@@ -1,12 +1,6 @@
-import type {
-  DesignAssembly,
-  DesignMeta,
-  DesignParameters,
-  DesignParts,
-  DesignPresets,
-} from '@villagekit/design'
+import type { Meta, Parameters, Parts, PartsFn, Presets } from '@villagekit/kit'
 
-export const meta: DesignMeta = {
+export const meta: Meta = {
   id: 'chair',
   label: 'Chair',
   description:
@@ -51,9 +45,9 @@ export const parameters = {
     max: 10,
     min: 5,
   },
-} satisfies DesignParameters
+} satisfies Parameters
 
-export const presets: DesignPresets<typeof parameters> = [
+export const presets: Presets<typeof parameters> = [
   {
     id: 'regular-with-back',
     label: 'Regular With Back',
@@ -78,7 +72,7 @@ export const presets: DesignPresets<typeof parameters> = [
   },
 ]
 
-export const assembly: DesignAssembly<typeof parameters> = (parameters) => {
+export const parts: PartsFn<typeof parameters> = (parameters) => {
   const { seatWidth, seatDepth, seatHeight, backHeight, shouldIncludeBack } = parameters
 
   const backZBeamEndZ = shouldIncludeBack ? seatHeight + backHeight : seatHeight
@@ -150,5 +144,5 @@ export const assembly: DesignAssembly<typeof parameters> = (parameters) => {
       y: [0, seatDepth],
       z: seatHeight - 1,
     },
-  ] satisfies DesignParts
+  ] satisfies Parts
 }
