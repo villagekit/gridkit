@@ -1,0 +1,26 @@
+import { z } from 'zod'
+
+// https://stackoverflow.com/questions/1221985/how-to-validate-a-user-name-with-regex
+const NAME_RE = /^@[A-Za-z0-9]+(?:-[A-Za-z0-9]+)*\/[A-Za-z0-9]+(?:-[A-Za-z0-9]+)*$/
+
+const TAG_RE = /^[A-Za-z0-9]+(?:-[A-Za-z0-9]+)*$/
+
+// https://semver.org/#is-there-a-suggested-regular-expression-regex-to-check-a-semver-string
+// const VERSION_RE
+
+// https://stackoverflow.com/questions/537772/what-is-the-most-correct-regular-expression-for-a-unix-file-path
+const PATH_RE = /^[^\0]+$/
+
+export const nameSchema = z.string().regex(NAME_RE)
+export const tagSchema = z.string().regex(TAG_RE)
+export const pathSchema = z.string().regex(PATH_RE)
+export const productTypeSchema = z.enum(['kit'])
+
+export const metaSchema = z.object({
+  name: nameSchema,
+  label: z.string().min(1),
+  description: z.string(),
+  type: productTypeSchema,
+  exports: pathSchema,
+  tags: z.array(tagSchema).optional(),
+})

@@ -8,38 +8,35 @@ import { Perf } from 'r3f-perf'
 import type React from 'react'
 import { useCallback, useMemo, useRef, useState } from 'react'
 import { ACESFilmicToneMapping, Box3, PCFSoftShadowMap, Vector3, sRGBEncoding } from 'three'
-import { AssemblyGl } from './assembly'
-import { SandboxAssemblyContext } from './assembly/context'
 import { CameraControls, type CameraControlsRef } from './camera'
-import { SandboxContext, useSandboxContext } from './context'
 import { SandboxControls } from './controls'
 import { SceneryGl } from './scenery'
 import { useDefaultSandboxControlSettings, useSaveSandboxControlSettings } from './settings'
 
-export { AssemblyInfo, AssemblySummary } from './assembly'
 export type * from './types'
-export { SandboxProvider, useSandboxContext } from './context'
 
 export type SandboxMode = 'default' | 'screenshot'
 
 export interface SandboxProps {
+  label: string
   scale?: number
   mode?: SandboxMode
   isDebug?: boolean
   showParameterControls?: boolean
   alwaysShowFullscreenControls?: boolean
+  bridgeContexts?: Array<React.Context<any>>
 }
 
 export function Sandbox(props: SandboxProps) {
   const {
+    label,
     scale,
     mode = 'default',
     isDebug = false,
     showParameterControls = false,
     alwaysShowFullscreenControls = false,
+    bridgeContexts = [],
   } = props
-
-  const { render } = useSandboxContext()
 
   const maxTiers = 3
   const gpu = useDetectGPU()
@@ -59,7 +56,7 @@ export function Sandbox(props: SandboxProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const cameraControlsRef = useRef<CameraControlsRef | null>(null)
 
-  const ContextBridge = useContextBridge(SandboxContext, SandboxAssemblyContext)
+  const ContextBridge = useContextBridge(...bridgeContexts)
 
   const onCanvasCreated = useCallback((state: RootState) => {
     state.gl.toneMapping = ACESFilmicToneMapping
@@ -73,7 +70,7 @@ export function Sandbox(props: SandboxProps) {
     <Box
       id="sandbox-container"
       role="img"
-      aria-label={render?.meta?.label}
+      aria-label={label}
       ref={containerRef}
       sx={{
         ':hover, :focus-within': {
@@ -170,9 +167,6 @@ interface ContentGlProps {
 
 function ContentGl(props: ContentGlProps) {
   const { scale = 1, mode, shouldAutoRotate, shouldDisplayGrid, cameraControlsRef } = props
-
-  const { render } = useSandboxContext()
-  const designType = render?.type
 
   const gridLengthInMeters = 0.04
 

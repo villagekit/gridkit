@@ -1,0 +1,26 @@
+{
+  "name": "@villagekit/design",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "source": "src/index.ts",
+  "main": "dist/index.cjs",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    "kit": {
+      "types": "./dist/kit.d.ts",
+      "import": "./dist/kit.js",
+      "require": "./dist/kit.cjs"
+    }
+  },
+  "sideEffects": false,
+  "scripts": {
+    "build:pkg": "tsup src",
+    "lint": "biome check ."
+  },
+  "dependencies": {
+    "@villagekit/product-kit": "workspace:*"
+  },
+  "peerDependencies": {}
+}
