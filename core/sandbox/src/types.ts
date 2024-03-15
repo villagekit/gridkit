@@ -1,7 +1,7 @@
 import type { DesignAssemblyPlugins, DesignMeta, DesignParts } from '@villagekit/design'
 import type {
-  ExtractValuesFromParametersOptions,
-  ParametersOptions,
+  ExtractValuesFromParameters,
+  Parameters,
   Presets,
 } from '@villagekit/parameters'
 import type { PartVariantsByType } from '@villagekit/part'
@@ -14,21 +14,21 @@ export type DesignFileAssembly = {
 }
 export type DesignFile = DesignFileAssembly
 
-export type DesignRenderAssembly<ParamsOptions extends ParametersOptions = never> = {
+export type DesignRenderAssembly<Params extends Parameters = never> = {
   type: 'assembly'
   meta: DesignMeta
-  parameters: ParamsOptions extends never ? null : ParamsOptions
-  presets: ParamsOptions extends never ? null : Presets<ParamsOptions>
-  assembly: ParamsOptions extends never
+  parameters: Params extends never ? null : Params
+  presets: Params extends never ? null : Presets<Params>
+  assembly: Params extends never
     ? () => Promise<DesignParts>
     : (
-        parameters: ExtractValuesFromParametersOptions<ParamsOptions>,
+        parameters: ExtractValuesFromParameters<Params>,
         partVariants: PartVariantsByType,
       ) => Promise<DesignParts>
   plugins?: DesignAssemblyPlugins
 }
-export type DesignRender<ParamsOptions extends ParametersOptions> =
-  null | DesignRenderAssembly<ParamsOptions>
+export type DesignRender<Params extends Parameters> =
+  null | DesignRenderAssembly<Params>
 
 export type DesignRenderErrorStackFrame = {
   name: string
@@ -54,12 +54,12 @@ export type DesignValidationKey = keyof NonNullable<DesignRender<any>>
 export type DesignValidationErrors = Partial<Record<DesignValidationKey, DesignValidationError>>
 export type ExtendDesignValidationErrors = (errors: DesignValidationErrors) => void
 
-export type DesignInstance<ParamsOptions extends ParametersOptions = never> = {
+export type DesignInstance<Params extends Parameters = never> = {
   file: DesignFile
-  render: DesignRender<ParamsOptions>
+  render: DesignRender<Params>
   renderError: DesignRenderError
   validationErrors: DesignValidationErrors
-  parameterValues: ParamsOptions extends never
+  parameterValues: Params extends never
     ? null
-    : ExtractValuesFromParametersOptions<ParamsOptions>
+    : ExtractValuesFromParameters<Params>
 }

@@ -5,7 +5,7 @@ import {
   generatePartsForPlugins,
   getPartCreatorsFromDesignParts,
 } from '@villagekit/design'
-import type { ExtractValuesFromParametersOptions, ParametersOptions } from '@villagekit/parameters'
+import type { ExtractValuesFromParameters, Parameters } from '@villagekit/parameters'
 import {
   type PartCreator,
   type PartGlValue,
@@ -21,11 +21,11 @@ import { createContext, useContext, useEffect, useMemo, useState } from 'react'
 import type { Box3 } from 'three'
 import type { DesignRenderAssembly, ExtendDesignValidationErrors } from '../types'
 
-type SandboxAssemblyOptions<ParamsOptions extends ParametersOptions> = {
-  assembly: DesignRenderAssembly<ParamsOptions>
-  parameterValues: ParamsOptions extends never
+type SandboxAssemblyOptions<Params extends Parameters> = {
+  assembly: DesignRenderAssembly<Params>
+  parameterValues: Params extends never
     ? null
-    : ExtractValuesFromParametersOptions<ParamsOptions>
+    : ExtractValuesFromParameters<Params>
   extendValidationErrors: ExtendDesignValidationErrors
 }
 
@@ -36,8 +36,8 @@ type SandboxAssemblyState = {
   parts: Array<PartState>
 }
 
-function useSandboxAssembly<ParamsOptions extends ParametersOptions>(
-  props: SandboxAssemblyOptions<ParamsOptions>,
+function useSandboxAssembly<Params extends Parameters>(
+  props: SandboxAssemblyOptions<Params>,
 ): SandboxAssemblyState {
   const { isLoading, parts } = useParts(props)
 
@@ -74,8 +74,8 @@ type UsePartsValue = Pick<SandboxAssemblyState, 'isLoading' | 'parts'>
 
 const noPlugins: Array<AssemblyPlugin> = []
 
-function useParts<ParamsOptions extends ParametersOptions>(
-  options: SandboxAssemblyOptions<ParamsOptions>,
+function useParts<Params extends Parameters>(
+  options: SandboxAssemblyOptions<Params>,
 ): UsePartsValue {
   const { assembly, parameterValues, extendValidationErrors } = options
 

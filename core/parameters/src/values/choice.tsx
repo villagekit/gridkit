@@ -4,20 +4,20 @@ import { type ChangeEvent, useCallback } from 'react'
 import { StringParam } from 'serialize-query-params'
 import { z } from 'zod'
 import { Label } from '../components/label'
-import { type BaseProps, baseOptionsSchema } from './base'
+import { type BaseProps, baseParameterSchema } from './base'
 
 export const ChoiceId = 'choice'
 export type ChoiceValue = string
 export const choiceValueSchema = z.string()
 export const ChoiceQueryParam = StringParam
 
-export const choiceOptionsSchema = baseOptionsSchema.extend({
+export const choiceParameterSchema = baseParameterSchema.extend({
   type: z.literal(ChoiceId),
   options: z.record(z.string(), z.string()),
 })
-export type ChoiceOptions = z.infer<typeof choiceOptionsSchema>
+export type ChoiceParameter = z.infer<typeof choiceParameterSchema>
 
-export type ChoiceProps = Omit<ChoiceOptions, 'type'> & BaseProps<ChoiceValue>
+export type ChoiceProps = Omit<ChoiceParameter, 'type'> & BaseProps<ChoiceValue>
 
 export function Choice(props: ChoiceProps) {
   const { id, onChange, value, label, description, options } = props

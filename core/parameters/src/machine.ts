@@ -15,15 +15,15 @@ import {
 import { assign, fromCallback, sendTo, setup } from 'xstate'
 import type { Preset, Presets } from './presets'
 import type {
-  ExtractValuesFromParametersOptions,
-  ParameterOptions,
-  ParametersOptions,
+  ExtractValuesFromParameters,
+  Parameters,
+  Parameters,
   ParametersValues,
 } from './values'
 
 export type OnLocationUpdate = (location: Location) => void
 export type ParametersInput = {
-  parameters: ParametersOptions
+  parameters: Parameters
   presets: Presets<any>
   onLocationUpdate?: OnLocationUpdate
 }
@@ -43,7 +43,7 @@ type UpdateParamsEvent = UpdateStateEvent | UpdateInputEvent
 const queryParamsActor = fromCallback<UpdateParamsEvent, ParametersInput>(
   ({ input, receive, sendBack }) => {
     let currentOnLocationUpdate: OnLocationUpdate | undefined
-    let currentParameters: ParametersOptions
+    let currentParameters: Parameters
     let queryParameterDefinitions: QueryParamConfigMap
 
     setupInput(input)
@@ -226,10 +226,10 @@ export const parametersMachine = setup({
   },
 })
 
-function assertPresets<ParamsOptions extends ParametersOptions>(
-  parameters: ParamsOptions,
+function assertPresets<Params extends Parameters>(
+  parameters: Params,
   presets: Presets<any>,
-): asserts presets is Presets<ParamsOptions> {
+): asserts presets is Presets<Params> {
   const paramKeys = Object.keys(parameters)
   const presetKeys = Object.keys(presets[0].values)
   if (
@@ -242,9 +242,9 @@ function assertPresets<ParamsOptions extends ParametersOptions>(
   }
 }
 
-function calculateQueryParameterDefinitions<ParamsOptions extends ParametersOptions>(
-  parameters: ParamsOptions,
-  defaultPreset: Preset<ParamsOptions>,
+function calculateQueryParameterDefinitions<Params extends Parameters>(
+  parameters: Params,
+  defaultPreset: Preset<Params>,
 ): QueryParamConfigMap {
   const configMap: QueryParamConfigMap = {
     preset: withDefault(StringParam, defaultPreset.id),
@@ -260,7 +260,7 @@ function calculateQueryParameterDefinitions<ParamsOptions extends ParametersOpti
 
   return configMap
 
-  function queryParamConfigForParameter(parameterKey: string, parameter: ParameterOptions) {
+  function queryParamConfigForParameter(parameterKey: string, parameter: Parameters) {
     switch (parameter.type) {
       case 'boolean':
         return withDefault(BooleanParam, defaultPreset.values[parameterKey] as boolean)
@@ -272,9 +272,9 @@ function calculateQueryParameterDefinitions<ParamsOptions extends ParametersOpti
   }
 }
 
-function mapValuesToQueryValueMap<ParamsOptions extends ParametersOptions>(
-  parameters: ParamsOptions,
-  values: ExtractValuesFromParametersOptions<ParamsOptions>,
+function mapValuesToQueryValueMap<Params extends Parameters>(
+  parameters: Params,
+  values: ExtractValuesFromParameters<Params>,
 ): DecodedValueMap<QueryParamConfigMap> {
   const valuesMap: DecodedValueMap<QueryParamConfigMap> = {}
   for (const parameterKey in parameters) {
@@ -284,20 +284,20 @@ function mapValuesToQueryValueMap<ParamsOptions extends ParametersOptions>(
   return valuesMap
 }
 
-function mapQueryValueMapToValues<ParamsOptions extends ParametersOptions>(
-  parameters: ParamsOptions,
+function mapQueryValueMapToValues<Params extends Parameters>(
+  parameters: Params,
   valuesMap: DecodedValueMap<QueryParamConfigMap>,
-): ExtractValuesFromParametersOptions<ParamsOptions> {
-  const values: Partial<ExtractValuesFromParametersOptions<ParamsOptions>> = {}
+): ExtractValuesFromParameters<Params> {
+  const values: Partial<ExtractValuesFromParameters<Params>> = {}
   for (const parameterKey in parameters) {
     const parameter = parameters[parameterKey]!
     values[parameterKey] = valuesMap[parameter.shortId || parameterKey]
   }
-  return values as ExtractValuesFromParametersOptions<ParamsOptions>
+  return values as ExtractValuesFromParameters<Params>
 }
 
-function getQueryParamsValues<ParamsOptions extends ParametersOptions>(
-  parameters: ParamsOptions,
+function getQueryParamsValues<Params extends Parameters>(
+  parameters: Params,
   queryParameterDefinitions: QueryParamConfigMap,
 ) {
   const urlParams = parseQueryString(location.search)

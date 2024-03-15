@@ -3,29 +3,29 @@ import { find } from 'lodash-es'
 import { type ChangeEvent, useCallback } from 'react'
 import { z } from 'zod'
 import {
-  type ExtractValuesFromParametersOptions,
-  type ParametersOptions,
-  extractValuesSchemaFromParametersOptions,
+  type ExtractValuesFromParameters,
+  type Parameters,
+  extractValuesSchemaFromParameters,
   usePresetId,
   usePresets,
   useUpdateParametersValues,
   useUpdatePresetId,
 } from '../'
 
-export interface Preset<ParamsOptions extends ParametersOptions> {
+export interface Preset<Params extends Parameters> {
   id: string
   label: string
-  values: ExtractValuesFromParametersOptions<ParamsOptions>
+  values: ExtractValuesFromParameters<Params>
 }
 
-export function getPresetValuesSchema<ParamsOptions extends ParametersOptions>(
-  parameters: ParamsOptions,
+export function getPresetValuesSchema<Params extends Parameters>(
+  parameters: Params,
 ) {
-  return extractValuesSchemaFromParametersOptions(parameters)
+  return extractValuesSchemaFromParameters(parameters)
 }
 
-export function getPresetSchema<ParamsOptions extends ParametersOptions>(
-  parameters: ParamsOptions,
+export function getPresetSchema<Params extends Parameters>(
+  parameters: Params,
 ) {
   return z.object({
     id: z.string(),
@@ -34,19 +34,19 @@ export function getPresetSchema<ParamsOptions extends ParametersOptions>(
   })
 }
 
-export type Presets<ParamsOptions extends ParametersOptions> = [
-  Preset<ParamsOptions>,
-  ...Array<Preset<ParamsOptions>>,
+export type Presets<Params extends Parameters> = [
+  Preset<Params>,
+  ...Array<Preset<Params>>,
 ]
 
-export function Presets<ParamsOptions extends ParametersOptions>(
-  presets: Presets<ParamsOptions>,
-): Presets<ParamsOptions> {
+export function Presets<Params extends Parameters>(
+  presets: Presets<Params>,
+): Presets<Params> {
   return presets
 }
 
-export function getPresetsSchema<ParamsOptions extends ParametersOptions>(
-  parameters: ParamsOptions,
+export function getPresetsSchema<Params extends Parameters>(
+  parameters: Params,
 ) {
   const presetSchema = getPresetSchema(parameters)
   return z.array(presetSchema).min(1)

@@ -1,14 +1,14 @@
 import { type PartCreator, type PartState, calculateStateForAll } from '@villagekit/part'
 import { flatten } from 'lodash-es'
 
-export interface AssemblyPlugin<PluginState = unknown> {
+export interface Plugin<PluginState = unknown> {
   init?: () => void
   generateParts: (parts: Array<PartState>) => Promise<Array<PartCreator>>
   state: PluginState
 }
 
 export function generatePartsForPlugins(
-  plugins: Array<AssemblyPlugin>,
+  plugins: Array<Plugin>,
   partCreators: Array<PartCreator>,
 ): Promise<Array<PartCreator>> {
   const partStates = calculateStateForAll(partCreators)

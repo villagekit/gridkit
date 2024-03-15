@@ -1,0 +1,3 @@
+[module]
+type = "kit"
+exports = "./chair.ts"

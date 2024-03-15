@@ -5,7 +5,7 @@ import {
   ParameterControls,
   ParameterControlsContextProvider,
   ParameterValueControls,
-  ParametersOptions,
+  Parameters,
   PresetControls,
   Presets,
 } from '../src'
@@ -19,7 +19,7 @@ export default meta
 
 type Story = StoryObj
 
-const simpleParameters = ParametersOptions({
+const simpleParameters = Parameters({
   select: {
     helperText: 'String as select',
     label: 'Select',

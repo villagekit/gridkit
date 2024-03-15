@@ -1,7 +1,7 @@
 import type { PartCreator } from '@villagekit/part'
-import type { DesignParts, RecursiveArray } from './types'
+import type { Parts, RecursiveArray } from './types'
 
-export function getPartCreatorsFromDesignParts(parts: DesignParts): Array<PartCreator> {
+export function getPartCreatorsFromKitParts(parts: Parts): Array<PartCreator> {
   const results: Array<PartCreator> = []
   deepForEach(parts, (value, indices) => {
     if (value === false || value === undefined || value === null) {
