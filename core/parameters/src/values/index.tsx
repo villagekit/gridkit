@@ -85,11 +85,9 @@ export function ParamValueControls() {
   const updateParamsValues = useUpdateParamsValues()
   const showControls = useShowControls()
 
-  if (!showControls) return null
-  if (values == null) return null
-
+  type Values = NonNullable<typeof values>
   const setValue = useCallback(
-    <Key extends keyof typeof values>(key: Key, value: (typeof values)[Key]) => {
+    <Key extends keyof Values>(key: Key, value: Values[Key]) => {
       const nextValues = Object.assign({}, values, {
         [key]: value,
       })
@@ -98,6 +96,8 @@ export function ParamValueControls() {
     [values, updateParamsValues],
   )
 
+  if (!showControls) return null
+  if (values == null) return null
   if (params == null) return null
 
   return (

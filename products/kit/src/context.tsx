@@ -1,4 +1,9 @@
-import { type ExtractValuesFromParams, type Params, useParamsValues } from '@villagekit/parameters'
+import {
+  type ExtractValuesFromParams,
+  type Params,
+  useParamsValues,
+  useUpdateParams,
+} from '@villagekit/parameters'
 import {
   type PartCreator,
   type PartGlValue,
@@ -32,6 +37,14 @@ type ProductKitState = {
 
 function useProductKit(): ProductKitState {
   const render = useRender()
+
+  const updateParams = useUpdateParams()
+  useEffect(() => {
+    if (render == null) return
+    const { parameters: params, presets } = render
+    if (params == null || presets == null) return
+    updateParams(params, presets)
+  }, [render, updateParams])
 
   const paramsValues = useParamsValues()
 

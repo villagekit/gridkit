@@ -105,10 +105,12 @@ function ValidateParams() {
     const presetsSchema = getPresetsSchema(params)
     const presetsResult = presetsSchema.safeParse(presets)
     if (!presetsResult.success) errors.presets = presetsResult.error
-    updateProductError({
-      type: 'error:validation',
-      errors,
-    })
+    if (!paramsResult.success || !presetsResult.success) {
+      updateProductError({
+        type: 'error:validation',
+        errors,
+      })
+    }
   }, [params, presets, updateProductError])
 
   return <Fragment />
