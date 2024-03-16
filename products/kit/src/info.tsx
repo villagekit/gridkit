@@ -3,16 +3,16 @@ import { convert, meter, millimeter } from '@villagekit/util-units'
 import type React from 'react'
 import { useMemo } from 'react'
 import { Vector3 } from 'three'
-import { useSandboxAssemblyContext } from './context'
+import { useProductKitContext } from './context'
 
-interface AssemblyInfoProps {
+interface ProductKitInfoProps {
   containerRef?: React.RefObject<HTMLElement | null>
 }
 
-export function AssemblyInfo(props: AssemblyInfoProps) {
+export function ProductKitInfo(props: ProductKitInfoProps) {
   const { containerRef } = props
 
-  const { boundingBox } = useSandboxAssemblyContext()
+  const { boundingBox } = useProductKitContext()
 
   const dimensionsInMillimeters = useMemo(
     () =>

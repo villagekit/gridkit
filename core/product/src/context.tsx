@@ -1,8 +1,22 @@
-import { ParamsProvider } from '@villagekit/parameters'
+import {
+  ParamsProvider,
+  getPresetsSchema,
+  paramsSchema,
+  useParams,
+  usePresets,
+} from '@villagekit/parameters'
 import { useActorRef, useSelector } from '@xstate/react'
-import { type PropsWithChildren, createContext, useContext, useEffect, useMemo } from 'react'
+import {
+  type PropsWithChildren,
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+} from 'react'
 import type { ActorRefFrom, SnapshotFrom } from 'xstate'
 import { ProductTypeProvider } from './components'
+import type { ProductError, ProductErrorValidation } from './errors'
 import { type ProductMachineInput, productMachine } from './machine'
 
 type ProductProviderProps = PropsWithChildren<
@@ -34,6 +48,8 @@ export function ProductProvider(props: ProductProviderProps) {
     actorRef.send({ type: 'updateInput', input })
   }, [actorRef, input])
 
+  useValidateParams()
+
   return (
     <ProductContext.Provider value={actorRef}>
       <ParamsProvider onLocationUpdate={onLocationUpdate}>
@@ -44,13 +60,13 @@ export function ProductProvider(props: ProductProviderProps) {
 }
 
 function useProductActor(): ActorRefFrom<typeof productMachine> {
-  const actor = useContext(ProductContext)
-  if (actor == null) {
+  const actorRef = useContext(ProductContext)
+  if (actorRef == null) {
     throw new Error(
       "You used a hook for ProductContext but it's not inside a ProductProvider component",
     )
   }
-  return actor
+  return actorRef
 }
 
 export const useHasProduct = () => useContext(ProductContext) != null
@@ -62,3 +78,34 @@ const selectProductMeta = (snapshot: ProductSnapshot) => snapshot.context.meta
 export const useProductMeta = () => useSelector(useProductActor(), selectProductMeta)
 const selectProductCode = (snapshot: ProductSnapshot) => snapshot.context.code
 export const useProductCode = () => useSelector(useProductActor(), selectProductCode)
+
+export const useUpdateProductError = () => {
+  const actorRef = useProductActor()
+  return useCallback(
+    (error: ProductError | null) => {
+      actorRef.send({ type: 'updateError', error })
+    },
+    [actorRef],
+  )
+}
+
+function useValidateParams() {
+  const params = useParams()
+  const presets = usePresets()
+  const updateProductError = useUpdateProductError()
+
+  useEffect(() => {
+    if (params == null || presets == null) return
+    const errors: ProductErrorValidation['errors'] = {}
+    const paramsResult = paramsSchema.safeParse(params)
+    if (!paramsResult.success) errors.params = paramsResult.error
+
+    const presetsSchema = getPresetsSchema(params)
+    const presetsResult = presetsSchema.safeParse(presets)
+    if (!presetsResult.success) errors.presets = presetsResult.error
+    updateProductError({
+      type: 'error:validation',
+      errors,
+    })
+  }, [params, presets, updateProductError])
+}

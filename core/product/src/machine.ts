@@ -1,4 +1,5 @@
 import { assign, setup } from 'xstate'
+import type { ProductError } from './errors'
 import type { ProductData, ProductModule } from './types'
 
 export type ProductMachineInput = ProductData & {
@@ -7,9 +8,12 @@ export type ProductMachineInput = ProductData & {
 
 export type ProductMachineContext = ProductMachineInput & {
   Product: ProductModule
+  error: ProductError | null
 }
 
-export type ProductMachineEvent = { type: 'updateInput'; input: ProductMachineInput }
+export type ProductMachineEvent =
+  | { type: 'updateInput'; input: ProductMachineInput }
+  | { type: 'updateError'; error: ProductError | null }
 
 export const productMachine = setup({
   types: {} as {
@@ -22,7 +26,12 @@ export const productMachine = setup({
   context: ({ input }) => getContextFromInput(input),
   on: {
     updateInput: {
-      actions: [assign(({ event: { input } }) => getContextFromInput(input))],
+      actions: assign(({ event: { input } }) => getContextFromInput(input)),
+    },
+    updateError: {
+      actions: assign({
+        error: ({ event: { error } }) => error,
+      }),
     },
   },
 })
@@ -34,7 +43,8 @@ function getContextFromInput(input: ProductMachineInput): ProductMachineContext 
     throw new Error(`Unknown product type: ${meta.type}`)
   }
   return {
-    Product,
     ...input,
+    Product,
+    error: null,
   }
 }

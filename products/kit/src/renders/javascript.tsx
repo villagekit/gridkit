@@ -1,38 +1,27 @@
 import { AnyMap, type TraceMap, originalPositionFor } from '@jridgewell/trace-mapping'
-import type {
-  DesignMeta,
-  DesignParams,
-  DesignParamsValues,
-  DesignPartVariantsByType,
-  DesignParts,
-  DesignPresets,
-} from '@villagekit/design'
 import * as Comlink from 'comlink'
 import { parseStackTrace } from 'errorstacks'
 import { fromCallback } from 'xstate'
 import { comlinkDataUrl } from '../comlink'
-import type { RenderInputEvent } from './'
+import type { Params, ParamsValues, PartVariantsByType, Parts, Presets } from '../types'
+import type { ProductKitRenderEvent, RendererMachineEvent } from './'
 
-type AssemblyEvaluator = {
+type Evaluator = {
   loadModule: (code: string) => Promise<string>
   evaluateModule: () => Promise<{
-    meta: DesignMeta
-    parameters: DesignParams | null
-    presets: DesignPresets<any> | null
-    assembly: DesignParts | null
+    parameters: Params | null
+    presets: Presets<any> | null
+    parts: Parts | null
   }>
-  evaluateAssembly: (
-    parameters: DesignParamsValues,
-    partVariants: DesignPartVariantsByType,
-  ) => Promise<DesignParts>
+  evaluateParts: (paramsValues: ParamsValues, partVariants: PartVariantsByType) => Promise<Parts>
 }
 
-export const javascriptAssemblyRenderer = fromCallback<RenderInputEvent>(
+export const javascriptRenderer = fromCallback<ProductKitRenderEvent, RendererMachineEvent>(
   ({ sendBack, receive }) => {
     const evaluatorIframe = createEvaulatorIframe()
     document.body.appendChild(evaluatorIframe)
 
-    const evaluator = Comlink.wrap<AssemblyEvaluator>(
+    const evaluator = Comlink.wrap<Evaluator>(
       Comlink.windowEndpoint(evaluatorIframe.contentWindow!),
     )
     const hasLoadedEvaluator = new Promise((resolve) => {
@@ -55,7 +44,7 @@ export const javascriptAssemblyRenderer = fromCallback<RenderInputEvent>(
 
       const moduleUrl = await evaluator.loadModule(jsCode)
 
-      let jsModule: Awaited<ReturnType<AssemblyEvaluator['evaluateModule']>>
+      let jsModule: Awaited<ReturnType<Evaluator['evaluateModule']>>
       try {
         jsModule = await evaluator.evaluateModule()
       } catch (error) {
@@ -65,28 +54,24 @@ export const javascriptAssemblyRenderer = fromCallback<RenderInputEvent>(
 
       if (jsModule == null) return
 
-      const { meta, parameters, presets } = jsModule
+      const { parameters, presets } = jsModule
 
-      sendBack({
+      const event: RendererMachineEvent = {
         type: 'renderer.success',
         render: {
-          type: 'assembly' as const,
-          meta,
           parameters,
           presets,
-          assembly: async (
-            parameters: DesignParamsValues,
-            partVariants: DesignPartVariantsByType,
-          ) => {
+          parts: async (paramsValues: ParamsValues, partVariants: PartVariantsByType) => {
             try {
-              return await evaluator.evaluateAssembly(parameters, partVariants)
+              return await evaluator.evaluateParts(paramsValues, partVariants)
             } catch (error) {
               sendEvaluationError(error)
               return []
             }
           },
         },
-      })
+      }
+      sendBack(event)
 
       function sendEvaluationError(error: unknown) {
         console.error('error', error)
@@ -94,13 +79,15 @@ export const javascriptAssemblyRenderer = fromCallback<RenderInputEvent>(
           error instanceof Error
             ? traceError(error, moduleUrl, traceMap)
             : { message: String(error), stack: [] }
-        sendBack({
+        const event: RendererMachineEvent = {
           type: 'renderer.failure',
           renderError: {
-            type: 'javascript.evaluate',
-            error: tracedError,
+            type: 'error:stack',
+            title: 'JavaScript evaluation',
+            ...tracedError,
           },
-        })
+        }
+        sendBack(event)
       }
     }
   },
@@ -138,25 +125,24 @@ const createEvaulatorWorkerSrc = () => `
   async function evaluateModule() {
     module = await import(moduleUrl)
 
-    const { meta, parameters, presets, assembly } = module
+    const { parameters, presets, parts } = module
 
     return {
-      meta,
       parameters,
       presets,
     }
   }
 
-  function evaluateAssembly(parameters, partVariants) {
-    return typeof module.assembly === 'function'
-      ? module.assembly(parameters, partVariants)
-      : module.assembly
+  function evaluateParts(parameters, partVariants) {
+    return typeof module.parts === 'function'
+      ? module.parts(parameters, partVariants)
+      : module.parts
   }
 
   const exports = {
     loadModule,
     evaluateModule,
-    evaluateAssembly,
+    evaluateParts,
   }
 
   Comlink.expose(exports)

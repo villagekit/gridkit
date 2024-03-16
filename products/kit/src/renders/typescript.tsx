@@ -1,13 +1,13 @@
 import initSwc, { type Output as TransformOutput, transformSync } from '@swc/wasm-web'
 import { type ActorRefFrom, fromCallback } from 'xstate'
-import type { RenderInputEvent } from './'
-import type { javascriptAssemblyRenderer } from './javascript'
+import type { RenderEvent, RendererMachineEvent } from './'
+import type { javascriptRenderer } from './javascript'
 
-export const typescriptAssemblyRenderer = fromCallback<
-  RenderInputEvent,
-  { javascriptAssemblyRenderer: ActorRefFrom<typeof javascriptAssemblyRenderer> }
+export const typescriptRenderer = fromCallback<
+  RenderEvent,
+  { javascriptRenderer: ActorRefFrom<typeof javascriptRenderer> }
 >(({ input, sendBack, receive }) => {
-  const { javascriptAssemblyRenderer } = input
+  const { javascriptRenderer } = input
 
   const swcInitialized = initSwc()
 
@@ -36,19 +36,26 @@ export const typescriptAssemblyRenderer = fromCallback<
         sourceMaps: 'inline',
       })
     } catch (error) {
-      sendBack({
-        type: 'renderer.failure',
-        renderError: {
-          type: 'typescript.transform',
-          error: error,
-        },
-      })
+      if (typeof error === 'string') {
+        const event: RendererMachineEvent = {
+          type: 'renderer.failure',
+          renderError: {
+            type: 'error:text',
+            title: 'TypeScript transform',
+            body: error,
+          },
+        }
+        sendBack(event)
+      } else {
+        throw error
+      }
       return
     }
 
-    javascriptAssemblyRenderer.send({
+    const event: RenderEvent = {
       type: 'render',
       code: tsTransformOutput.code,
-    })
+    }
+    javascriptRenderer.send(event)
   }
 })

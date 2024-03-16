@@ -7,17 +7,17 @@ import {
 import { SummaryContextProvider } from '@villagekit/part-base'
 import { debounce } from 'lodash-es'
 import { useEffect, useMemo, useState } from 'react'
-import { useSandboxAssemblyContext } from './context'
+import { useProductKitContext } from './context'
 
-interface AssemblySummaryProps {
+type ProductKitSummaryProps = {
   displayUnit: 'gu' | 'mm'
   groupParts: boolean
 }
 
-export function AssemblySummary(props: AssemblySummaryProps) {
+export function ProductKitSummary(props: ProductKitSummaryProps) {
   const { displayUnit, groupParts } = props
 
-  const { parts } = useSandboxAssemblyContext()
+  const { parts } = useProductKitContext()
 
   const [localParts, setLocalParts] = useState(parts)
 

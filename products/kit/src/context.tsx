@@ -1,17 +1,4 @@
-import {
-  type DesignParts,
-  type KitPlugin,
-  designPartsSchema,
-  generatePartsForPlugins,
-  getPartCreatorsFromDesignParts,
-} from '@villagekit/design'
-import {
-  type ExtractValuesFromParams,
-  type Params,
-  useParams,
-  useParamsValues,
-  usePresets,
-} from '@villagekit/parameters'
+import { type ExtractValuesFromParams, type Params, useParamsValues } from '@villagekit/parameters'
 import {
   type PartCreator,
   type PartGlValue,
@@ -21,56 +8,40 @@ import {
   calculateStateForAll,
   getPartVariants,
 } from '@villagekit/part'
-import { type ProductTypeProviderProps, useProductCode, useProductMeta } from '@villagekit/product'
+import {
+  type ProductError,
+  type ProductTypeProviderProps,
+  useUpdateProductError,
+} from '@villagekit/product'
 import { map, uniq } from 'lodash-es'
 import pDebounce from 'p-debounce'
-import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
+import { createContext, useContext, useEffect, useMemo, useState } from 'react'
 import type { Box3 } from 'three'
+import { getPartCreatorsFromKitParts } from './helpers'
+import { generatePartsForPlugins } from './plugins'
 import { useRender } from './renders'
-import type {
-  ExtendDesignValidationErrors,
-  Presets,
-  Render,
-  RenderError,
-  ValidationErrors,
-} from './types'
+import { partsSchema } from './schema'
+import type { Parts, Plugins, ProductKitRender } from './types'
 
 type ProductKitState = {
   boundingBox: Box3
-  renderError: RenderError
-  validationErrors: ValidationErrors
   isLoading: boolean
   partValues: Array<PartGlValue>
   parts: Array<PartState>
 }
 
-function useProductKit(props: ProductTypeProviderProps): ProductKitState {
-  const { exports: filePath } = useProductMeta()
-  const code = useProductCode()
+function useProductKit(): ProductKitState {
+  const render = useRender()
 
-  const [validationErrors, setValidationErrors] = useState({})
-  const extendValidationErrors = useCallback((nextValidationErrors: ValidationErrors) => {
-    setValidationErrors((validationErrors) => ({
-      ...validationErrors,
-      ...nextValidationErrors,
-    }))
-  }, [])
-
-  const { render, renderError } = useRender({ filePath, code })
-
-  const params = useParams()
-  const presets = usePresets()
   const paramsValues = useParamsValues()
-  useValidateParams({ params, presets }, extendValidationErrors)
 
+  // @ts-ignore
   const { isLoading, parts } = useParts({ render, paramsValues })
 
   const partValues = usePartValues(parts)
   const boundingBox = useBoundingBox(partValues)
 
   return {
-    renderError,
-    validationErrors,
     boundingBox,
     isLoading,
     partValues,
@@ -80,9 +51,9 @@ function useProductKit(props: ProductTypeProviderProps): ProductKitState {
 
 export const ProductKitContext = createContext<ProductKitState | null>(null)
 
-export function ProductKitProvider(props: ProductKitOptions<any> & { children: React.ReactNode }) {
-  const { children, ...options } = props
-  const value = useProductKit(options)
+export function ProductKitProvider(props: ProductTypeProviderProps) {
+  const { children } = props
+  const value = useProductKit()
   return <ProductKitContext.Provider value={value}>{children}</ProductKitContext.Provider>
 }
 
@@ -94,40 +65,46 @@ export function useProductKitContext(): ProductKitState {
   return context
 }
 
-type UsePartsOptions = {
-  kit: Render
-  params
+type UsePartsOptions<Ps extends Params> = {
+  render: ProductKitRender<Ps> | null
+  paramsValues: ExtractValuesFromParams<Ps> | null
+  updateProductError: (error: ProductError) => void
 }
 
 type UsePartsValue = Pick<ProductKitState, 'isLoading' | 'parts'>
 
-const noPlugins: Array<KitPlugin> = []
+const noPlugins: Plugins = []
 
-function useParts<Ps extends Params>(options: ProductKitOptions<Ps>): UsePartsValue {
-  const { kit, paramsValues, extendValidationErrors } = options
+function useParts<Ps extends Params>(options: UsePartsOptions<Ps>): UsePartsValue {
+  const { render, paramsValues } = options
+
+  const updateProductError = useUpdateProductError()
 
   const partVariants = useMemo(() => getPartVariants(), [])
 
-  const [kitParts, setKitParts] = useState<DesignParts>([])
+  const [kitParts, setKitParts] = useState<Parts>([])
   useEffect(() => {
+    if (render == null) return
     if (paramsValues == null) return
-    kit.kit(paramsValues, partVariants).then((parts) => {
-      const result = designPartsSchema.safeParse(parts)
+    render.parts(paramsValues, partVariants).then((parts) => {
+      const result = partsSchema.safeParse(parts)
       if (result.success) {
         setKitParts(result.data)
-        extendValidationErrors({ kit: null })
       } else {
-        extendValidationErrors({ kit: result.error })
+        updateProductError({
+          type: 'error:validation',
+          errors: {
+            kit: result.error,
+          },
+        })
       }
     })
-  }, [kit, paramsValues, partVariants, extendValidationErrors])
+  }, [render, paramsValues, partVariants, updateProductError])
 
   const [partCreators, setPartCreators] = useState<Array<PartCreator>>([])
   const [isLoading, setLoading] = useState(false)
 
-  const {
-    kit: { plugins = noPlugins },
-  } = options
+  const { plugins = noPlugins } = render ?? {}
   const generatePluginParts = useMemo(() => {
     return pDebounce((partCreators: Array<PartCreator>) => {
       return generatePartsForPlugins(plugins, partCreators)
@@ -135,7 +112,7 @@ function useParts<Ps extends Params>(options: ProductKitOptions<Ps>): UsePartsVa
   }, [plugins])
 
   useEffect(() => {
-    const kitPartCreators = getPartCreatorsFromDesignParts(kitParts)
+    const kitPartCreators = getPartCreatorsFromKitParts(kitParts)
     setPartCreators(kitPartCreators)
 
     let isCancelled = false
@@ -187,23 +164,17 @@ function useBoundingBox(partGlValues: Array<PartGlValue>): Box3 {
   }, [partGlValues])
 }
 
-function useValidateParams(
-  params: Params | null,
-  presets: Presets<any> | null,
-  extendValidationErrors: ExtendValidationErrors,
-) {
-  useEffect(() => {
-    if (params == null || presets == null) return
-
-    const paramsResult = paramsSchema.safeParse(params)
-    const paramsError = paramsResult.success ? null : paramsResult.error
-
-    const presetsSchema = getPresetsSchema(params)
-    const presetsResult = presetsSchema.safeParse(presets)
-    const presetsError = presetsResult.success ? null : presetsResult.error
-    extendValidationErrors({
-      params: paramsError,
-      presets: presetsError,
-    })
-  }, [params, presets, extendValidationErrors])
+/*
+function assertRender<Ps extends Params>(
+  render: ProductKitRender<any>,
+): asserts render is ProductKitRender<Ps> {
+  // TODO
 }
+
+function assertParamsValues<Ps extends Params>(
+  _render: ProductKitRender<Ps>,
+  paramsValues: ParamsValues,
+): asserts paramsValues is ExtractValuesFromParams<Ps> {
+  // TODO
+}
+*/

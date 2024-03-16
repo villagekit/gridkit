@@ -1,11 +1,16 @@
 import { ProductKitProvider } from './context'
+import { ProductKitInfo } from './info'
+import { ProductKitSummary } from './summary'
+import { ProductKitView } from './view'
 
 export { ProductKitContext } from './context'
 
 export default {
-  id: 'kit'
+  id: 'kit',
   components: {
-  ProductProvider: ProductKitProvider,
+    ProductProvider: ProductKitProvider,
     ProductView: ProductKitView,
-}
+    ProductSummary: ProductKitSummary,
+    ProductInfo: ProductKitInfo,
+  },
 }

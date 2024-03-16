@@ -1,27 +1,27 @@
+import {
+  type ProductError,
+  useProductCode,
+  useProductMeta,
+  useUpdateProductError,
+} from '@villagekit/product'
 import { useMachine } from '@xstate/react'
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { type ActorRefFrom, assign, sendTo, setup } from 'xstate'
-import type { Render, RenderError } from '../types'
+import type { ProductKitRender } from '../types'
 import { javascriptRenderer } from './javascript'
 import { typescriptRenderer } from './typescript'
 
-type RenderOptions = {
-  filePath: string
+export type RenderEvent = {
+  type: 'render'
   code: string
 }
 
-type RenderOutput = {
-  render: Render
-  renderError: RenderError
-}
-
-export function useRender(options: RenderOptions): RenderOutput {
-  const { filePath, code } = options
-
-  const [render, setRender] = useState<DesignRender<any>>(null)
-  const [renderError, setRenderError] = useState<DesignRenderError>(null)
+export function useRender(): ProductKitRender<any> | null {
+  const { exports: filePath } = useProductMeta()
+  const code = useProductCode()
 
   const [state, send] = useMachine(rendererMachine)
+  const { render, renderError } = state.context
 
   const language = filePath.endsWith('.ts')
     ? 'typescript'
@@ -40,41 +40,45 @@ export function useRender(options: RenderOptions): RenderOutput {
     }
   }, [send, language, code])
 
+  const updateProductError = useUpdateProductError()
   useEffect(() => {
-    const { render, renderError } = state.context
-    setRender(render)
-    setRenderError(renderError)
-  }, [state.context])
+    if (renderError != null) {
+      updateProductError(renderError)
+    }
+  }, [renderError, updateProductError])
 
-  return { render, renderError }
+  return render
 }
+
+export type RendererMachineContext = {
+  rendererRefs:
+    | null
+    | [ActorRefFrom<typeof javascriptRenderer>, ActorRefFrom<typeof typescriptRenderer>]
+  render: ProductKitRender<any> | null
+  renderError: ProductError | null
+}
+export type RendererMachineEvent =
+  | {
+      type: 'renderer.render.javascript'
+      code: string
+    }
+  | {
+      type: 'renderer.render.typescript'
+      code: string
+    }
+  | {
+      type: 'renderer.success'
+      render: ProductKitRender<any>
+    }
+  | {
+      type: 'renderer.failure'
+      renderError: ProductError
+    }
 
 export const rendererMachine = setup({
   types: {} as {
-    context: {
-      rendererRefs:
-        | null
-        | [ActorRefFrom<typeof javascriptRenderer>, ActorRefFrom<typeof typescriptRenderer>]
-      render: DesignRender<any>
-      renderError: DesignRenderError
-    }
-    events:
-      | {
-          type: 'renderer.render.javascript'
-          code: string
-        }
-      | {
-          type: 'renderer.render.typescript'
-          code: string
-        }
-      | {
-          type: 'renderer.success'
-          render: DesignRender<any>
-        }
-      | {
-          type: 'renderer.failure'
-          renderError: DesignRenderError
-        }
+    context: RendererMachineContext
+    events: RendererMachineEvent
   },
 }).createMachine({
   id: 'kit-renderer',
