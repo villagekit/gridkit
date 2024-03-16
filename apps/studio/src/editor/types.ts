@@ -1,7 +1,7 @@
 import type {
   DesignAssembly,
   DesignMeta,
-  DesignParameters,
+  DesignParams,
   DesignPart,
   DesignParts,
   DesignPresets,
@@ -13,4 +13,4 @@ import '@villagekit/part'
 import '@villagekit/part-gridbeam'
 import '@villagekit/part-gridpanel'
 
-export type { DesignPart, DesignParts, DesignMeta, DesignParameters, DesignPresets, DesignAssembly }
+export type { DesignPart, DesignParts, DesignMeta, DesignParams, DesignPresets, DesignAssembly }

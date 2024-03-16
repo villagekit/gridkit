@@ -22,7 +22,7 @@ export interface SandboxProps {
   scale?: number
   mode?: SandboxMode
   isDebug?: boolean
-  showParameterControls?: boolean
+  showParamControls?: boolean
   alwaysShowFullscreenControls?: boolean
   bridgeContexts?: Array<React.Context<any>>
 }
@@ -33,7 +33,7 @@ export function Sandbox(props: SandboxProps) {
     scale,
     mode = 'default',
     isDebug = false,
-    showParameterControls = false,
+    showParamControls = false,
     alwaysShowFullscreenControls = false,
     bridgeContexts = [],
   } = props
@@ -128,7 +128,7 @@ export function Sandbox(props: SandboxProps) {
           onToggleDisplayGrid={onToggleDisplayGrid}
           cameraControlsRef={cameraControlsRef}
           containerRef={containerRef}
-          showParameterControls={showParameterControls}
+          showParamControls={showParamControls}
           alwaysShowFullscreenControls={alwaysShowFullscreenControls}
           // NOTE(mw): before, assembly could be null and this was false.
           //             does this still happen?

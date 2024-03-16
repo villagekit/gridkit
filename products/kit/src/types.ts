@@ -1,26 +1,26 @@
 import type {
-  ExtractValuesFromParameters,
-  Parameters,
-  ParametersValues,
+  ExtractValuesFromParams,
+  Params,
+  ParamsValues,
   Presets,
 } from '@villagekit/parameters'
 import type { PartCreator, PartVariantsByType } from '@villagekit/part'
 import type { Plugin } from './plugins'
 
-export type Product<Params extends Parameters = never> = {
+export type Product<Ps extends Params = never> = {
   type: 'kit'
-  parameters: Params
-  presets: Params extends never ? never : Presets<Params>
-  parts: Params extends never ? Parts : PartsFn<Params>
+  parameters: Ps
+  presets: Ps extends never ? never : Presets<Ps>
+  parts: Ps extends never ? Parts : PartsFn<Ps>
 }
 
 export type Part = WithOptionalId<PartCreator>
 export type Parts = RecursiveArray<Part | false | undefined | null>
 
-export type { Parameters, Presets, ParametersValues, PartVariantsByType }
+export type { Params, Presets, ParamsValues, PartVariantsByType }
 
-export type PartsFn<Params extends Parameters> = (
-  parameters: ExtractValuesFromParameters<Params>,
+export type PartsFn<Ps extends Params> = (
+  parameters: ExtractValuesFromParams<Ps>,
   partVariants: PartVariantsByType,
 ) => Parts
 

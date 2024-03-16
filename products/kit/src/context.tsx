@@ -5,7 +5,7 @@ import {
   generatePartsForPlugins,
   getPartCreatorsFromDesignParts,
 } from '@villagekit/design'
-import type { ExtractValuesFromParameters, Parameters } from '@villagekit/parameters'
+import type { ExtractValuesFromParams, Params } from '@villagekit/parameters'
 import {
   type PartCreator,
   type PartGlValue,
@@ -21,11 +21,9 @@ import { createContext, useContext, useEffect, useMemo, useState } from 'react'
 import type { Box3 } from 'three'
 import type { DesignRenderAssembly, ExtendDesignValidationErrors } from '../types'
 
-type SandboxAssemblyOptions<Params extends Parameters> = {
-  assembly: DesignRenderAssembly<Params>
-  parameterValues: Params extends never
-    ? null
-    : ExtractValuesFromParameters<Params>
+type SandboxAssemblyOptions<Ps extends Params> = {
+  assembly: DesignRenderAssembly<Ps>
+  parameterValues: Ps extends never ? null : ExtractValuesFromParams<Ps>
   extendValidationErrors: ExtendDesignValidationErrors
 }
 
@@ -36,8 +34,8 @@ type SandboxAssemblyState = {
   parts: Array<PartState>
 }
 
-function useSandboxAssembly<Params extends Parameters>(
-  props: SandboxAssemblyOptions<Params>,
+function useSandboxAssembly<Ps extends Params>(
+  props: SandboxAssemblyOptions<Ps>,
 ): SandboxAssemblyState {
   const { isLoading, parts } = useParts(props)
 
@@ -74,9 +72,7 @@ type UsePartsValue = Pick<SandboxAssemblyState, 'isLoading' | 'parts'>
 
 const noPlugins: Array<AssemblyPlugin> = []
 
-function useParts<Params extends Parameters>(
-  options: SandboxAssemblyOptions<Params>,
-): UsePartsValue {
+function useParts<Ps extends Params>(options: SandboxAssemblyOptions<Ps>): UsePartsValue {
   const { assembly, parameterValues, extendValidationErrors } = options
 
   const partVariants = useMemo(() => getPartVariants(), [])
@@ -159,3 +155,41 @@ function useBoundingBox(partGlValues: Array<PartGlValue>): Box3 {
     return calculateBoundingBoxForAll(partGlValues)
   }, [partGlValues])
 }
+
+/*
+
+export type ValidationError = ZodError | null
+export type ValidationErrors = Partial<Record<string, ValidationError>>
+export type ExtendValidationErrors = (errors: ValidationErrors) => void
+
+  const [validationErrors, setValidationErrors] = useState({})
+  const extendValidationErrors = useCallback((nextValidationErrors: ValidationErrors) => {
+    setValidationErrors((validationErrors) => ({
+      ...validationErrors,
+      ...nextValidationErrors,
+    }))
+  }, [])
+
+  useValidateParamics(parameterics, extendValidationErrors)
+
+function useValidateParamics<Ps extends Params>(
+  parametrics: Parametrics<Ps> | null,
+  extendValidationErrors: ExtendValidationErrors,
+) {
+  useEffect(() => {
+    if (parametrics == null) return
+    const { parameters, presets } = parametrics
+
+    const parametersResult = parametersSchema.safeParse(parameters)
+    const parametersError = parametersResult.success ? null : parametersResult.error
+
+    const presetsSchema = getPresetsSchema(parameters)
+    const presetsResult = presetsSchema.safeParse(presets)
+    const presetsError = presetsResult.success ? null : presetsResult.error
+    extendValidationErrors({
+      parameters: parametersError,
+      presets: presetsError,
+    })
+  }, [parametrics, extendValidationErrors])
+}
+*/

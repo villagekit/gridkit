@@ -8,26 +8,26 @@ import {
   Tooltip,
   useMobileFriendlyTooltip,
 } from '@villagekit/ui'
-import { NumberParam } from 'serialize-query-params'
+import { NumberParam as NumberQueryParam } from 'serialize-query-params'
 import { z } from 'zod'
 import { Label } from '../components/label'
-import { useParameterControlsInternalContext } from '../internal-context'
-import { type BaseProps, baseParameterSchema } from './base'
+import { useParamControlsInternalContext } from '../internal-context'
+import { type BaseProps, baseParamSchema } from './base'
 
 export const NumberId = 'number'
 export type NumberValue = number
 export const numberValueSchema = z.number()
-export const NumberQueryParam = NumberParam
+export { NumberQueryParam }
 
-export const numberParameterSchema = baseParameterSchema.extend({
+export const numberParamSchema = baseParamSchema.extend({
   type: z.literal(NumberId),
   min: z.number(),
   max: z.number(),
   step: z.number().optional(),
 })
-export type NumberParameter = z.infer<typeof numberParameterSchema>
+export type NumberParam = z.infer<typeof numberParamSchema>
 
-export type NumberProps = Omit<NumberParameter, 'type'> & BaseProps<NumberValue>
+export type NumberProps = Omit<NumberParam, 'type'> & BaseProps<NumberValue>
 
 // biome-ignore lint/suspicious/noShadowRestrictedNames:
 export function Number(props: NumberProps) {
@@ -35,7 +35,7 @@ export function Number(props: NumberProps) {
 
   const { onPointerEnterTooltip, onPointerLeaveTooltip, showTooltip } = useMobileFriendlyTooltip()
 
-  const { containerRef } = useParameterControlsInternalContext()
+  const { containerRef } = useParamControlsInternalContext()
 
   return (
     <FormControl id={id} role="group">

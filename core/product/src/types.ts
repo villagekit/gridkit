@@ -1,5 +1,5 @@
 import type { PropsWithChildren, ReactNode } from 'react'
-import type { ZodError, z } from 'zod'
+import type { z } from 'zod'
 import type { metaSchema } from './schema'
 
 export type ProductMeta = z.infer<typeof metaSchema>
@@ -9,13 +9,7 @@ export type ProductData = {
   code: string
 }
 
-export type ProductProviderProps = PropsWithChildren<
-  ProductData & {
-    Products: Array<ProductModule>
-    onLocationUpdate?: (location: Location) => void
-  }
->
-
+export type ProductProviderProps = PropsWithChildren<{}>
 export type ProductProvider = (props: ProductProviderProps) => ReactNode
 export type ProductGlProps = {}
 export type ProductGl = (props: ProductGlProps) => ReactNode
@@ -33,7 +27,3 @@ export type ProductModule = {
     ProductInfo: ProductInfo
   }
 }
-
-export type ValidationError = ZodError | null
-export type ValidationErrors = Partial<Record<string, ValidationError>>
-export type ExtendValidationErrors = (errors: ValidationErrors) => void

@@ -1,6 +1,6 @@
 import '../globals'
 
-import { ParameterControls } from '@villagekit/parameters'
+import { ParamControls } from '@villagekit/parameters'
 import {
   Box,
   HStack,
@@ -36,7 +36,7 @@ export interface SandboxControlsProps {
   onToggleDisplayGrid: () => void
   cameraControlsRef: React.MutableRefObject<CameraControlsRef | null>
   containerRef: React.RefObject<HTMLDivElement>
-  showParameterControls?: boolean
+  showParamControls?: boolean
   alwaysShowFullscreenControls?: boolean
   shouldRenderAssemblyInfo?: boolean
 }
@@ -49,7 +49,7 @@ export function SandboxControls(props: SandboxControlsProps) {
     onToggleDisplayGrid,
     cameraControlsRef,
     containerRef,
-    showParameterControls = false,
+    showParamControls = false,
     alwaysShowFullscreenControls = false,
     shouldRenderAssemblyInfo = true,
   } = props
@@ -194,7 +194,7 @@ export function SandboxControls(props: SandboxControlsProps) {
         </Control>
       )}
 
-      {showParameterControls && (
+      {showParamControls && (
         <>
           <Control
             right
@@ -205,7 +205,7 @@ export function SandboxControls(props: SandboxControlsProps) {
               padding: 4,
             }}
           >
-            <ParameterControls containerRef={containerRef} />
+            <ParamControls containerRef={containerRef} />
           </Control>
 
           {shouldShowFullscreenControls && !canShowFullscreenControls && (

@@ -1,7 +1,7 @@
 import {
-  type Parameters,
-  ParametersProvider,
-  type ParametersValues,
+  type Params,
+  ParamsProvider,
+  type ParamsValues,
   type Presets,
   getPresetsSchema,
   parametersSchema,
@@ -15,7 +15,15 @@ import {
   useMemo,
   useState,
 } from 'react'
-import type { ExtendValidationErrors, ProductData, ProductModule, ValidationErrors } from './types'
+import type { ActorRefFrom } from 'xstate'
+import type { ProductMachineInput, productMachine } from './machine'
+import type {
+  ExtendValidationErrors,
+  ProductData,
+  ProductMeta,
+  ProductModule,
+  ValidationErrors,
+} from './types'
 
 type ProductOptions = ProductData & {
   Products: Array<ProductModule>
@@ -24,10 +32,18 @@ type ProductOptions = ProductData & {
 
 type ProductProviderProps = PropsWithChildren<ProductOptions>
 
-type ProductState = {
-  parameters: Parameters
-  presets: Presets<any>
-  parametersValues: ParametersValues
+type Parametrics<Ps extends Params> = {
+  parameters: Ps
+  presets: Presets<Ps>
+}
+
+type ProductContext = {
+  Product: ProductModule
+  meta: ProductMeta
+  parameters: Params | null
+  presets: Presets<any> | null
+  parametersValues: ParamsValues | null
+  setParamics: (parametrics: Parametrics<any>) => void
   validationErrors: ValidationErrors
   extendValidationErrors: ExtendValidationErrors
 }
@@ -42,17 +58,12 @@ export function useProductContext(): ProductState {
   return context
 }
 
-type Parametrics<Params extends Parameters> = {
-  parameters: Params
-  presets: Presets<Params>
-}
-
 export function ProductProvider(props: ProductProviderProps) {
-  const { meta, onLocationUpdate, children } = props
+  const { meta, Products, onLocationUpdate, children } = props
 
-  const [parameterics, setParameterics] = useState<Parametrics<any> | null>(null)
+  const [parameterics, setParamics] = useState<Parametrics<any> | null>(null)
   const { parameters = null, presets = null } = parameterics ?? {}
-  const [parametersValues, setParametersValues] = useState<ParametersValues | null>(null)
+  const [parametersValues, setParamsValues] = useState<ParamsValues | null>(null)
 
   const [validationErrors, setValidationErrors] = useState({})
   const extendValidationErrors = useCallback((nextValidationErrors: ValidationErrors) => {
@@ -62,53 +73,56 @@ export function ProductProvider(props: ProductProviderProps) {
     }))
   }, [])
 
-  useValidateParameterics(parameterics, extendValidationErrors)
+  useValidateParamics(parameterics, extendValidationErrors)
+
+  const Product = useMemo(() => {
+    return Products.find((P) => P.id === meta.type)
+  }, [meta, Products])
 
   const state = {
+    Product,
+    meta,
     parameters,
     presets,
     parametersValues,
-    setParameterics,
+    setParamics,
     validationErrors,
     extendValidationErrors,
   }
 
   return (
     <ProductContext.Provider value={state}>
-      <ParametersProvider
+      <ParamsProvider
         parameters={parameters}
         presets={presets}
-        onParametersValuesUpdate={setParametersValues}
+        onParamsValuesUpdate={setParamsValues}
         onLocationUpdate={onLocationUpdate}
       >
-        <ProductTypeProvider
-        {renderTyped}
-      </ParametersProvider>
+        <ProductTypeProvider meta={meta} Products={Products}>
+          {children}
+        </ProductTypeProvider>
+      </ParamsProvider>
     </ProductContext.Provider>
   )
 }
 
-type ProductTypeProviderProps = ProductProviderProps & {
-  setParameterics: (parametrics: Parametrics<any> | null) => void
-  extendValidationErrors: ExtendValidationErrors
-}
+type ProductTypeProviderProps = PropsWithChildren<{
+  meta: ProductMeta
+  Products: Array<ProductModule>
+}>
 
-function ProductTypeProvider(props: ProductProviderProps) {
-  const { meta, Products, ...rest } = props
-
-  const Product = useMemo(() => {
-    return Products.find((P) => P.id === meta.type)
-  }, [meta, Products])
+function ProductTypeProvider(props: ProductTypeProviderProps) {
+  const { meta, Product } = props
 
   if (Product == null) {
     throw new Error(`Unknown product type: ${meta.type}`)
   }
 
-  return <Product.components.ProductProvider meta={meta} {...rest} />
+  return <Product.components.ProductProvider />
 }
 
-function useValidateParameterics<Params extends Parameters>(
-  parametrics: Parametrics<Params> | null,
+function useValidateParamics<Ps extends Params>(
+  parametrics: Parametrics<Ps> | null,
   extendValidationErrors: ExtendValidationErrors,
 ) {
   useEffect(() => {
@@ -126,4 +140,70 @@ function useValidateParameterics<Params extends Parameters>(
       presets: presetsError,
     })
   }, [parametrics, extendValidationErrors])
+}
+
+export const ProductContext = createContext<ActorRefFrom<typeof productMachine> | null>(null)
+
+type ParamsProviderProps = PropsWithChildren<ProductMachineInput>
+
+export function ProductProvider(
+  props: ParamsProviderProps,
+) {
+  const { machine, props, code } = props
+
+  if (parameters == null) return children
+  if (presets == null) return children
+
+  return (
+    <ParamsProviderContext parameters={parameters} presets={presets} {...rest}>
+      {children}
+    </ParamsProviderContext>
+  )
+}
+
+function ParamsProviderContext(props: ParamsProviderProps) {
+  const { children, parameters, presets, onLocationUpdate } = props
+
+  const actorRef = useActorRef(parametersMachine, {
+    input: { parameters, presets, onLocationUpdate },
+  })
+
+  // handle updateInput
+  useEffect(() => {
+    actorRef.send({ type: 'updateInput', parameters, presets, onLocationUpdate })
+  }, [actorRef, parameters, presets, onLocationUpdate])
+
+  return <ParamsContext.Provider value={actorRef}>{children}</ParamsContext.Provider>
+}
+
+function useParamsActor(): ActorRefFrom<typeof parametersMachine> {
+  const actor = useContext(ParamsContext)
+  if (actor == null) {
+    throw new Error(
+      "You used a hook for ParamsContext but it's not inside a ParamsProvider component",
+    )
+  }
+  return actor
+}
+
+export const useHasParams = () => useContext(ParamsContext) != null
+
+type ParamsSnapshot = SnapshotFrom<typeof parametersMachine>
+const selectParams = (snapshot: ParamsSnapshot) => snapshot.context.parameters
+export const useParams = () => useSelector(useParamsActor(), selectParams)
+const selectPresets = (snapshot: ParamsSnapshot) => snapshot.context.presets
+export const usePresets = () => useSelector(useParamsActor(), selectPresets)
+const selectPresetId = (snapshot: ParamsSnapshot) => snapshot.context.presetId
+export const usePresetId = () => useSelector(useParamsActor(), selectPresetId)
+const selectParamsValues = (snapshot: ParamsSnapshot) => snapshot.context.parametersValues
+export const useParamsValues = () => useSelector(useParamsActor(), selectParamsValues)
+const selectShowControls = (snapshot: ParamsSnapshot) => snapshot.context.showControls
+export const useShowControls = () => useSelector(useParamsActor(), selectShowControls)
+
+export function useSetShowControls() {
+  const actorRef = useParamsActor()
+  return useCallback(
+    (showControls: boolean) => actorRef.send({ type: 'setShowControls', showControls }),
+    [actorRef],
+  )
 }

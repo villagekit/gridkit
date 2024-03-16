@@ -1545,7 +1545,7 @@ declare class ZodFunction<
   _parse(input: ParseInput): ParseReturnType<any>
   parameters(): Args
   returnType(): Returns
-  args<Items extends Parameters<(typeof ZodTuple)['create']>[0]>(
+  args<Items extends Params<(typeof ZodTuple)['create']>[0]>(
     ...items: Items
   ): ZodFunction<ZodTuple<Items, ZodUnknown>, Returns>
   returns<NewReturnType extends ZodType<any, any>>(
@@ -2353,35 +2353,35 @@ declare const parametersSchema: ZodDiscriminatedUnion<
     >,
   ]
 >
-export type Parameters = TypeOf<typeof parametersSchema>
-export type ParameterValuesByType = {
+export type Params = TypeOf<typeof parametersSchema>
+export type ParamValuesByType = {
   [BooleanId]: BooleanValue
   [ChoiceId]: ChoiceValue
   [NumberId]: NumberValue
 }
-export type Parameters = {
-  [Id: string]: Parameters
+export type Params = {
+  [Id: string]: Params
 }
-declare function Parameters<Params extends Parameters>(
-  parameters: Params,
-): Params
-export type ExtractValueFromParameters<Params extends Parameters> =
-  ParameterValuesByType[Params['type']]
-export type ExtractValuesFromParameters<Params extends Parameters> = {
-  [Key in keyof Params]: ExtractValueFromParameters<Params[Key]>
+declare function Params<Ps extends Params>(
+  parameters: Ps,
+): Ps
+export type ExtractValueFromParams<Ps extends Params> =
+  ParamValuesByType[Ps['type']]
+export type ExtractValuesFromParams<Ps extends Params> = {
+  [Key in keyof Ps]: ExtractValueFromParams<Ps[Key]>
 }
-export interface Preset<Params extends Parameters> {
+export interface Preset<Ps extends Params> {
   id: string
   label: string
-  values: ExtractValuesFromParameters<Params>
+  values: ExtractValuesFromParams<Ps>
 }
-export type Presets<Params extends Parameters> = [
-  Preset<Params>,
-  ...Array<Preset<Params>>,
+export type Presets<Ps extends Params> = [
+  Preset<Ps>,
+  ...Array<Preset<Ps>>,
 ]
-declare function Presets<Params extends Parameters>(
-  presets: Presets<Params>,
-): Presets<Params>
+declare function Presets<Ps extends Params>(
+  presets: Presets<Ps>,
+): Presets<Ps>
 declare const designMetaSchema: ZodObject<
   {
     id: ZodString
@@ -2407,10 +2407,10 @@ declare const designMetaSchema: ZodObject<
 export type DesignPart = WithOptionalId<PartCreator>
 export type DesignParts = RecursiveArray<DesignPart | false | undefined | null>
 export type DesignMeta = TypeOf<typeof designMetaSchema>
-export type DesignParameters = Parameters
-export type DesignPresets<Params extends Parameters> = Presets<Params>
-export type DesignAssembly<Params extends Parameters = never> = (
-  parameters: ExtractValuesFromParameters<Params>,
+export type DesignParams = Params
+export type DesignPresets<Ps extends Params> = Presets<Ps>
+export type DesignAssembly<Ps extends Params = never> = (
+  parameters: ExtractValuesFromParams<Ps>,
   partVariants: PartVariantsByType,
 ) => DesignParts
 export type WithOptionalId<

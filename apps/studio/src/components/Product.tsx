@@ -3,7 +3,7 @@ import '@villagekit/part-gridpanel'
 
 import { useProductContext } from '@/context/product'
 import Ansi from '@curvenote/ansi-to-react'
-import { ParameterControls } from '@villagekit/parameters'
+import { ParamControls } from '@villagekit/parameters'
 import {
   AssemblyInfo,
   type DesignRenderError,
@@ -95,7 +95,7 @@ function ProductAssemblyViewer() {
 function ProductAssemblyGl() {
   return (
     <React.Suspense fallback={<Loading />}>
-      <Sandbox showParameterControls />
+      <Sandbox showParamControls />
     </React.Suspense>
   )
 }
@@ -113,7 +113,7 @@ function ProductAssemblyDetails() {
 
   return (
     <>
-      <ParameterControls />
+      <ParamControls />
       <AssemblyInfo />
     </>
   )

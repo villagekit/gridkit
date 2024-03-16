@@ -2,14 +2,14 @@ import { Box, VStack } from '@villagekit/ui'
 import { map, mapValues } from 'lodash-es'
 import { useCallback } from 'react'
 import { z } from 'zod'
-import { useParameters, useParametersValues, useShowControls, useUpdateParametersValues } from '..'
+import { useParams, useParamsValues, useShowControls, useUpdateParamsValues } from '..'
 import {
   // biome-ignore lint/suspicious/noShadowRestrictedNames:
   Boolean,
   BooleanId,
   BooleanQueryParam,
   type BooleanValue,
-  booleanParameterSchema,
+  booleanParamSchema,
   booleanValueSchema,
 } from './boolean'
 import {
@@ -17,7 +17,7 @@ import {
   ChoiceId,
   ChoiceQueryParam,
   type ChoiceValue,
-  choiceParameterSchema,
+  choiceParamSchema,
   choiceValueSchema,
 } from './choice'
 import {
@@ -26,18 +26,18 @@ import {
   NumberId,
   NumberQueryParam,
   type NumberValue,
-  numberParameterSchema,
+  numberParamSchema,
   numberValueSchema,
 } from './number'
 
 export const parameterSchema = z.discriminatedUnion('type', [
-  booleanParameterSchema,
-  choiceParameterSchema,
-  numberParameterSchema,
+  booleanParamSchema,
+  choiceParamSchema,
+  numberParamSchema,
 ])
-export type Parameter = z.infer<typeof parameterSchema>
+export type Param = z.infer<typeof parameterSchema>
 
-export type ParameterValuesByType = {
+export type ParamValuesByType = {
   [BooleanId]: BooleanValue
   [ChoiceId]: ChoiceValue
   [NumberId]: NumberValue
@@ -55,8 +55,8 @@ export const parameterValueSchema = z.union([
   numberValueSchema,
 ])
 
-export type ParameterValue = BooleanValue | ChoiceValue | NumberValue
-export type ParametersValues = Record<string, ParameterValue>
+export type ParamValue = BooleanValue | ChoiceValue | NumberValue
+export type ParamsValues = Record<string, ParamValue>
 
 export const parameterQueryParamsByType = {
   [BooleanId]: BooleanQueryParam,
@@ -64,30 +64,29 @@ export const parameterQueryParamsByType = {
   [NumberId]: NumberQueryParam,
 }
 
-export type Parameters = {
-  [Id: string]: Parameter
+export type Params = {
+  [Id: string]: Param
 }
 
 export const parametersSchema = z.record(z.string(), parameterSchema)
 
-export type ExtractValueFromParameter<Param extends Parameter> =
-  ParameterValuesByType[Param['type']]
+export type ExtractValueFromParam<P extends Param> = ParamValuesByType[P['type']]
 
-export type ExtractValuesFromParameters<Params extends Parameters> = {
-  [Key in keyof Params]: ExtractValueFromParameter<Params[Key]>
+export type ExtractValuesFromParams<Ps extends Params> = {
+  [Key in keyof Ps]: ExtractValueFromParam<Ps[Key]>
 }
 
-export function extractValueSchemaFromParameter<Param extends Parameter>(parameter: Param) {
+export function extractValueSchemaFromParam<P extends Param>(parameter: P) {
   return parameterValueSchemasByType[parameter.type]
 }
-export function extractValuesSchemaFromParameters<Params extends Parameters>(parameters: Params) {
-  return z.object(mapValues(parameters, extractValueSchemaFromParameter))
+export function extractValuesSchemaFromParams<Ps extends Params>(parameters: Ps) {
+  return z.object(mapValues(parameters, extractValueSchemaFromParam))
 }
 
-export function ParameterValueControls() {
-  const parameters = useParameters()
-  const values = useParametersValues()
-  const updateParametersValues = useUpdateParametersValues()
+export function ParamValueControls() {
+  const params = useParams()
+  const values = useParamsValues()
+  const updateParamsValues = useUpdateParamsValues()
   const showControls = useShowControls()
 
   if (!showControls) return null
@@ -98,19 +97,21 @@ export function ParameterValueControls() {
       const nextValues = Object.assign({}, values, {
         [key]: value,
       })
-      updateParametersValues(nextValues)
+      updateParamsValues(nextValues)
     },
-    [values, updateParametersValues],
+    [values, updateParamsValues],
   )
+
+  if (params == null) return null
 
   return (
     <Box role="menu" sx={{ width: '100%' }}>
       <VStack spacing="4">
-        {map(parameters, (parameter, id) => (
-          <ParameterValueControl<typeof id, typeof parameters, typeof parameter>
+        {map(params, (param, id) => (
+          <ParamValueControl<typeof id, typeof params, typeof param>
             key={id}
             id={id}
-            parameter={parameter}
+            param={param}
             values={values}
             setValue={setValue}
           />
@@ -120,36 +121,30 @@ export function ParameterValueControls() {
   )
 }
 
-export interface ParameterValueControlProps<
-  Id extends string,
-  Params extends Parameters,
-  Param extends Parameter,
-> {
+export interface ParamValueControlProps<Id extends string, Ps extends Params, P extends Param> {
   id: Id
-  parameter: Param
-  values: ExtractValuesFromParameters<Params>
-  setValue: (id: Id, value: ExtractValueFromParameter<Param>) => void
+  param: P
+  values: ExtractValuesFromParams<Ps>
+  setValue: (id: Id, value: ExtractValueFromParam<P>) => void
 }
 
-function ParameterValueControl<
-  Id extends string,
-  Params extends Parameters,
-  Param extends Parameter,
->(props: ParameterValueControlProps<Id, Params, Param>) {
-  const { id, parameter, setValue, values } = props
+function ParamValueControl<Id extends string, Ps extends Params, P extends Param>(
+  props: ParamValueControlProps<Id, Ps, P>,
+) {
+  const { id, param, setValue, values } = props
 
   const handleChange = useCallback(
-    (value: ExtractValueFromParameter<Param>) => {
+    (value: ExtractValueFromParam<P>) => {
       setValue(id, value)
     },
     [id, setValue],
   )
 
-  switch (parameter.type) {
+  switch (param.type) {
     case 'boolean': {
       return (
         <Boolean
-          {...parameter}
+          {...param}
           id={id}
           value={values[id] as BooleanValue}
           onChange={handleChange as (value: BooleanValue) => void}
@@ -159,7 +154,7 @@ function ParameterValueControl<
     case 'choice': {
       return (
         <Choice
-          {...parameter}
+          {...param}
           id={id}
           value={values[id] as ChoiceValue}
           onChange={handleChange as (value: ChoiceValue) => void}
@@ -169,7 +164,7 @@ function ParameterValueControl<
     case 'number': {
       return (
         <Number
-          {...parameter}
+          {...param}
           id={id}
           value={values[id] as NumberValue}
           onChange={handleChange as (value: NumberValue) => void}

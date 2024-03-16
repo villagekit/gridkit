@@ -1,7 +1,7 @@
 import type { DesignAssemblyPlugins, DesignMeta, DesignParts } from '@villagekit/design'
 import type {
-  ExtractValuesFromParameters,
-  Parameters,
+  ExtractValuesFromParams,
+  Params,
   Presets,
 } from '@villagekit/parameters'
 import type { PartVariantsByType } from '@villagekit/part'
@@ -14,21 +14,21 @@ export type DesignFileAssembly = {
 }
 export type DesignFile = DesignFileAssembly
 
-export type DesignRenderAssembly<Params extends Parameters = never> = {
+export type DesignRenderAssembly<Ps extends Params = never> = {
   type: 'assembly'
   meta: DesignMeta
-  parameters: Params extends never ? null : Params
-  presets: Params extends never ? null : Presets<Params>
-  assembly: Params extends never
+  parameters: Ps extends never ? null : Ps
+  presets: Ps extends never ? null : Presets<Ps>
+  assembly: Ps extends never
     ? () => Promise<DesignParts>
     : (
-        parameters: ExtractValuesFromParameters<Params>,
+        parameters: ExtractValuesFromParams<Ps>,
         partVariants: PartVariantsByType,
       ) => Promise<DesignParts>
   plugins?: DesignAssemblyPlugins
 }
-export type DesignRender<Params extends Parameters> =
-  null | DesignRenderAssembly<Params>
+export type DesignRender<Ps extends Params> =
+  null | DesignRenderAssembly<Ps>
 
 export type DesignRenderErrorStackFrame = {
   name: string
@@ -54,12 +54,12 @@ export type DesignValidationKey = keyof NonNullable<DesignRender<any>>
 export type DesignValidationErrors = Partial<Record<DesignValidationKey, DesignValidationError>>
 export type ExtendDesignValidationErrors = (errors: DesignValidationErrors) => void
 
-export type DesignInstance<Params extends Parameters = never> = {
+export type DesignInstance<Ps extends Params = never> = {
   file: DesignFile
-  render: DesignRender<Params>
+  render: DesignRender<Ps>
   renderError: DesignRenderError
   validationErrors: DesignValidationErrors
-  parameterValues: Params extends never
+  parameterValues: Ps extends never
     ? null
-    : ExtractValuesFromParameters<Params>
+    : ExtractValuesFromParams<Ps>
 }

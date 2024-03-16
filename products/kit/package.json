@@ -28,6 +28,8 @@
     "@types/three": "^0.150.1",
     "@villagekit/parameters": "workspace:*",
     "@villagekit/part": "workspace:*",
+    "@villagekit/part-base": "workspace:*",
+    "@villagekit/product": "workspace:*",
     "lodash-es": "^4.17.21",
     "zod": "^3.22.4"
   },

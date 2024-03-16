@@ -1,1 +1,1 @@
-export type { Meta, Parameters, Parts, PartsFn, Presets } from '@villagekit/product-kit'
+export type { Meta, Params, Parts, PartsFn, Presets } from '@villagekit/product-kit'

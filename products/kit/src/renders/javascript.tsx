@@ -1,8 +1,8 @@
 import { AnyMap, type TraceMap, originalPositionFor } from '@jridgewell/trace-mapping'
 import type {
   DesignMeta,
-  DesignParameters,
-  DesignParametersValues,
+  DesignParams,
+  DesignParamsValues,
   DesignPartVariantsByType,
   DesignParts,
   DesignPresets,
@@ -17,12 +17,12 @@ type AssemblyEvaluator = {
   loadModule: (code: string) => Promise<string>
   evaluateModule: () => Promise<{
     meta: DesignMeta
-    parameters: DesignParameters | null
+    parameters: DesignParams | null
     presets: DesignPresets<any> | null
     assembly: DesignParts | null
   }>
   evaluateAssembly: (
-    parameters: DesignParametersValues,
+    parameters: DesignParamsValues,
     partVariants: DesignPartVariantsByType,
   ) => Promise<DesignParts>
 }
@@ -75,7 +75,7 @@ export const javascriptAssemblyRenderer = fromCallback<RenderInputEvent>(
           parameters,
           presets,
           assembly: async (
-            parameters: DesignParametersValues,
+            parameters: DesignParamsValues,
             partVariants: DesignPartVariantsByType,
           ) => {
             try {
