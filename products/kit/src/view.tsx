@@ -1,20 +1,23 @@
 import { PartsGlForAll } from '@villagekit/part'
-import { useEffect } from 'react'
-import type { Box3 } from 'three'
-import { useKitContext } from './context'
+import { type ProductViewProps, useProductMeta } from '@villagekit/product'
+import { Sandbox } from '@villagekit/sandbox'
+import { ProductKitContext, useProductKitContext } from './context'
 
-interface KitViewProps {
-  setBoundingBox: (box: Box3) => void
-}
+export function ProductKitView(props: ProductViewProps) {
+  const { ...sandboxProps } = props
 
-export function KitView(props: KitViewProps) {
-  const { setBoundingBox } = props
+  const meta = useProductMeta()
 
-  const { boundingBox, partValues: partGlValues } = useKitContext()
+  const { boundingBox, partValues: partGlValues } = useProductKitContext()
 
-  useEffect(() => {
-    setBoundingBox(boundingBox)
-  }, [setBoundingBox, boundingBox])
-
-  return <PartsGlForAll partGlValues={partGlValues} />
+  return (
+    <Sandbox
+      label={meta.label}
+      boundingBox={boundingBox}
+      bridgeContexts={[ProductKitContext]}
+      {...sandboxProps}
+    >
+      <PartsGlForAll partGlValues={partGlValues} />
+    </Sandbox>
+  )
 }

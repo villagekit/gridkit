@@ -38,27 +38,3 @@ export type Render<Ps extends Params = never> = {
     : (parameters: ExtractValuesFromParams<Ps>, partVariants: PartVariantsByType) => Promise<Parts>
   plugins?: Plugins
 }
-
-export type RenderErrorStackFrame = {
-  name: string
-  line: number
-  column: number
-}
-export type RenderError =
-  | null
-  | {
-      type: 'typescript.transform'
-      error: string
-    }
-  | {
-      type: 'javascript.evaluate'
-      error: {
-        message: string
-        stack: Array<RenderErrorStackFrame>
-      }
-    }
-
-export type ValidationError = ZodError | null
-export type ValidationKey = keyof NonNullable<Render<any>>
-export type ValidationErrors = Partial<Record<ValidationKey, ValidationError>>
-export type ExtendDesignValidationErrors = (errors: ValidationErrors) => void

@@ -3,6 +3,7 @@ import './globals'
 import { ResizeObserver } from '@juggle/resize-observer'
 import { AdaptiveDpr, useContextBridge, useDetectGPU } from '@react-three/drei'
 import { Canvas, type RootState } from '@react-three/fiber'
+import type { ProductViewProps } from '@villagekit/product'
 import { Box, useDisclosure } from '@villagekit/ui'
 import { Perf } from 'r3f-perf'
 import type React from 'react'
@@ -15,13 +16,9 @@ import { useDefaultSandboxControlSettings, useSaveSandboxControlSettings } from 
 
 export type SandboxMode = 'default' | 'screenshot'
 
-export interface SandboxProps {
+export type SandboxProps = ProductViewProps & {
   label: string
   boundingBox: Box3
-  mode?: SandboxMode
-  isDebug?: boolean
-  showParamControls?: boolean
-  alwaysShowFullscreenControls?: boolean
   bridgeContexts?: Array<React.Context<any>>
   children: React.ReactNode
 }

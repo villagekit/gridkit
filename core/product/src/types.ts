@@ -10,7 +10,14 @@ export type ProductData = {
 }
 
 export type ProductTypeProviderProps = PropsWithChildren<{}>
-export type ProductViewProps = {}
+export type ProductViewMode = 'default' | 'screenshot'
+export type ProductViewProps = {
+  mode?: ProductViewMode
+  isDebug?: boolean
+  showParamControls?: boolean
+  alwaysShowFullscreenControls?: boolean
+  shouldRenderProductInfo?: boolean
+}
 export type ProductSummaryProps = {}
 export type ProductInfoProps = {
   containerRef: React.RefObject<HTMLDivElement>

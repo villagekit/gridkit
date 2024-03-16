@@ -33,6 +33,7 @@
     "@villagekit/part-base": "workspace:*",
     "@villagekit/product": "workspace:*",
     "@villagekit/sandbox": "workspace:*",
+    "@villagekit/ui": "workspace:*",
     "comlink": "^4.4.1",
     "dnum": "^2.9.0",
     "errorstacks": "^2.4.1",

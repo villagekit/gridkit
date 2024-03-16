@@ -221,31 +221,3 @@ function ValidationErrorDisplay(props: ValidationErrorDisplayProps) {
     </List>
   )
 }
-
-type ErrorBoxProps = {
-  children: React.ReactNode
-}
-
-function ErrorBox(props: ErrorBoxProps) {
-  const { children } = props
-
-  const { fontSize, ref } = useFitText()
-
-  return (
-    <Box
-      ref={ref}
-      sx={{
-        backgroundColor: 'red.100',
-        height: '100%',
-        width: '100%',
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'center',
-        alignItems: 'center',
-        fontSize,
-      }}
-    >
-      {children}
-    </Box>
-  )
-}
