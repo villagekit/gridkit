@@ -1,8 +1,8 @@
 import type { FunctionComponent, PropsWithChildren } from 'react'
 import type { z } from 'zod'
-import type { metaSchema } from './schema'
+import type { productMetaSchema } from './schema'
 
-export type ProductMeta = z.infer<typeof metaSchema>
+export type ProductMeta = z.infer<typeof productMetaSchema>
 
 export type ProductData = {
   meta: ProductMeta
@@ -18,9 +18,12 @@ export type ProductViewProps = {
   alwaysShowFullscreenControls?: boolean
   shouldRenderProductInfo?: boolean
 }
-export type ProductSummaryProps = {}
+export type ProductSummaryProps = {
+  displayUnit: 'gu' | 'mm'
+  groupParts: boolean
+}
 export type ProductInfoProps = {
-  containerRef: React.RefObject<HTMLDivElement>
+  containerRef?: React.RefObject<HTMLDivElement>
 }
 
 export type ProductModule = {

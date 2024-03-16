@@ -1,6 +1,7 @@
 import { constants, access, mkdir, readFile, readdir, writeFile } from 'node:fs/promises'
 import { basename, join } from 'node:path'
 import { initTRPC } from '@trpc/server'
+import { productMetaSchema } from '@villagekit/product'
 import { app, dialog } from 'electron'
 import { camelCase, kebabCase } from 'lodash-es'
 import { parse as parseToml, stringify as stringifyToml } from 'smol-toml'
@@ -26,22 +27,11 @@ type AppConfig = z.infer<typeof appConfigSchema>
 
 const productPathSchema = pathSchema
 const productIdSchema = z.string()
-const productEntrySchema = pathSchema
 
 const productIndexSchema = z.object({
   path: productPathSchema,
   id: productIdSchema,
 })
-
-const productTypeSchema = z.enum(['assembly'])
-export type ProductType = z.infer<typeof productTypeSchema>
-
-const productMetaSchema = z.object({
-  type: productTypeSchema,
-  entry: pathSchema,
-})
-
-export type ProductMeta = z.infer<typeof productMetaSchema>
 
 const productMetaFileSchema = z.object({
   product: productMetaSchema,
@@ -103,19 +93,15 @@ export const router = t.router({
       const productMetaPath = join(productPath, 'villagekit.toml')
       const productMetaData = await readTomlFile(productMetaPath)
       const productMetaFile = await productMetaFileSchema.parseAsync(productMetaData)
-      const { type, entry } = productMetaFile.product
-      const productMeta = {
-        type,
-        entry: join(productPath, entry),
-      }
+      const productMeta = productMetaFile.product
       return productMeta
     }),
 
-  getProductEntry: t.procedure
-    .input(z.object({ productEntryPath: productEntrySchema }))
+  getProductFile: t.procedure
+    .input(z.object({ productFilePath: pathSchema }))
     .query(async function getProductAssemblyMeta(opts) {
-      const { productEntryPath } = opts.input
-      const productAssemblyData = await readFile(productEntryPath, 'utf8')
+      const { productFilePath } = opts.input
+      const productAssemblyData = await readFile(productFilePath, 'utf8')
       return productAssemblyData
     }),
 })

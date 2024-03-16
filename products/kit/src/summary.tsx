@@ -5,16 +5,12 @@ import {
   calculateSummaryValueForAll,
 } from '@villagekit/part'
 import { SummaryContextProvider } from '@villagekit/part-base'
+import type { ProductSummaryProps } from '@villagekit/product'
 import { debounce } from 'lodash-es'
 import { useEffect, useMemo, useState } from 'react'
 import { useProductKitContext } from './context'
 
-type ProductKitSummaryProps = {
-  displayUnit: 'gu' | 'mm'
-  groupParts: boolean
-}
-
-export function ProductKitSummary(props: ProductKitSummaryProps) {
+export function ProductKitSummary(props: ProductSummaryProps) {
   const { displayUnit, groupParts } = props
 
   const { parts } = useProductKitContext()

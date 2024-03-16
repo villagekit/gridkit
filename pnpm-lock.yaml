@@ -197,9 +197,12 @@ importers:
       '@villagekit/part-gridpanel':
         specifier: workspace:^
         version: link:../../parts/part-gridpanel
-      '@villagekit/sandbox':
+      '@villagekit/product':
         specifier: workspace:^
-        version: link:../../core/sandbox
+        version: link:../../core/product
+      '@villagekit/product-kit':
+        specifier: workspace:^
+        version: link:../../products/kit
       '@villagekit/ui':
         specifier: workspace:^
         version: link:../../core/ui
@@ -215,9 +218,6 @@ importers:
       codemirror-theme-catppuccin:
         specifier: ^0.3.0
         version: 0.3.0
-      comlink:
-        specifier: ^4.4.1
-        version: 4.4.1
       constate:
         specifier: ^3.3.2
         version: 3.3.2(react@18.2.0)

@@ -78,6 +78,8 @@ const selectProductMeta = (snapshot: ProductSnapshot) => snapshot.context.meta
 export const useProductMeta = () => useSelector(useProductActor(), selectProductMeta)
 const selectProductCode = (snapshot: ProductSnapshot) => snapshot.context.code
 export const useProductCode = () => useSelector(useProductActor(), selectProductCode)
+const selectProductError = (snapshot: ProductSnapshot) => snapshot.context.error
+export const useProductError = () => useSelector(useProductActor(), selectProductError)
 
 export const useUpdateProductError = () => {
   const actorRef = useProductActor()

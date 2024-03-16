@@ -1,72 +1,58 @@
 import { client } from '@/client'
-import { type DesignFile, SandboxProvider } from '@villagekit/sandbox'
-import { createContext, useContext, useEffect, useMemo } from 'react'
+import {
+  ProductProvider as CoreProductProvider,
+  type ProductMeta,
+  type ProductModule,
+} from '@villagekit/product'
+import { ProductKit } from '@villagekit/product-kit'
+import { type PropsWithChildren, useEffect } from 'react'
 import { useEditorContext } from './editor'
 
-type ProviderProps = {
-  children: React.ReactNode
-}
-
-export interface ProductOptions {
+export type ProductOptions = {
   productPath: string
 }
 
-type ProductState = null | {
-  file: DesignFile
+type ProductEntry = null | {
+  meta: ProductMeta
+  code: string
 }
 
-function useProduct(options: ProductOptions): ProductState {
+const Products: Array<ProductModule> = [ProductKit]
+
+export function ProductProvider(props: PropsWithChildren<ProductOptions>) {
+  const { children, ...options } = props
+
+  const entry = useProductEntry(options)
+
+  if (entry == null) return children
+
+  const { meta, code } = entry
+
+  return <CoreProductProvider Products={Products} meta={meta} code={code} />
+}
+
+function useProductEntry(options: ProductOptions): ProductEntry {
   const { productPath } = options
 
   const productMetaQuery = client.getProductMeta.useQuery({ productPath })
 
-  const productEntryQuery = client.getProductEntry.useQuery(
-    { productEntryPath: productMetaQuery.isSuccess ? productMetaQuery.data.entry : '' },
+  const productExportsQuery = client.getProductFile.useQuery(
+    { productFilePath: productMetaQuery.isSuccess ? productMetaQuery.data.exports : '' },
     { enabled: productMetaQuery.isSuccess },
   )
 
   const { code: editorCode, setCodeToLoad: setEditorCode } = useEditorContext()
 
   useEffect(() => {
-    if (!productEntryQuery.isSuccess) return
-    setEditorCode(productEntryQuery.data)
-  }, [productEntryQuery.isSuccess, productEntryQuery.data, setEditorCode])
+    if (!productExportsQuery.isSuccess) return
+    setEditorCode(productExportsQuery.data)
+  }, [productExportsQuery.isSuccess, productExportsQuery.data, setEditorCode])
 
-  return useMemo(() => {
-    if (!productMetaQuery.isSuccess) return null
-    const { type, entry } = productMetaQuery.data
+  if (!productMetaQuery.isSuccess) return null
+  if (!productExportsQuery.isSuccess) return null
 
-    const language = entry.endsWith('.ts')
-      ? 'typescript'
-      : entry.endsWith('.js')
-        ? 'javascript'
-        : 'unknown'
-
-    if (language === 'unknown') throw new Error(`Unexpected product entry extension: ${entry}`)
-
-    return {
-      file: {
-        type,
-        code: editorCode,
-        language,
-      },
-    }
-  }, [productMetaQuery.isSuccess, productMetaQuery.data, editorCode])
-}
-
-export const ProductContext = createContext<ProductState | null>(null)
-
-export function useProductContext() {
-  return useContext(ProductContext)
-}
-
-export function ProductProvider(props: ProductOptions & ProviderProps) {
-  const { children, ...options } = props
-
-  const product = useProduct(options)
-
-  const sandbox =
-    product == null ? children : <SandboxProvider file={product.file}>{children}</SandboxProvider>
-
-  return <ProductContext.Provider value={product}>{sandbox}</ProductContext.Provider>
+  return {
+    meta: productMetaQuery.data,
+    code: editorCode,
+  }
 }

@@ -1,3 +1,4 @@
+import type { ProductModule } from '@villagekit/product'
 import { ProductKitProvider } from './context'
 import { ProductKitInfo } from './info'
 import { ProductKitSummary } from './summary'
@@ -6,7 +7,7 @@ import { ProductKitView } from './view'
 export { ProductKitContext } from './context'
 export type { Params, Parts, PartsFn, Presets } from './types'
 
-export default {
+export const ProductKit: ProductModule = {
   id: 'kit',
   components: {
     ProductProvider: ProductKitProvider,
