@@ -98,11 +98,12 @@ export const router = t.router({
     }),
 
   getProductFile: t.procedure
-    .input(z.object({ productFilePath: pathSchema }))
-    .query(async function getProductAssemblyMeta(opts) {
-      const { productFilePath } = opts.input
-      const productAssemblyData = await readFile(productFilePath, 'utf8')
-      return productAssemblyData
+    .input(z.object({ productPath: productPathSchema, filePath: pathSchema }))
+    .query(async function getProductFile(opts) {
+      const { productPath, filePath } = opts.input
+      const productFilePath = join(productPath, filePath)
+      const fileData = await readFile(productFilePath, 'utf8')
+      return fileData
     }),
 })
 

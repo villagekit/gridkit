@@ -7,6 +7,7 @@ import {
 } from '@villagekit/parameters'
 import { useActorRef, useSelector } from '@xstate/react'
 import {
+  Fragment,
   type PropsWithChildren,
   createContext,
   useCallback,
@@ -48,11 +49,10 @@ export function ProductProvider(props: ProductProviderProps) {
     actorRef.send({ type: 'updateInput', input })
   }, [actorRef, input])
 
-  useValidateParams()
-
   return (
     <ProductContext.Provider value={actorRef}>
       <ParamsProvider onLocationUpdate={onLocationUpdate}>
+        <ValidateParams />
         <ProductTypeProvider>{children}</ProductTypeProvider>
       </ParamsProvider>
     </ProductContext.Provider>
@@ -91,7 +91,7 @@ export const useUpdateProductError = () => {
   )
 }
 
-function useValidateParams() {
+function ValidateParams() {
   const params = useParams()
   const presets = usePresets()
   const updateProductError = useUpdateProductError()
@@ -110,4 +110,6 @@ function useValidateParams() {
       errors,
     })
   }, [params, presets, updateProductError])
+
+  return <Fragment />
 }

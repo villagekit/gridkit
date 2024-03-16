@@ -1,26 +1,24 @@
 import { useEditorContext } from '@/context/editor'
-import { useProductContext } from '@/context/product'
 import { getTypeScriptExtensions } from '@/editor/typescript'
+import { useProductMeta } from '@villagekit/product'
 import { Box } from '@villagekit/ui'
 import { useEffect, useRef } from 'react'
 
 interface ProductEditorProps {}
 
 export function ProductEditor(_props: ProductEditorProps) {
-  const productContext = useProductContext()
+  const { exports } = useProductMeta()
   const { setParentEl, setLanguageExtensions } = useEditorContext()
 
-  const language = productContext?.file?.language
   useEffect(() => {
-    if (language == null) return
-    if (language === 'typescript') {
+    if (exports.endsWith('.ts')) {
       getTypeScriptExtensions().then((languageExtensions) => {
         setLanguageExtensions(languageExtensions)
       })
     } else {
-      throw new Error(`Unexpected product assembly file language: ${language}`)
+      throw new Error(`Unexpected product exports file extension: ${exports}`)
     }
-  }, [language, setLanguageExtensions])
+  }, [exports, setLanguageExtensions])
 
   const parentRef = useRef(null)
   useEffect(() => {

@@ -28,7 +28,11 @@ export function ProductProvider(props: PropsWithChildren<ProductOptions>) {
 
   const { meta, code } = entry
 
-  return <CoreProductProvider Products={Products} meta={meta} code={code} />
+  return (
+    <CoreProductProvider Products={Products} meta={meta} code={code}>
+      {children}
+    </CoreProductProvider>
+  )
 }
 
 function useProductEntry(options: ProductOptions): ProductEntry {
@@ -37,7 +41,10 @@ function useProductEntry(options: ProductOptions): ProductEntry {
   const productMetaQuery = client.getProductMeta.useQuery({ productPath })
 
   const productExportsQuery = client.getProductFile.useQuery(
-    { productFilePath: productMetaQuery.isSuccess ? productMetaQuery.data.exports : '' },
+    {
+      productPath,
+      filePath: productMetaQuery.isSuccess ? productMetaQuery.data.exports : '',
+    },
     { enabled: productMetaQuery.isSuccess },
   )
 
