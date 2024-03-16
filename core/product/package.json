@@ -26,7 +26,6 @@
     "@types/react": "^18.2.0",
     "@types/three": "^0.150.1",
     "@villagekit/parameters": "workspace:*",
-    "@villagekit/sandbox": "workspace:*",
     "@villagekit/part": "workspace:*",
     "@xstate/react": "^4.1.0",
     "lodash-es": "^4.17.21",

@@ -1,42 +1,50 @@
 import { useMachine } from '@xstate/react'
 import { useEffect, useState } from 'react'
 import { type ActorRefFrom, assign, sendTo, setup } from 'xstate'
-import type { DesignFile, DesignRender, DesignRenderError } from '../types'
-import { javascriptAssemblyRenderer } from './javascript'
-import { typescriptAssemblyRenderer } from './typescript'
+import type { Render, RenderError } from '../types'
+import { javascriptRenderer } from './javascript'
+import { typescriptRenderer } from './typescript'
 
-export type RenderInputEvent = {
-  type: 'render'
+type RenderOptions = {
+  filePath: string
   code: string
 }
 
-export function useDesignRender(options: {
-  file: DesignFile
-}) {
-  const { file } = options
+type RenderOutput = {
+  render: Render
+  renderError: RenderError
+}
+
+export function useRender(options: RenderOptions): RenderOutput {
+  const { filePath, code } = options
 
   const [render, setRender] = useState<DesignRender<any>>(null)
   const [renderError, setRenderError] = useState<DesignRenderError>(null)
 
   const [state, send] = useMachine(rendererMachine)
 
+  const language = filePath.endsWith('.ts')
+    ? 'typescript'
+    : filePath.endsWith('.js')
+      ? 'javascript'
+      : 'unknown'
+
+  if (language === 'unknown') throw new Error(`Unexpected kit file path extension: ${filePath}`)
+
   useEffect(() => {
-    switch (file.type) {
-      case 'assembly':
-        switch (file.language) {
-          case 'typescript':
-            return send({ type: 'renderer.render.typescript', code: file.code })
-          case 'javascript':
-            return send({ type: 'renderer.render.javascript', code: file.code })
-        }
+    switch (language) {
+      case 'typescript':
+        return send({ type: 'renderer.render.typescript', code })
+      case 'javascript':
+        return send({ type: 'renderer.render.javascript', code })
     }
-  }, [send, file])
+  }, [send, language, code])
 
   useEffect(() => {
     const { render, renderError } = state.context
     setRender(render)
     setRenderError(renderError)
-  }, [state])
+  }, [state.context])
 
   return { render, renderError }
 }
@@ -46,10 +54,7 @@ export const rendererMachine = setup({
     context: {
       rendererRefs:
         | null
-        | [
-            ActorRefFrom<typeof javascriptAssemblyRenderer>,
-            ActorRefFrom<typeof typescriptAssemblyRenderer>,
-          ]
+        | [ActorRefFrom<typeof javascriptRenderer>, ActorRefFrom<typeof typescriptRenderer>]
       render: DesignRender<any>
       renderError: DesignRenderError
     }
@@ -72,7 +77,7 @@ export const rendererMachine = setup({
         }
   },
 }).createMachine({
-  id: 'renderer',
+  id: 'kit-renderer',
   context: {
     rendererRefs: null,
     render: null,
@@ -81,28 +86,28 @@ export const rendererMachine = setup({
   entry: assign({
     rendererRefs: ({ spawn }) => {
       // @ts-ignore
-      const javascriptAssemblyRendererRef = spawn(javascriptAssemblyRenderer, {
-        id: 'javascriptAssemblyRenderer',
+      const javascriptRendererRef = spawn(javascriptRenderer, {
+        id: 'javascriptRenderer',
       })
       // @ts-ignore
-      const typescriptAssemblyRendererRef = spawn(typescriptAssemblyRenderer, {
-        id: 'typescriptAssemblyRenderer',
+      const typescriptRendererRef = spawn(typescriptRenderer, {
+        id: 'typescriptRenderer',
         input: {
-          javascriptAssemblyRenderer: javascriptAssemblyRendererRef,
+          javascriptRenderer: javascriptRendererRef,
         },
       })
-      return [javascriptAssemblyRendererRef, typescriptAssemblyRendererRef]
+      return [javascriptRendererRef, typescriptRendererRef]
     },
   }),
   on: {
     'renderer.render.javascript': {
-      actions: sendTo('javascriptAssemblyRenderer', ({ event }) => ({
+      actions: sendTo('javascriptRenderer', ({ event }) => ({
         type: 'render',
         code: event.code,
       })),
     },
     'renderer.render.typescript': {
-      actions: sendTo('typescriptAssemblyRenderer', ({ event }) => ({
+      actions: sendTo('typescriptRenderer', ({ event }) => ({
         type: 'render',
         code: event.code,
       })),

@@ -436,9 +436,6 @@ importers:
       '@villagekit/part':
         specifier: workspace:*
         version: link:../part
-      '@villagekit/sandbox':
-        specifier: workspace:*
-        version: link:../sandbox
       '@xstate/react':
         specifier: ^4.1.0
         version: 4.1.0(@types/react@18.2.38)(react@18.2.0)(xstate@5.9.1)
@@ -460,9 +457,6 @@ importers:
 
   core/sandbox:
     dependencies:
-      '@jridgewell/trace-mapping':
-        specifier: ^0.3.25
-        version: 0.3.25
       '@juggle/resize-observer':
         specifier: ^3.4.0
         version: 3.4.0
@@ -472,9 +466,6 @@ importers:
       '@react-three/fiber':
         specifier: ^8.12.0
         version: 8.15.12(react-dom@18.2.0)(react@18.2.0)(three@0.150.1)
-      '@swc/wasm-web':
-        specifier: ^1.4.2
-        version: 1.4.2
       '@types/lodash-es':
         specifier: ^4.17.12
         version: 4.17.12
@@ -487,48 +478,30 @@ importers:
       '@types/three':
         specifier: ^0.150.1
         version: 0.150.2
-      '@villagekit/design':
-        specifier: workspace:*
-        version: link:../design
       '@villagekit/parameters':
         specifier: workspace:*
         version: link:../parameters
-      '@villagekit/part':
+      '@villagekit/product':
         specifier: workspace:*
-        version: link:../part
-      '@villagekit/part-base':
-        specifier: workspace:*
-        version: link:../../parts/part-base
+        version: link:../product
       '@villagekit/ui':
         specifier: workspace:*
         version: link:../ui
-      '@villagekit/util-units':
-        specifier: workspace:*
-        version: link:../../util/units
       '@xstate/react':
         specifier: ^4.1.0
         version: 4.1.0(@types/react@18.2.38)(react@18.2.0)(xstate@5.9.1)
       camera-controls:
         specifier: ^1.37.3
         version: 1.38.2(three@0.150.1)
-      comlink:
-        specifier: ^4.4.1
-        version: 4.4.1
       constate:
         specifier: ^3.3.2
         version: 3.3.2(react@18.2.0)
       dnum:
         specifier: ^2.9.0
         version: 2.9.0
-      errorstacks:
-        specifier: ^2.4.1
-        version: 2.4.1
       lodash-es:
         specifier: ^4.17.21
         version: 4.17.21
-      p-debounce:
-        specifier: ^4.0.0
-        version: 4.0.0
       r3f-perf:
         specifier: ^7.1.2
         version: 7.1.2(@react-three/fiber@8.15.12)(@types/three@0.150.2)(react-dom@18.2.0)(react@18.2.0)(three@0.150.1)
@@ -547,9 +520,6 @@ importers:
       xstate:
         specifier: ^5.9.1
         version: 5.9.1
-      zod:
-        specifier: ^3.22.4
-        version: 3.22.4
     devDependencies:
       '@storybook/react':
         specifier: ^7.6.3
@@ -757,6 +727,15 @@ importers:
 
   products/kit:
     dependencies:
+      '@jridgewell/trace-mapping':
+        specifier: ^0.3.25
+        version: 0.3.25
+      '@react-three/fiber':
+        specifier: ^8.12.0
+        version: 8.15.12(react-dom@18.2.0)(react@18.2.0)(three@0.150.1)
+      '@swc/wasm-web':
+        specifier: ^1.4.2
+        version: 1.4.2
       '@types/lodash-es':
         specifier: ^4.17.12
         version: 4.17.12
@@ -781,15 +760,36 @@ importers:
       '@villagekit/product':
         specifier: workspace:*
         version: link:../../core/product
+      '@xstate/react':
+        specifier: ^4.1.0
+        version: 4.1.0(@types/react@18.2.38)(react@18.2.0)(xstate@5.9.1)
+      comlink:
+        specifier: ^4.4.1
+        version: 4.4.1
+      dnum:
+        specifier: ^2.9.0
+        version: 2.9.0
+      errorstacks:
+        specifier: ^2.4.1
+        version: 2.4.1
       lodash-es:
         specifier: ^4.17.21
         version: 4.17.21
+      p-debounce:
+        specifier: ^4.0.0
+        version: 4.0.0
       react:
-        specifier: 18.2.0
+        specifier: ^18.2.0
         version: 18.2.0
+      react-icons:
+        specifier: ^4.10.1
+        version: 4.12.0(react@18.2.0)
       three:
         specifier: ^0.150.1
         version: 0.150.1
+      xstate:
+        specifier: ^5.9.1
+        version: 5.9.1
       zod:
         specifier: ^3.22.4
         version: 3.22.4
@@ -825,7 +825,7 @@ packages:
     engines: {node: '>=6.0.0'}
     dependencies:
       '@jridgewell/gen-mapping': 0.3.3
-      '@jridgewell/trace-mapping': 0.3.20
+      '@jridgewell/trace-mapping': 0.3.25
     dev: true
 
   /@aw-web-design/x-default-browser@1.4.126:
@@ -881,7 +881,7 @@ packages:
     dependencies:
       '@babel/types': 7.23.4
       '@jridgewell/gen-mapping': 0.3.3
-      '@jridgewell/trace-mapping': 0.3.20
+      '@jridgewell/trace-mapping': 0.3.25
       jsesc: 2.5.2
     dev: true
 
@@ -4794,7 +4794,7 @@ packages:
     dependencies:
       '@babel/core': 7.23.3
       '@jest/types': 29.6.3
-      '@jridgewell/trace-mapping': 0.3.20
+      '@jridgewell/trace-mapping': 0.3.25
       babel-plugin-istanbul: 6.1.1
       chalk: 4.1.2
       convert-source-map: 2.0.0
@@ -4871,13 +4871,6 @@ packages:
 
   /@jridgewell/sourcemap-codec@1.4.15:
     resolution: {integrity: sha512-eF2rxCRulEKXHTRiDrDy6erMYWqNw4LPdQ8UQA4huuxaQsVeRPFl2oM8oDGxMFhJUWZf9McpLtJasDDZb/Bpeg==}
-
-  /@jridgewell/trace-mapping@0.3.20:
-    resolution: {integrity: sha512-R8LcPeWZol2zR8mmH3JeKQ6QRCFb7XgUhV9ZlGhHLGyg4wpPiPZNQOOWhFZhxKw8u//yTbNGI42Bx/3paXEQ+Q==}
-    dependencies:
-      '@jridgewell/resolve-uri': 3.1.1
-      '@jridgewell/sourcemap-codec': 1.4.15
-    dev: true
 
   /@jridgewell/trace-mapping@0.3.25:
     resolution: {integrity: sha512-vNk6aEwybGtawWmy/PzwnGDOjCkLWSD2wqvjGGAgOAwCGWySYXfYoxt00IJkTF+8Lb57DwOb3Aa0o9CApepiYQ==}

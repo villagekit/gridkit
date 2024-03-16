@@ -1,6 +1,7 @@
 import '../globals'
 
 import { ParamControls } from '@villagekit/parameters'
+import { ProductInfo } from '@villagekit/product'
 import {
   Box,
   HStack,
@@ -24,7 +25,6 @@ import {
   FaUndoAlt,
 } from 'react-icons/fa'
 import screenfull from 'screenfull'
-import { AssemblyInfo } from '../assembly'
 import type { CameraControlsRef } from '../camera'
 import { ControlsContextProvider } from './context'
 import { Control } from './control'
@@ -38,7 +38,7 @@ export interface SandboxControlsProps {
   containerRef: React.RefObject<HTMLDivElement>
   showParamControls?: boolean
   alwaysShowFullscreenControls?: boolean
-  shouldRenderAssemblyInfo?: boolean
+  shouldRenderProductInfo?: boolean
 }
 
 export function SandboxControls(props: SandboxControlsProps) {
@@ -51,7 +51,7 @@ export function SandboxControls(props: SandboxControlsProps) {
     containerRef,
     showParamControls = false,
     alwaysShowFullscreenControls = false,
-    shouldRenderAssemblyInfo = true,
+    shouldRenderProductInfo = true,
   } = props
 
   const handleZoomIn = useCallback(() => {
@@ -188,9 +188,9 @@ export function SandboxControls(props: SandboxControlsProps) {
         </HStack>
       </Control>
 
-      {shouldShowFullscreenControls && canShowFullscreenControls && shouldRenderAssemblyInfo && (
+      {shouldShowFullscreenControls && canShowFullscreenControls && shouldRenderProductInfo && (
         <Control bottom sx={{ minWidth: 'md' }}>
-          <AssemblyInfo containerRef={containerRef} />
+          <ProductInfo containerRef={containerRef} />
         </Control>
       )}
 

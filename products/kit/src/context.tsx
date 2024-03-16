@@ -1,11 +1,17 @@
 import {
-  type AssemblyPlugin,
   type DesignParts,
+  type KitPlugin,
   designPartsSchema,
   generatePartsForPlugins,
   getPartCreatorsFromDesignParts,
 } from '@villagekit/design'
-import type { ExtractValuesFromParams, Params } from '@villagekit/parameters'
+import {
+  type ExtractValuesFromParams,
+  type Params,
+  useParams,
+  useParamsValues,
+  usePresets,
+} from '@villagekit/parameters'
 import {
   type PartCreator,
   type PartGlValue,
@@ -15,34 +21,56 @@ import {
   calculateStateForAll,
   getPartVariants,
 } from '@villagekit/part'
+import { type ProductTypeProviderProps, useProductCode, useProductMeta } from '@villagekit/product'
 import { map, uniq } from 'lodash-es'
 import pDebounce from 'p-debounce'
-import { createContext, useContext, useEffect, useMemo, useState } from 'react'
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import type { Box3 } from 'three'
-import type { DesignRenderAssembly, ExtendDesignValidationErrors } from '../types'
+import { useRender } from './renders'
+import type {
+  ExtendDesignValidationErrors,
+  Presets,
+  Render,
+  RenderError,
+  ValidationErrors,
+} from './types'
 
-type SandboxAssemblyOptions<Ps extends Params> = {
-  assembly: DesignRenderAssembly<Ps>
-  parameterValues: Ps extends never ? null : ExtractValuesFromParams<Ps>
-  extendValidationErrors: ExtendDesignValidationErrors
-}
-
-type SandboxAssemblyState = {
+type ProductKitState = {
   boundingBox: Box3
+  renderError: RenderError
+  validationErrors: ValidationErrors
   isLoading: boolean
   partValues: Array<PartGlValue>
   parts: Array<PartState>
 }
 
-function useSandboxAssembly<Ps extends Params>(
-  props: SandboxAssemblyOptions<Ps>,
-): SandboxAssemblyState {
-  const { isLoading, parts } = useParts(props)
+function useProductKit(props: ProductTypeProviderProps): ProductKitState {
+  const { exports: filePath } = useProductMeta()
+  const code = useProductCode()
+
+  const [validationErrors, setValidationErrors] = useState({})
+  const extendValidationErrors = useCallback((nextValidationErrors: ValidationErrors) => {
+    setValidationErrors((validationErrors) => ({
+      ...validationErrors,
+      ...nextValidationErrors,
+    }))
+  }, [])
+
+  const { render, renderError } = useRender({ filePath, code })
+
+  const params = useParams()
+  const presets = usePresets()
+  const paramsValues = useParamsValues()
+  useValidateParams({ params, presets }, extendValidationErrors)
+
+  const { isLoading, parts } = useParts({ render, paramsValues })
 
   const partValues = usePartValues(parts)
   const boundingBox = useBoundingBox(partValues)
 
   return {
+    renderError,
+    validationErrors,
     boundingBox,
     isLoading,
     partValues,
@@ -50,52 +78,55 @@ function useSandboxAssembly<Ps extends Params>(
   }
 }
 
-export const SandboxAssemblyContext = createContext<SandboxAssemblyState | null>(null)
+export const ProductKitContext = createContext<ProductKitState | null>(null)
 
-export function SandboxAssemblyProvider(
-  props: SandboxAssemblyOptions<any> & { children: React.ReactNode },
-) {
+export function ProductKitProvider(props: ProductKitOptions<any> & { children: React.ReactNode }) {
   const { children, ...options } = props
-  const value = useSandboxAssembly(options)
-  return <SandboxAssemblyContext.Provider value={value}>{children}</SandboxAssemblyContext.Provider>
+  const value = useProductKit(options)
+  return <ProductKitContext.Provider value={value}>{children}</ProductKitContext.Provider>
 }
 
-export function useSandboxAssemblyContext(): SandboxAssemblyState {
-  const context = useContext(SandboxAssemblyContext)
+export function useProductKitContext(): ProductKitState {
+  const context = useContext(ProductKitContext)
   if (context == null) {
-    throw new Error('useSandboxAssemblyContext must be wrapped in SandboxAssemblyProvider')
+    throw new Error('useProductKitContext must be wrapped in ProductKitProvider')
   }
   return context
 }
 
-type UsePartsValue = Pick<SandboxAssemblyState, 'isLoading' | 'parts'>
+type UsePartsOptions = {
+  kit: Render
+  params
+}
 
-const noPlugins: Array<AssemblyPlugin> = []
+type UsePartsValue = Pick<ProductKitState, 'isLoading' | 'parts'>
 
-function useParts<Ps extends Params>(options: SandboxAssemblyOptions<Ps>): UsePartsValue {
-  const { assembly, parameterValues, extendValidationErrors } = options
+const noPlugins: Array<KitPlugin> = []
+
+function useParts<Ps extends Params>(options: ProductKitOptions<Ps>): UsePartsValue {
+  const { kit, paramsValues, extendValidationErrors } = options
 
   const partVariants = useMemo(() => getPartVariants(), [])
 
-  const [assemblyParts, setAssemblyParts] = useState<DesignParts>([])
+  const [kitParts, setKitParts] = useState<DesignParts>([])
   useEffect(() => {
-    if (parameterValues == null) return
-    assembly.assembly(parameterValues, partVariants).then((parts) => {
+    if (paramsValues == null) return
+    kit.kit(paramsValues, partVariants).then((parts) => {
       const result = designPartsSchema.safeParse(parts)
       if (result.success) {
-        setAssemblyParts(result.data)
-        extendValidationErrors({ assembly: null })
+        setKitParts(result.data)
+        extendValidationErrors({ kit: null })
       } else {
-        extendValidationErrors({ assembly: result.error })
+        extendValidationErrors({ kit: result.error })
       }
     })
-  }, [assembly, parameterValues, partVariants, extendValidationErrors])
+  }, [kit, paramsValues, partVariants, extendValidationErrors])
 
   const [partCreators, setPartCreators] = useState<Array<PartCreator>>([])
   const [isLoading, setLoading] = useState(false)
 
   const {
-    assembly: { plugins = noPlugins },
+    kit: { plugins = noPlugins },
   } = options
   const generatePluginParts = useMemo(() => {
     return pDebounce((partCreators: Array<PartCreator>) => {
@@ -104,16 +135,16 @@ function useParts<Ps extends Params>(options: SandboxAssemblyOptions<Ps>): UsePa
   }, [plugins])
 
   useEffect(() => {
-    const assemblyPartCreators = getPartCreatorsFromDesignParts(assemblyParts)
-    setPartCreators(assemblyPartCreators)
+    const kitPartCreators = getPartCreatorsFromDesignParts(kitParts)
+    setPartCreators(kitPartCreators)
 
     let isCancelled = false
 
     setLoading(true)
 
-    void generatePluginParts(assemblyPartCreators).then((generatedParts) => {
+    void generatePluginParts(kitPartCreators).then((generatedParts) => {
       if (!isCancelled && generatedParts.length > 0) {
-        setPartCreators([...assemblyPartCreators, ...generatedParts])
+        setPartCreators([...kitPartCreators, ...generatedParts])
       }
 
       setLoading(false)
@@ -122,7 +153,7 @@ function useParts<Ps extends Params>(options: SandboxAssemblyOptions<Ps>): UsePa
     return () => {
       isCancelled = true
     }
-  }, [assemblyParts, generatePluginParts])
+  }, [kitParts, generatePluginParts])
 
   const partStates = useMemo(() => {
     return calculateStateForAll(partCreators)
@@ -156,40 +187,23 @@ function useBoundingBox(partGlValues: Array<PartGlValue>): Box3 {
   }, [partGlValues])
 }
 
-/*
-
-export type ValidationError = ZodError | null
-export type ValidationErrors = Partial<Record<string, ValidationError>>
-export type ExtendValidationErrors = (errors: ValidationErrors) => void
-
-  const [validationErrors, setValidationErrors] = useState({})
-  const extendValidationErrors = useCallback((nextValidationErrors: ValidationErrors) => {
-    setValidationErrors((validationErrors) => ({
-      ...validationErrors,
-      ...nextValidationErrors,
-    }))
-  }, [])
-
-  useValidateParamics(parameterics, extendValidationErrors)
-
-function useValidateParamics<Ps extends Params>(
-  parametrics: Parametrics<Ps> | null,
+function useValidateParams(
+  params: Params | null,
+  presets: Presets<any> | null,
   extendValidationErrors: ExtendValidationErrors,
 ) {
   useEffect(() => {
-    if (parametrics == null) return
-    const { parameters, presets } = parametrics
+    if (params == null || presets == null) return
 
-    const parametersResult = parametersSchema.safeParse(parameters)
-    const parametersError = parametersResult.success ? null : parametersResult.error
+    const paramsResult = paramsSchema.safeParse(params)
+    const paramsError = paramsResult.success ? null : paramsResult.error
 
-    const presetsSchema = getPresetsSchema(parameters)
+    const presetsSchema = getPresetsSchema(params)
     const presetsResult = presetsSchema.safeParse(presets)
     const presetsError = presetsResult.success ? null : presetsResult.error
     extendValidationErrors({
-      parameters: parametersError,
+      params: paramsError,
       presets: presetsError,
     })
-  }, [parametrics, extendValidationErrors])
+  }, [params, presets, extendValidationErrors])
 }
-*/

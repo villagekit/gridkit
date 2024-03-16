@@ -6,36 +6,36 @@ import { Canvas, type RootState } from '@react-three/fiber'
 import { Box, useDisclosure } from '@villagekit/ui'
 import { Perf } from 'r3f-perf'
 import type React from 'react'
-import { useCallback, useMemo, useRef, useState } from 'react'
-import { ACESFilmicToneMapping, Box3, PCFSoftShadowMap, Vector3, sRGBEncoding } from 'three'
+import { useCallback, useMemo, useRef } from 'react'
+import { ACESFilmicToneMapping, type Box3, PCFSoftShadowMap, Vector3, sRGBEncoding } from 'three'
 import { CameraControls, type CameraControlsRef } from './camera'
 import { SandboxControls } from './controls'
 import { SceneryGl } from './scenery'
 import { useDefaultSandboxControlSettings, useSaveSandboxControlSettings } from './settings'
 
-export type * from './types'
-
 export type SandboxMode = 'default' | 'screenshot'
 
 export interface SandboxProps {
   label: string
-  scale?: number
+  boundingBox: Box3
   mode?: SandboxMode
   isDebug?: boolean
   showParamControls?: boolean
   alwaysShowFullscreenControls?: boolean
   bridgeContexts?: Array<React.Context<any>>
+  children: React.ReactNode
 }
 
 export function Sandbox(props: SandboxProps) {
   const {
     label,
-    scale,
+    boundingBox,
     mode = 'default',
     isDebug = false,
     showParamControls = false,
     alwaysShowFullscreenControls = false,
     bridgeContexts = [],
+    children,
   } = props
 
   const maxTiers = 3
@@ -62,6 +62,15 @@ export function Sandbox(props: SandboxProps) {
     state.gl.toneMapping = ACESFilmicToneMapping
     state.gl.outputEncoding = sRGBEncoding
   }, [])
+
+  const gridLengthInMeters = 0.04
+
+  const center: [number, number, number] = useMemo(() => {
+    const centerVector = new Vector3()
+    boundingBox.getCenter(centerVector)
+    return [centerVector.x, centerVector.y, centerVector.z]
+  }, [boundingBox])
+  const sceneryCenterInMeters: [number, number] = useMemo(() => [center[0], center[1]], [center])
 
   if (gpu == null) return null
   const perfMax = gpu.tier / maxTiers
@@ -106,17 +115,21 @@ export function Sandbox(props: SandboxProps) {
         resize={{ polyfill: ResizeObserver }}
       >
         <ContextBridge>
-          <ContainerGl mode={mode} isDebug={isDebug}>
-            {
-              <ContentGl
-                scale={scale}
-                mode={mode}
-                shouldAutoRotate={shouldAutoRotate}
-                shouldDisplayGrid={shouldDisplayGrid}
-                cameraControlsRef={cameraControlsRef}
-              />
-            }
-          </ContainerGl>
+          {isDebug && mode !== 'screenshot' && <Perf />}
+          <AdaptiveDpr />
+          <SceneryGl
+            gridLengthInMeters={gridLengthInMeters}
+            centerInMeters={sceneryCenterInMeters}
+            mode={mode}
+            shouldDisplayGrid={shouldDisplayGrid}
+          />
+          <CameraControls
+            ref={cameraControlsRef}
+            boundingBox={boundingBox}
+            mode={mode}
+            shouldAutoRotate={shouldAutoRotate}
+          />
+          {children}
         </ContextBridge>
       </Canvas>
 
@@ -136,76 +149,5 @@ export function Sandbox(props: SandboxProps) {
         />
       )}
     </Box>
-  )
-}
-
-interface ContainerGlProps {
-  children: React.ReactNode | Array<React.ReactNode>
-  mode: SandboxMode
-  isDebug: boolean
-}
-
-function ContainerGl(props: ContainerGlProps) {
-  const { children, mode, isDebug } = props
-
-  return (
-    <>
-      {isDebug && mode !== 'screenshot' && <Perf />}
-      <AdaptiveDpr />
-      {children}
-    </>
-  )
-}
-
-interface ContentGlProps {
-  scale?: number
-  mode: SandboxMode
-  shouldAutoRotate: boolean
-  shouldDisplayGrid: boolean
-  cameraControlsRef: React.MutableRefObject<CameraControlsRef | null>
-}
-
-function ContentGl(props: ContentGlProps) {
-  const { scale = 1, mode, shouldAutoRotate, shouldDisplayGrid, cameraControlsRef } = props
-
-  const gridLengthInMeters = 0.04
-
-  const [boundingBox, setBoundingBox] = useState<Box3>(new Box3())
-  const center: [number, number, number] = useMemo(() => {
-    const centerVector = new Vector3()
-    boundingBox.getCenter(centerVector)
-    return [centerVector.x, centerVector.y, centerVector.z]
-  }, [boundingBox])
-  const sceneryCenterInMeters: [number, number] = useMemo(() => [center[0], center[1]], [center])
-
-  const handleBoundingBoxChange = useCallback(
-    (nextBoundingBox: Box3) => {
-      const scaledBoundingBox = new Box3(
-        nextBoundingBox.min.multiplyScalar(scale),
-        nextBoundingBox.max.multiplyScalar(scale),
-      )
-      setBoundingBox(scaledBoundingBox)
-    },
-    [scale],
-  )
-
-  return (
-    <>
-      <SceneryGl
-        gridLengthInMeters={gridLengthInMeters}
-        centerInMeters={sceneryCenterInMeters}
-        mode={mode}
-        shouldDisplayGrid={shouldDisplayGrid}
-      />
-      <CameraControls
-        ref={cameraControlsRef}
-        boundingBox={boundingBox}
-        mode={mode}
-        shouldAutoRotate={shouldAutoRotate}
-      />
-      <group scale={scale}>
-        {designType === 'assembly' ? <AssemblyGl setBoundingBox={handleBoundingBoxChange} /> : null}
-      </group>
-    </>
   )
 }

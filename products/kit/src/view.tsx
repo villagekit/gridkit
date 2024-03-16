@@ -3,11 +3,11 @@ import { useEffect } from 'react'
 import type { Box3 } from 'three'
 import { useKitContext } from './context'
 
-interface KitGlProps {
+interface KitViewProps {
   setBoundingBox: (box: Box3) => void
 }
 
-export function KitGl(props: KitGlProps) {
+export function KitView(props: KitViewProps) {
   const { setBoundingBox } = props
 
   const { boundingBox, partValues: partGlValues } = useKitContext()

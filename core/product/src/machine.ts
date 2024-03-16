@@ -22,11 +22,7 @@ export const productMachine = setup({
   context: ({ input }) => getContextFromInput(input),
   on: {
     updateInput: {
-      actions: [
-        assign(({ event }) => {
-          return getContextFromInput(event.input)
-        }),
-      ],
+      actions: [assign(({ event: { input } }) => getContextFromInput(input))],
     },
   },
 })

@@ -1,8 +1,8 @@
 import { useActorRef, useSelector } from '@xstate/react'
 import { type PropsWithChildren, createContext, useCallback, useContext } from 'react'
 import type { ActorRefFrom, SnapshotFrom } from 'xstate'
-import type { Presets } from '.'
 import { type ParamsMachineInput, paramsMachine } from './machine'
+import type { Presets } from './presets'
 import type { Params, ParamsValues } from './values'
 
 export const ParamsContext = createContext<ActorRefFrom<typeof paramsMachine> | null>(null)

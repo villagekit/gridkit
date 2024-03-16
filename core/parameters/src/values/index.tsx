@@ -30,12 +30,12 @@ import {
   numberValueSchema,
 } from './number'
 
-export const parameterSchema = z.discriminatedUnion('type', [
+export const paramSchema = z.discriminatedUnion('type', [
   booleanParamSchema,
   choiceParamSchema,
   numberParamSchema,
 ])
-export type Param = z.infer<typeof parameterSchema>
+export type Param = z.infer<typeof paramSchema>
 
 export type ParamValuesByType = {
   [BooleanId]: BooleanValue
@@ -43,22 +43,18 @@ export type ParamValuesByType = {
   [NumberId]: NumberValue
 }
 
-export const parameterValueSchemasByType = {
+export const paramValueSchemasByType = {
   [BooleanId]: booleanValueSchema,
   [ChoiceId]: choiceValueSchema,
   [NumberId]: numberValueSchema,
 }
 
-export const parameterValueSchema = z.union([
-  booleanValueSchema,
-  choiceValueSchema,
-  numberValueSchema,
-])
+export const paramValueSchema = z.union([booleanValueSchema, choiceValueSchema, numberValueSchema])
 
 export type ParamValue = BooleanValue | ChoiceValue | NumberValue
 export type ParamsValues = Record<string, ParamValue>
 
-export const parameterQueryParamsByType = {
+export const paramQueryParamsByType = {
   [BooleanId]: BooleanQueryParam,
   [ChoiceId]: ChoiceQueryParam,
   [NumberId]: NumberQueryParam,
@@ -68,7 +64,7 @@ export type Params = {
   [Id: string]: Param
 }
 
-export const parametersSchema = z.record(z.string(), parameterSchema)
+export const paramsSchema = z.record(z.string(), paramSchema)
 
 export type ExtractValueFromParam<P extends Param> = ParamValuesByType[P['type']]
 
@@ -76,11 +72,11 @@ export type ExtractValuesFromParams<Ps extends Params> = {
   [Key in keyof Ps]: ExtractValueFromParam<Ps[Key]>
 }
 
-export function extractValueSchemaFromParam<P extends Param>(parameter: P) {
-  return parameterValueSchemasByType[parameter.type]
+export function extractValueSchemaFromParam<P extends Param>(param: P) {
+  return paramValueSchemasByType[param.type]
 }
-export function extractValuesSchemaFromParams<Ps extends Params>(parameters: Ps) {
-  return z.object(mapValues(parameters, extractValueSchemaFromParam))
+export function extractValuesSchemaFromParams<Ps extends Params>(params: Ps) {
+  return z.object(mapValues(params, extractValueSchemaFromParam))
 }
 
 export function ParamValueControls() {
