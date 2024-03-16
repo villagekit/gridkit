@@ -4,7 +4,7 @@ import { parseStackTrace } from 'errorstacks'
 import { fromCallback } from 'xstate'
 import { comlinkDataUrl } from '../comlink'
 import type { Params, ParamsValues, PartVariantsByType, Parts, Presets } from '../types'
-import type { ProductKitRenderEvent, RendererMachineEvent } from './'
+import type { RenderEvent, RendererMachineEvent } from './'
 
 type Evaluator = {
   loadModule: (code: string) => Promise<string>
@@ -16,7 +16,7 @@ type Evaluator = {
   evaluateParts: (paramsValues: ParamsValues, partVariants: PartVariantsByType) => Promise<Parts>
 }
 
-export const javascriptRenderer = fromCallback<ProductKitRenderEvent, RendererMachineEvent>(
+export const javascriptRenderer = fromCallback<RenderEvent, RendererMachineEvent>(
   ({ sendBack, receive }) => {
     const evaluatorIframe = createEvaulatorIframe()
     document.body.appendChild(evaluatorIframe)

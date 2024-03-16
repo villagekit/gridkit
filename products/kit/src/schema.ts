@@ -1,7 +1,7 @@
-import { getPresetsSchema, parametersSchema } from '@villagekit/parameters'
+import { getPresetsSchema, paramsSchema } from '@villagekit/parameters'
 import { partCreatorSchema } from '@villagekit/part'
 import { z } from 'zod'
-import type { RecursiveArray } from '.'
+import type { RecursiveArray } from './types'
 
 export const categorySchema = z.enum(['seating', 'tables', 'storage', 'office'])
 
@@ -12,7 +12,7 @@ export const metaSchema = z.object({
   categories: z.array(categorySchema).optional(),
 })
 
-export { parametersSchema, getPresetsSchema }
+export { paramsSchema, getPresetsSchema }
 
 export const partSchema = z.intersection(
   partCreatorSchema,

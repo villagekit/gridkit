@@ -1,6 +1,5 @@
 import type { ExtractValuesFromParams, Params, ParamsValues, Presets } from '@villagekit/parameters'
 import type { PartCreator, PartVariantsByType } from '@villagekit/part'
-import type { ZodError } from 'zod'
 import type { Plugin } from './plugins'
 
 export type ProductKit<Ps extends Params = never> = {

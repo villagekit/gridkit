@@ -4,6 +4,7 @@ import { ProductKitSummary } from './summary'
 import { ProductKitView } from './view'
 
 export { ProductKitContext } from './context'
+export type { Params, Parts, PartsFn, Presets } from './types'
 
 export default {
   id: 'kit',
