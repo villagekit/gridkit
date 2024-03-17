@@ -218,6 +218,9 @@ importers:
       codemirror-theme-catppuccin:
         specifier: ^0.3.0
         version: 0.3.0
+      comlink:
+        specifier: ^4.4.1
+        version: 4.4.1
       constate:
         specifier: ^3.3.2
         version: 3.3.2(react@18.2.0)
@@ -288,9 +291,6 @@ importers:
       '@types/three':
         specifier: ^0.150.1
         version: 0.150.2
-      dts-bundle-generator:
-        specifier: ^9.3.1
-        version: 9.3.1
       electron:
         specifier: ^28.2.2
         version: 28.2.2
@@ -306,9 +306,19 @@ importers:
 
   core/design:
     dependencies:
+      '@villagekit/part-gridbeam':
+        specifier: workspace:*
+        version: link:../../parts/part-gridbeam
+      '@villagekit/part-gridpanel':
+        specifier: workspace:*
+        version: link:../../parts/part-gridpanel
       '@villagekit/product-kit':
         specifier: workspace:*
         version: link:../../products/kit
+    devDependencies:
+      dts-bundle-generator:
+        specifier: ^9.3.1
+        version: 9.3.1
 
   core/parameters:
     dependencies:

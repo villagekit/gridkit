@@ -8,7 +8,7 @@ import * as Comlink from 'comlink'
 import ts from 'typescript'
 
 // @ts-ignore
-import typesDts from '../types.d.ts?raw'
+import designKitDts from '@villagekit/design/type-bundles/kit.d.ts?raw'
 
 Comlink.expose(
   createWorker(async () => {
@@ -18,7 +18,7 @@ Comlink.expose(
       false,
       ts,
     )
-    fsMap.set('/node_modules/@villagekit/design/index.d.ts', typesDts)
+    fsMap.set('/node_modules/@villagekit/design/kit.d.ts', designKitDts)
     const system = createSystem(fsMap)
     const compilerOpts = {}
     return createVirtualTypeScriptEnvironment(system, [], ts, compilerOpts)

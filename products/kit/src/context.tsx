@@ -107,7 +107,7 @@ function useParts<Ps extends Params>(options: UsePartsOptions<Ps>): UsePartsValu
         updateProductError({
           type: 'error:validation',
           errors: {
-            kit: result.error,
+            parts: result.error,
           },
         })
       }

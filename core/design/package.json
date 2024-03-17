@@ -8,19 +8,29 @@
   "module": "dist/index.js",
   "types": "dist/index.d.ts",
   "exports": {
-    "kit": {
+    "./kit": {
       "types": "./dist/kit.d.ts",
       "import": "./dist/kit.js",
       "require": "./dist/kit.cjs"
+    },
+    "./type-bundles/*.d.ts": {
+      "import": "./dist-type-bundles/*.d.ts",
+      "require": "./dist-type-bundles/*.d.ts"
     }
   },
   "sideEffects": false,
   "scripts": {
-    "build:pkg": "tsup src",
+    "build:types:kit": "dts-bundle-generator --project '../../tsconfig.json' --external-inlines 'zod' --inline-declare-global --export-referenced-types -o ./dist-type-bundles/kit.d.ts --no-check ./src/kit.ts",
+    "build:pkg": "npm run build:types:kit && tsup src --no-splitting",
     "lint": "biome check ."
   },
   "dependencies": {
+    "@villagekit/part-gridbeam": "workspace:*",
+    "@villagekit/part-gridpanel": "workspace:*",
     "@villagekit/product-kit": "workspace:*"
+  },
+  "devDependencies": {
+    "dts-bundle-generator": "^9.3.1"
   },
   "peerDependencies": {}
 }
