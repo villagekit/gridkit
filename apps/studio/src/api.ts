@@ -75,12 +75,13 @@ export const router = t.router({
     .output(z.array(productIndexSchema))
     .query(async function listProduct(opts) {
       const { workspacePath } = opts.input
+      const workspaceProductsPath = join(workspacePath, 'products')
       const products = []
-      const dirEntries = await readdir(workspacePath)
+      const dirEntries = await readdir(workspaceProductsPath)
       for (const productPath of dirEntries) {
         const productId = basename(productPath)
         products.push({
-          path: join(workspacePath, productPath),
+          path: join(workspaceProductsPath, productPath),
           id: productId,
         })
       }
