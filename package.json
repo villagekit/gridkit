@@ -9,6 +9,7 @@
     "dev": "pnpm run '/^dev:.*/'",
     "lint": "turbo lint",
     "format": "biome check --apply .",
+    "format:unsafe": "biome check --apply-unsafe .",
     "test": "turbo test"
   },
   "devDependencies": {

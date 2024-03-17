@@ -69,9 +69,7 @@ const simplePresets = Presets<typeof simpleParams>([
 export function SimpleValueControls() {
   const [values, setValues] = useState(simplePresets[0].values)
 
-  return (
-    <ParamValueControls parameters={simpleParams} values={values} onChange={setValues} />
-  )
+  return <ParamValueControls parameters={simpleParams} values={values} onChange={setValues} />
 }
 
 export function SimplePresetControls() {

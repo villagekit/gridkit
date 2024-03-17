@@ -8,5 +8,5 @@ export default defineConfig({
   banner: {
     js: "'use client'",
   },
-  clean: true
+  clean: true,
 })

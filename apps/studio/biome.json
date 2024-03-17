@@ -1,8 +1,5 @@
 {
   "extends": ["../../biome.json"],
-  "files": {
-    "ignore": ["./src/editor/types.d.ts"]
-  },
   "vcs": {
     "root": "../../"
   }

@@ -7,9 +7,7 @@ interface ParamControlsInternalContextProps {
 
 interface ParamControlsInternalContextType extends ParamControlsInternalContextProps {}
 
-function useParams(
-  props: ParamControlsInternalContextProps,
-): ParamControlsInternalContextType {
+function useParams(props: ParamControlsInternalContextProps): ParamControlsInternalContextType {
   return props
 }
 
