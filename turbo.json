@@ -4,11 +4,13 @@
   "pipeline": {
     "build:pkg": {
       "dependsOn": ["^build:pkg"],
-      "outputs": ["dist/**"]
+      "outputs": ["dist/**"],
+      "outputMode": "errors-only"
     },
     "build:app": {
       "dependsOn": ["^build:app", "build:pkg"],
-      "outputs": [".next/**", "!.next/cache/**", "storybook-static/**"]
+      "outputs": [".next/**", "!.next/cache/**", "storybook-static/**", "out/**"],
+      "outputMode": "new-only"
     },
     "types": {},
     "test": {},

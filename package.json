@@ -3,7 +3,7 @@
   "private": true,
   "scripts": {
     "postinstall": "patch-package",
-    "build": "turbo build:pkg && turbo build:app",
+    "build:app": "turbo build:app",
     "build:pkg": "turbo build:pkg",
     "dev:pkg": "tsx ./watch.ts",
     "dev:app": "turbo dev:app",
