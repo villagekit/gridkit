@@ -23,12 +23,12 @@
   "dependencies": {
     "@types/react": "^18.2.37",
     "@types/three": "^0.150.1",
-    "@villagekit/part": "workspace:*",
-    "@villagekit/part-base": "workspace:*",
-    "@villagekit/part-base-grid": "workspace:*",
-    "@villagekit/ui": "workspace:*",
-    "@villagekit/util-math": "workspace:*",
-    "@villagekit/util-units": "workspace:*",
+    "@villagekit/part": "*",
+    "@villagekit/part-base": "*",
+    "@villagekit/part-base-grid": "*",
+    "@villagekit/ui": "*",
+    "@villagekit/util-math": "*",
+    "@villagekit/util-units": "*",
     "deadbeef": "github:ahdinosaur/deadbeef#fix-typescript-declarations",
     "zod": "^3.22.4"
   },

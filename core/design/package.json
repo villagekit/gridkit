@@ -25,9 +25,9 @@
     "lint": "biome check ."
   },
   "dependencies": {
-    "@villagekit/part-gridbeam": "workspace:*",
-    "@villagekit/part-gridpanel": "workspace:*",
-    "@villagekit/product-kit": "workspace:*"
+    "@villagekit/part-gridbeam": "*",
+    "@villagekit/part-gridpanel": "*",
+    "@villagekit/product-kit": "*"
   },
   "devDependencies": {
     "dts-bundle-generator": "^9.3.1"

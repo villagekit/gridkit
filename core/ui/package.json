@@ -35,7 +35,7 @@
   },
   "devDependencies": {
     "@storybook/react": "^7.6.3",
-    "@villagekit/tsconfig": "workspace:*",
+    "@villagekit/tsconfig": "*",
     "tsup": "^8.0.1",
     "typescript": "^5.2.2"
   },

@@ -2,12 +2,12 @@
   "name": "villagekit",
   "private": true,
   "scripts": {
+    "postinstall": "patch-package",
     "build": "turbo build:pkg && turbo build:app",
     "build:pkg": "turbo build:pkg",
     "dev:pkg": "tsx ./watch.ts",
-    "//": "--concurrency 1000 until https://github.com/vercel/turbo/pull/6790 fixed",
-    "dev:app": "turbo dev:app --concurrency 1000",
-    "dev": "pnpm run '/^dev:.*/'",
+    "dev:app": "turbo dev:app",
+    "dev": "concurrently 'npm:dev:*'",
     "lint": "turbo lint",
     "format": "biome check --apply .",
     "format:unsafe": "biome check --apply-unsafe .",
@@ -17,7 +17,8 @@
     "@biomejs/biome": "^1.6.1",
     "@tauri-apps/cli": "^1.5.9",
     "@types/node": "^20.11.17",
-    "@villagekit/tsconfig": "workspace:*",
+    "@villagekit/tsconfig": "*",
+    "concurrently": "^8.2.2",
     "patch-package": "^8.0.0",
     "tsup": "^8.0.1",
     "tsx": "^4.7.0",
@@ -27,13 +28,15 @@
     "vite": "^5.0.0",
     "vite-tsconfig-paths": "^4.3.1"
   },
-  "packageManager": "pnpm",
-  "pnpm": {
-    "patchedDependencies": {
-      "turbowatch@2.29.4": "patches/turbowatch@2.29.4.patch"
-    },
-    "overrides": {
-      "three": "^0.150.1"
-    }
+  "workspaces": [
+    "dev/*",
+    "core/*",
+    "util/*",
+    "parts/*",
+    "products/*",
+    "apps/*"
+  ],
+  "overrides": {
+    "three": "^0.150.1"
   }
 }

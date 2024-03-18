@@ -52,12 +52,6 @@ To get started, first we need to install [`nvm`](https://github.com/nvm-sh/nvm) 
 nvm install --lts
 ```
 
-Then install [`pnpm`](https://pnpm.io/)
-
-```shell
-npm install -g pnpm
-```
-
 Then clone this git repo:
 
 ```shell
@@ -68,7 +62,7 @@ Then move inside and install the dependencies.
 
 ```shell
 cd villagekit
-pnpm install
+npm install
 ```
 
 Now you can run any of the scripts below:
@@ -80,7 +74,7 @@ Now you can run any of the scripts below:
 Start live development servers
 
 ```shell
-pnpm dev
+npm run dev
 ```
 
 ### Build
@@ -88,7 +82,7 @@ pnpm dev
 Build code
 
 ```shell
-pnpm build
+npm run build
 ```
 
 ### Lint
@@ -96,7 +90,7 @@ pnpm build
 Lint code using [Biome](https://biomejs.dev/)
 
 ```shell
-pnpm lint
+npm run lint
 ```
 
 ### Format
@@ -104,5 +98,5 @@ pnpm lint
 Format code using [Biome](https://biomejs.dev/)
 
 ```shell
-pnpm format
+npm run format
 ```

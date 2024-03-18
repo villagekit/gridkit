@@ -27,9 +27,9 @@
     "@types/node": "^20.5.2",
     "@types/react": "^18.2.0",
     "@types/three": "^0.150.1",
-    "@villagekit/product": "workspace:*",
-    "@villagekit/parameters": "workspace:*",
-    "@villagekit/ui": "workspace:*",
+    "@villagekit/product": "*",
+    "@villagekit/parameters": "*",
+    "@villagekit/ui": "*",
     "camera-controls": "^1.37.3",
     "constate": "^3.3.2",
     "dnum": "^2.9.0",
@@ -47,9 +47,9 @@
   },
   "devDependencies": {
     "@storybook/react": "^7.6.3",
-    "@villagekit/part-gridbeam": "workspace:*",
-    "@villagekit/part-gridpanel": "workspace:*",
-    "@villagekit/tsconfig": "workspace:*",
+    "@villagekit/part-gridbeam": "*",
+    "@villagekit/part-gridpanel": "*",
+    "@villagekit/tsconfig": "*",
     "tsup": "^8.0.1",
     "typescript": "^5.2.2"
   }
