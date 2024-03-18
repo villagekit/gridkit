@@ -4,15 +4,17 @@ Open source software to power [Village Kit](https://villagekit.com/):
 
 > Village Kit is a modular system for building physical things with a focus on peer production and circular economies.
 
-## Code
+## Get Started
+
+To get started with the CAD-as-code modular design app.
+
+## Code Overview
 
 ### `apps`: Applications
 
+#### `@villagekit/studio`: A CAD-as-code app for designing products
+
 #### `@villagekit/storybook`: A Storybook app
-
-#### `@villagekit/designer`: A Storybook app
-
-- [Pre-requisites](https://tauri.app/v1/guides/getting-started/prerequisites)
 
 ### `ui`: User interface
 

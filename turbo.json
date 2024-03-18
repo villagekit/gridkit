@@ -7,7 +7,7 @@
       "outputs": ["dist/**"]
     },
     "build:app": {
-      "dependsOn": ["^build:app"],
+      "dependsOn": ["^build:app", "build:pkg"],
       "outputs": [".next/**", "!.next/cache/**", "storybook-static/**"]
     },
     "types": {},
