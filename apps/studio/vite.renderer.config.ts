@@ -17,14 +17,14 @@ export default defineConfig((env) => {
     base: './',
     build: {
       outDir: `.vite/renderer/${name}`,
-      rollupOptions: {
-        external: ['@swc/wasm-web'],
-      },
     },
     plugins: [tsconfigPaths(), pluginExposeRenderer(name)],
     resolve: {
       preserveSymlinks: true,
     },
     clearScreen: false,
+    optimizeDeps: {
+      exclude: ['@swc/wasm-web'],
+    },
   } as UserConfig
 })
