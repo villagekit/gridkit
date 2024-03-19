@@ -42,8 +42,6 @@
     "@electron-forge/plugin-fuses": "^7.3.0",
     "@electron-forge/shared-types": "^7.2.0",
     "@electron/fuses": "^1.7.0",
-    "@manypkg/find-root": "^2.2.1",
-    "@npmcli/arborist": "^7.4.0",
     "@tanstack/react-query": "^4",
     "@tanstack/react-query-devtools": "^4",
     "@trpc/client": "^10",

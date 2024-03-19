@@ -1,31 +1,14 @@
 import { FusesPlugin } from '@electron-forge/plugin-fuses'
 import { FuseV1Options, FuseVersion } from '@electron/fuses'
-import { bundle } from './forge-bundler'
 
 import type { ForgeConfig } from '@electron-forge/shared-types'
 
 const config: ForgeConfig = {
   packagerConfig: {
     asar: true,
-    prune: false, // required for the workspace workaround below to work
   },
   rebuildConfig: {},
-  hooks: {
-    /*
-    packageAfterCopy: async (
-      _forgeConfig: any,
-      buildPath: string,
-      _electronVersion: string,
-      _platform: string,
-      _arch: string,
-    ) => {
-      console.log('bundle', buildPath)
-      // this is a workaround until we find a proper solution
-      // for running electron-forge in a mono repository
-      await bundle(__dirname, buildPath)
-    },
-    */
-  },
+  hooks: {},
   makers: [
     {
       name: '@electron-forge/maker-squirrel',
