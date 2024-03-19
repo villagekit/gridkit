@@ -1,7 +1,7 @@
 {
   "extends": "@villagekit/tsconfig/react-library.json",
   "compilerOptions": {
-    "module": "NodeNext",
+    "module": "CommonJS",
     "allowJs": true,
     "baseUrl": "src/",
     "paths": {

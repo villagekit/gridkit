@@ -4,7 +4,6 @@
   "version": "0.0.0",
   "private": true,
   "description": "Design modular products with Village Kit",
-  "type": "module",
   "main": ".vite/build/main.js",
   "scripts": {
     "dev:app": "electron-forge start",
@@ -74,7 +73,6 @@
     "react-resplit": "^1.2.0",
     "smol-toml": "^1.1.4",
     "three": "^0.150.1",
-    "vite-plugin-require": "^1.1.14",
     "xstate": "^5.9.1",
     "zod": "^3.22.4"
   }

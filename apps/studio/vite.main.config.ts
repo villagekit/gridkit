@@ -1,7 +1,6 @@
 // https://github.com/electron/forge/blob/main/packages/template/vite-typescript/tmpl/vite.main.config.ts
 import type { ConfigEnv, UserConfig } from 'vite'
 import { defineConfig, mergeConfig } from 'vite'
-import vitePluginRequireMod from 'vite-plugin-require'
 import tsconfigPaths from 'vite-tsconfig-paths'
 import {
   external,
@@ -10,8 +9,6 @@ import {
   pluginHotRestart,
   quietUseClientDirective,
 } from './vite.base.config'
-
-const vitePluginRequire = (vitePluginRequireMod as any).default as typeof vitePluginRequireMod
 
 // https://vitejs.dev/config
 export default defineConfig((env) => {
@@ -23,14 +20,14 @@ export default defineConfig((env) => {
       lib: {
         entry: forgeConfigSelf.entry!,
         fileName: () => '[name].js',
-        formats: ['es'],
+        formats: ['cjs'],
       },
       rollupOptions: {
         external,
         onwarn: quietUseClientDirective,
       },
     },
-    plugins: [pluginHotRestart('restart'), tsconfigPaths(), vitePluginRequire()],
+    plugins: [pluginHotRestart('restart'), tsconfigPaths()],
     define,
     resolve: {
       // Load the Node.js entry.
