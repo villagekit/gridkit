@@ -4,8 +4,11 @@ import { WorkspaceLayout } from '@/components/WorkspaceLayout'
 import WorkspaceSelector from '@/components/WorkspaceSelector'
 import { useWorkspaceContext } from '@/context/workspace'
 import { useWorkspacesContext } from '@/context/workspaces'
+import unhandled from 'electron-unhandled'
 import React from 'react'
 import { createRoot } from 'react-dom/client'
+
+unhandled()
 
 const rootElement = document.getElementById('root')
 

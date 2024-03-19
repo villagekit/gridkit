@@ -3,6 +3,9 @@ import { router } from '@/api'
 import { BrowserWindow, app } from 'electron'
 import installExtension, { REACT_DEVELOPER_TOOLS } from 'electron-devtools-installer'
 import { createIPCHandler } from 'electron-trpc/main'
+import unhandled from 'electron-unhandled'
+
+unhandled()
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require('electron-squirrel-startup')) {

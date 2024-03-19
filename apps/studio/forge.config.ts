@@ -5,7 +5,7 @@ import type { ForgeConfig } from '@electron-forge/shared-types'
 
 const config: ForgeConfig = {
   packagerConfig: {
-    asar: true,
+    // asar: true,
   },
   rebuildConfig: {},
   hooks: {},
@@ -28,10 +28,12 @@ const config: ForgeConfig = {
     },
   ],
   plugins: [
+    /*
     {
       name: '@electron-forge/plugin-auto-unpack-natives',
       config: {},
     },
+    */
     {
       name: '@electron-forge/plugin-vite',
       config: {
