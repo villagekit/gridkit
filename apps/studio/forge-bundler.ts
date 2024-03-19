@@ -9,8 +9,8 @@ import { findRoot } from '@manypkg/find-root'
 import arborist from '@npmcli/arborist'
 
 interface Edge {
+  prod: boolean
   workspace: boolean
-  type: 'prod' | 'dev' | 'peer' | 'optional'
   to: Node
 }
 
@@ -29,17 +29,23 @@ const resolveLink = (node: Node): Node => {
 }
 
 const getWorkspaceByPath = (node: Node, realPath: string): Node | undefined => {
-  return [...node.edgesOut.values()]
+  return Array.from(node.edgesOut.values())
     .filter((depEdge) => depEdge.workspace)
     .map((depEdge) => resolveLink(depEdge.to))
     .find((depNode) => depNode.realpath === realPath)
 }
 
-const collectProdDeps = (node: Node): Node[] => {
-  return [...node.edgesOut.values()]
-    .filter((depEdge) => depEdge.type === 'prod')
+const collectProdWorkspaceDeps = (node: Node, seen: Set<Node> = new Set()): Node[] => {
+  return Array.from(node.edgesOut.values())
+    .filter((depEdge) => depEdge.prod)
     .map((depEdge) => resolveLink(depEdge.to))
-    .flatMap((depNode) => [depNode, ...collectProdDeps(depNode)])
+    .filter((depNode) => depNode.isWorkspace)
+    .filter((depNode) => {
+      if (seen.has(depNode)) return false
+      seen.add(depNode)
+      return true
+    })
+    .flatMap((depNode) => [depNode, ...collectProdWorkspaceDeps(depNode, seen)])
 }
 
 export const bundle = async (source: string, destination: string): Promise<void> => {
@@ -51,12 +57,16 @@ export const bundle = async (source: string, destination: string): Promise<void>
     throw new Error(`Couldn't find source node. [Debug Info] source: ${source} `)
   }
 
-  const prodDeps = collectProdDeps(sourceNode)
+  // console.log('source', source)
 
-  for (const dep of prodDeps) {
-    const dest = dep.isWorkspace
-      ? path.join(destination, 'node_modules', dep.packageName)
-      : path.join(destination, dep.location)
+  const deps = collectProdWorkspaceDeps(sourceNode)
+
+  for (const dep of deps) {
+    // console.log('dep', dep)
+
+    const dest = path.join(destination, 'node_modules', dep.packageName)
+
+    // console.log('cp', dep.realpath, dest)
 
     await fs.cp(dep.realpath, dest, {
       recursive: true,

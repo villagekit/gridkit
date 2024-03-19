@@ -2,7 +2,12 @@
 import type { ConfigEnv, UserConfig } from 'vite'
 import { defineConfig, mergeConfig } from 'vite'
 import tsconfigPaths from 'vite-tsconfig-paths'
-import { external, getBuildConfig, pluginHotRestart } from './vite.base.config'
+import {
+  external,
+  getBuildConfig,
+  pluginHotRestart,
+  quietUseClientDirective,
+} from './vite.base.config'
 
 // https://vitejs.dev/config
 export default defineConfig((env) => {
@@ -22,6 +27,7 @@ export default defineConfig((env) => {
           chunkFileNames: '[name].js',
           assetFileNames: '[name].[ext]',
         },
+        onwarn: quietUseClientDirective,
       },
     },
     plugins: [pluginHotRestart('reload'), tsconfigPaths()],

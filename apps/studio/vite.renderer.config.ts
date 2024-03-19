@@ -3,7 +3,7 @@
 import type { ConfigEnv, UserConfig } from 'vite'
 import { defineConfig } from 'vite'
 import tsconfigPaths from 'vite-tsconfig-paths'
-import { pluginExposeRenderer } from './vite.base.config'
+import { pluginExposeRenderer, quietUseClientDirective } from './vite.base.config'
 
 // https://vitejs.dev/config
 export default defineConfig((env) => {
@@ -17,6 +17,9 @@ export default defineConfig((env) => {
     base: './',
     build: {
       outDir: `.vite/renderer/${name}`,
+      rollupOptions: {
+        onwarn: quietUseClientDirective,
+      },
     },
     plugins: [tsconfigPaths(), pluginExposeRenderer(name)],
     resolve: {

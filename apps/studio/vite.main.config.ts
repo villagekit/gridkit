@@ -2,7 +2,13 @@
 import type { ConfigEnv, UserConfig } from 'vite'
 import { defineConfig, mergeConfig } from 'vite'
 import tsconfigPaths from 'vite-tsconfig-paths'
-import { external, getBuildConfig, getBuildDefine, pluginHotRestart } from './vite.base.config'
+import {
+  external,
+  getBuildConfig,
+  getBuildDefine,
+  pluginHotRestart,
+  quietUseClientDirective,
+} from './vite.base.config'
 
 // https://vitejs.dev/config
 export default defineConfig((env) => {
@@ -18,6 +24,7 @@ export default defineConfig((env) => {
       },
       rollupOptions: {
         external,
+        onwarn: quietUseClientDirective,
       },
     },
     plugins: [pluginHotRestart('restart'), tsconfigPaths()],

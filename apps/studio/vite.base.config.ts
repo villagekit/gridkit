@@ -1,6 +1,6 @@
 import { builtinModules } from 'node:module'
 import type { AddressInfo } from 'node:net'
-import type { ConfigEnv, Plugin, UserConfig } from 'vite'
+import type { BuildOptions, ConfigEnv, Plugin, UserConfig } from 'vite'
 import pkg from './package.json'
 
 export const builtins = ['electron', ...builtinModules.flatMap((m) => [m, `node:${m}`])]
@@ -97,4 +97,13 @@ export function pluginHotRestart(command: 'reload' | 'restart'): Plugin {
       }
     },
   }
+}
+
+// https://github.com/TanStack/query/pull/5161#issuecomment-1506683450
+type RollupOnWarn = NonNullable<BuildOptions['rollupOptions']>['onwarn']
+export const quietUseClientDirective: RollupOnWarn = (warning, warn) => {
+  if (warning.code === 'MODULE_LEVEL_DIRECTIVE' && warning.message.includes(`"use client"`)) {
+    return
+  }
+  warn(warning)
 }
