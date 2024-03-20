@@ -102,3 +102,8 @@ Format code using [Biome](https://biomejs.dev/)
 ```shell
 npm run format
 ```
+
+## Code Decisions
+
+- Published JavaScript modules must be in Node.js-compatible ESM-only format, due to [dual package hazard](https://nodejs.org/api/packages.html#packages_dual_package_hazard)
+  - For example, if your module exports a singleton (e.g. a symbol or React Context), when you publish separate ESM and CJS modules, it's possible (if transitive dependencies are either CJS or ESM) to end up with unequal singletons.
