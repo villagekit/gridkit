@@ -5,7 +5,7 @@ import type { ForgeConfig } from '@electron-forge/shared-types'
 
 const config: ForgeConfig = {
   packagerConfig: {
-    // asar: true,
+    asar: true,
   },
   rebuildConfig: {},
   hooks: {},
@@ -23,17 +23,19 @@ const config: ForgeConfig = {
       config: {},
     },
     {
+      name: 'electron-forge-maker-appimage',
+      config: {},
+    },
+    {
       name: '@electron-forge/maker-rpm',
       config: {},
     },
   ],
   plugins: [
-    /*
     {
       name: '@electron-forge/plugin-auto-unpack-natives',
       config: {},
     },
-    */
     {
       name: '@electron-forge/plugin-vite',
       config: {
