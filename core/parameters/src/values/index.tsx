@@ -1,5 +1,5 @@
 import { Box, VStack } from '@villagekit/ui'
-import { map, mapValues } from 'lodash-es'
+import { map, mapValues } from 'lodash'
 import { useCallback } from 'react'
 import { z } from 'zod'
 import { useParams, useParamsValues, useShowControls, useUpdateParamsValues } from '..'

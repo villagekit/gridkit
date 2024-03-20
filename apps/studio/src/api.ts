@@ -3,7 +3,7 @@ import { basename, join } from 'node:path'
 import { initTRPC } from '@trpc/server'
 import { productMetaSchema } from '@villagekit/product'
 import { app, dialog } from 'electron'
-import { camelCase, kebabCase } from 'lodash-es'
+import { camelCase, kebabCase } from 'lodash'
 import { parse as parseToml, stringify as stringifyToml } from 'smol-toml'
 import { z } from 'zod'
 

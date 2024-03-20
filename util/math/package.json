@@ -20,9 +20,7 @@
     "build:pkg": "tsup src",
     "lint": "biome check ."
   },
-  "dependencies": {
-    "@types/three": "^0.150.1"
-  },
+  "dependencies": {},
   "peerDependencies": {
     "three": "^0.150.1"
   }

@@ -21,7 +21,6 @@
     "lint": "biome check ."
   },
   "dependencies": {
-    "@types/react": "^18.2.37",
     "@villagekit/part-base": "*",
     "@villagekit/util-units": "*",
     "@villagekit/ui": "*",

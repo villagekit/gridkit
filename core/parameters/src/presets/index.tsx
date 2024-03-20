@@ -1,5 +1,5 @@
 import { FormControl, FormLabel, Select } from '@villagekit/ui'
-import { find } from 'lodash-es'
+import { find } from 'lodash'
 import { type ChangeEvent, useCallback } from 'react'
 import { z } from 'zod'
 import {

@@ -1,4 +1,4 @@
-import { debounce, intersection, isEqual } from 'lodash-es'
+import { debounce, intersection, isEqual } from 'lodash'
 import { parse as parseQueryString } from 'query-string'
 import {
   BooleanParam,

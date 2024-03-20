@@ -6,7 +6,7 @@ import {
 } from '@villagekit/part'
 import { SummaryContextProvider } from '@villagekit/part-base'
 import type { ProductSummaryProps } from '@villagekit/product'
-import { debounce } from 'lodash-es'
+import { debounce } from 'lodash'
 import { useEffect, useMemo, useState } from 'react'
 import { useProductKitContext } from './context'
 

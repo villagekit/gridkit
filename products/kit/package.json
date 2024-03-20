@@ -24,10 +24,6 @@
   "dependencies": {
     "@jridgewell/trace-mapping": "^0.3.25",
     "@swc/wasm-web": "^1.4.2",
-    "@types/lodash-es": "^4.17.12",
-    "@types/node": "^20.5.2",
-    "@types/react": "^18.2.0",
-    "@types/three": "^0.150.1",
     "@villagekit/parameters": "*",
     "@villagekit/part": "*",
     "@villagekit/part-base": "*",
@@ -38,7 +34,7 @@
     "comlink": "^4.4.1",
     "dnum": "^2.9.0",
     "errorstacks": "^2.4.1",
-    "lodash-es": "^4.17.21",
+    "lodash": "^4.17.21",
     "react-icons": "^4.10.1",
     "p-debounce": "^4.0.0",
     "zod": "^3.22.4"
