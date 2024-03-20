@@ -18,7 +18,7 @@ import {
   type ProductTypeProviderProps,
   useUpdateProductError,
 } from '@villagekit/product'
-import { map, uniq } from 'lodash'
+import { map, uniq } from 'lodash-es'
 import pDebounce from 'p-debounce'
 import { createContext, useContext, useEffect, useMemo, useState } from 'react'
 import type { Box3 } from 'three'

@@ -23,7 +23,7 @@
     "@villagekit/part": "*",
     "@villagekit/ui": "*",
     "@xstate/react": "^4.1.0",
-    "lodash": "^4.17.21",
+    "lodash-es": "^4.17.21",
     "react-icons": "^5.0.1",
     "use-fit-text-new": "^3.0.0",
     "xstate": "^5.9.1",

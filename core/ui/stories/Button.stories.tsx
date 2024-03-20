@@ -1,6 +1,6 @@
 import { HStack, Icon } from '@chakra-ui/react'
 import type { Meta, StoryObj } from '@storybook/react'
-import { capitalize } from 'lodash'
+import { capitalize } from 'lodash-es'
 import { FaSearch } from 'react-icons/fa/index.js'
 
 import { Button, type ButtonProps, buttonTheme } from '../src/components/Button.js'

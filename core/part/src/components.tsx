@@ -1,4 +1,4 @@
-import { groupBy, map } from 'lodash'
+import { groupBy, map } from 'lodash-es'
 import type React from 'react'
 import { useMemo } from 'react'
 import { type PartGlValue, type PartState, type PartSummaryValue, getPartModule } from './index'

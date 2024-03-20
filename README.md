@@ -22,23 +22,25 @@ To get started with the CAD-as-code modular design app.
 
 #### `@villagekit/parameters`: Module Parameters
 
-#### `@villagekit/product`: Modular Product
+#### `@villagekit/part`: Modular Part Type Dispatcher
+
+#### `@villagekit/product`: Modular Product Type Dispatcher
 
 #### `@villagekit/sandbox`: Product Renderer
 
-### `part`: Modular Parts
+#### `@villagekit/design`: User-facing modeling interface
 
-#### `@villagekit/part`
+### `part`: Modular Part Types
 
 #### `@villagekit/part-gridbeam`
 
 #### `@villagekit/part-gridpanel`
 
+### `product`: Modular Product Types
+
+#### `@villagekit/part-kit`
+
 ### `dev` Developer tools
-
-#### `@villagekit/eslint-config`
-
-Shared ESLint configs.
 
 #### `@villagekit/tsconfig`
 

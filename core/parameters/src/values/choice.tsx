@@ -1,5 +1,5 @@
 import { FormControl, Select as SelectComponent } from '@villagekit/ui'
-import { map } from 'lodash'
+import { map } from 'lodash-es'
 import { type ChangeEvent, useCallback } from 'react'
 import * as SerializeQueryParams from 'serialize-query-params'
 import { z } from 'zod'

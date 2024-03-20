@@ -1,6 +1,6 @@
 import { HStack } from '@chakra-ui/react'
 import type { Meta, StoryObj } from '@storybook/react'
-import { capitalize } from 'lodash'
+import { capitalize } from 'lodash-es'
 
 import { buttonTheme } from '../src/components/Button.js'
 import { LinkButton, type LinkButtonProps } from '../src/components/LinkButton.js'

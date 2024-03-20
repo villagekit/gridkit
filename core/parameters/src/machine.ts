@@ -1,4 +1,4 @@
-import { debounce, intersection, isEqual } from 'lodash'
+import { debounce, intersection, isEqual } from 'lodash-es'
 import { parse as parseQueryString } from 'query-string'
 import type { DecodedValueMap, EncodedValueMap, QueryParamConfigMap } from 'serialize-query-params'
 import * as SerializeQueryParams from 'serialize-query-params'

@@ -1,5 +1,5 @@
 import { type PartCreator, type PartState, calculateStateForAll } from '@villagekit/part'
-import { flatten } from 'lodash'
+import { flatten } from 'lodash-es'
 
 export interface Plugin<PluginState = unknown> {
   init?: () => void
