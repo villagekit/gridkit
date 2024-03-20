@@ -11,6 +11,7 @@
     "lint": "turbo lint",
     "format": "biome check --apply .",
     "format:unsafe": "biome check --apply-unsafe .",
+    "publint": "turbo publint",
     "test": "turbo test"
   },
   "devDependencies": {
@@ -24,7 +25,9 @@
     "@types/three": "^0.150.1",
     "@villagekit/tsconfig": "*",
     "concurrently": "^8.2.2",
+    "esbuild-plugin-file-path-extensions": "^2.0.0",
     "patch-package": "^8.0.0",
+    "publint": "^0.2.7",
     "tsup": "^8.0.2",
     "tsx": "^4.7.0",
     "turbo": "^1.12.5",
