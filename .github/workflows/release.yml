@@ -9,9 +9,18 @@ on:
 
 jobs:
   studio:
-    name: release-studio
+    strategy:
+      matrix:
+        os:
+          - ubuntu-22.04
+          - windows-2022
+          - macos-12
 
-    runs-on: ["ubuntu-22.04", "windows-2022", "macos-12"]
+      fail-fast: false
+
+    name: release-studio-${{ matrix.os }}
+
+    runs-on: ${{ matrix.os }}
 
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
