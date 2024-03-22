@@ -6,6 +6,7 @@ import type { ForgeConfig } from '@electron-forge/shared-types'
 const config: ForgeConfig = {
   packagerConfig: {
     asar: true,
+    executableName: 'VillageKit-Studio'
   },
   rebuildConfig: {},
   hooks: {},
@@ -20,11 +21,9 @@ const config: ForgeConfig = {
     },
     {
       name: '@electron-forge/maker-deb',
-      config: {},
-    },
-    {
-      name: 'electron-forge-maker-appimage',
-      config: {},
+      config: {
+        bin: 'VillageKit-Studio'
+      },
     },
   ],
   plugins: [

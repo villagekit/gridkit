@@ -1,6 +1,6 @@
 {
   "name": "@villagekit/studio",
-  "productName": "Village Kit Design Studio",
+  "productName": "Village Kit Studio",
   "version": "0.0.0",
   "private": true,
   "description": "Design modular products with Village Kit",
@@ -24,7 +24,6 @@
     "@electron-forge/plugin-vite": "^7.3.0",
     "electron": "^28.2.2",
     "electron-devtools-installer": "^3.2.0",
-    "electron-forge-maker-appimage": "^25.0.0-alpha.5",
     "typescript": "^5",
     "vite": "^5.1.6"
   },
