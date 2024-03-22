@@ -47,7 +47,7 @@ jobs:
         run: npm install
 
       - name: Builds workspace packages
-        run: FORCE_COLOR=1 npm run build:pkg
+        run: npm run build:pkg
 
       - name: Package, make, and publish studio app
-        run: FORCE_COLOR=1 npm run -w '@villagekit/studio' publish
+        run: npm run -w '@villagekit/studio' publish
