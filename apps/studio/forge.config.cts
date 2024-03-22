@@ -1,15 +1,25 @@
 import { FusesPlugin } from '@electron-forge/plugin-fuses'
 import { FuseV1Options, FuseVersion } from '@electron/fuses'
-
-import type { ForgeConfig } from '@electron-forge/shared-types'
+import type { ForgeConfig, ResolvedForgeConfig } from '@electron-forge/shared-types'
+import { rm } from 'fs/promises'
+import { join } from 'path'
 
 const config: ForgeConfig = {
   packagerConfig: {
     asar: true,
-    executableName: 'VillageKit-Studio'
+    executableName: 'VillageKit-Studio',
+    prune: false,
   },
   rebuildConfig: {},
-  hooks: {},
+  hooks: {
+    postPackage: async (_forgeConfig: ResolvedForgeConfig, options: { platform: string, arch: string, outputPaths: Array<string> }) => {
+      // remove unnecessary node_modules
+      const { outputPaths } = options
+      for (const outputPath of outputPaths) {
+        await rm(join(outputPath, 'node_modules'), { recursive: true })
+      }
+    }
+  },
   makers: [
     {
       name: '@electron-forge/maker-squirrel',
