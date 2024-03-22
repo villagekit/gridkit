@@ -11,7 +11,7 @@ jobs:
   studio:
     name: release-studio
 
-    runs-on: [windows-latest, ubuntu-latest, macos-latest]
+    runs-on: [ubuntu-22.04, windows-2022, macos-12]
 
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
