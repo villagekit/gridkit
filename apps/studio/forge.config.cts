@@ -26,10 +26,6 @@ const config: ForgeConfig = {
       name: 'electron-forge-maker-appimage',
       config: {},
     },
-    {
-      name: '@electron-forge/maker-rpm',
-      config: {},
-    },
   ],
   plugins: [
     {
