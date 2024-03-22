@@ -16,8 +16,8 @@
   },
   "sideEffects": false,
   "scripts": {
-    "build:types:kit": "dts-bundle-generator --project '../../tsconfig.json' --external-inlines 'zod' --inline-declare-global --export-referenced-types -o ./dist-type-bundles/kit.d.ts --no-check ./src/kit.ts",
-    "build:pkg": "npm run build:types:kit && tsup src --no-splitting",
+    "build:types": "dts-bundle-generator --config ./dts-bundle-generator.json",
+    "build:pkg": "npm run build:types && tsup src --no-splitting",
     "lint": "biome check .",
     "publint": "publint"
   },
