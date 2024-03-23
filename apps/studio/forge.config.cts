@@ -23,7 +23,9 @@ const config: ForgeConfig = {
   makers: [
     {
       name: '@electron-forge/maker-squirrel',
-      config: {},
+      config: {
+        name: 'VillageKit-Studio'
+      },
     },
     {
       name: '@electron-forge/maker-zip',
