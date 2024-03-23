@@ -1,9 +1,9 @@
 import { FusesPlugin } from '@electron-forge/plugin-fuses'
 import { FuseV1Options, FuseVersion } from '@electron/fuses'
 import type { ForgeConfig, ResolvedForgeConfig } from '@electron-forge/shared-types'
-import { rm } from 'fs/promises'
-import { join } from 'path'
-import { existsSync } from 'fs'
+import { rm } from 'node:fs/promises'
+import { join } from 'node:path'
+import { existsSync } from 'node:fs'
 
 const config: ForgeConfig = {
   packagerConfig: {
@@ -17,6 +17,7 @@ const config: ForgeConfig = {
       // remove unnecessary node_modules
       const { outputPaths } = options
       for (const outputPath of outputPaths) {
+        console.log('oOoOoOput path', outputPath)
         const nodeModulesPath = join(outputPath, 'node_modules')
         if (existsSync(nodeModulesPath)) {
           await rm(nodeModulesPath, { recursive: true })
