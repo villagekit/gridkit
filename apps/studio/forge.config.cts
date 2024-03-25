@@ -97,11 +97,3 @@ const config: ForgeConfig = {
 }
 
 export default config
-
-async function rmIfExists(path: string) {
-  if (existsSync(path)) {
-    await rm(path, { recursive: true })
-    return true
-  }
-  return false
-}
