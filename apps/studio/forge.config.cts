@@ -1,9 +1,9 @@
-import { FusesPlugin } from '@electron-forge/plugin-fuses'
-import { FuseV1Options, FuseVersion } from '@electron/fuses'
-import type { ForgeConfig, ResolvedForgeConfig } from '@electron-forge/shared-types'
+import { existsSync } from 'node:fs'
 import { rm } from 'node:fs/promises'
 import { join } from 'node:path'
-import { existsSync } from 'node:fs'
+import { FusesPlugin } from '@electron-forge/plugin-fuses'
+import type { ForgeConfig, ResolvedForgeConfig } from '@electron-forge/shared-types'
+import { FuseV1Options, FuseVersion } from '@electron/fuses'
 
 const config: ForgeConfig = {
   packagerConfig: {
@@ -14,24 +14,28 @@ const config: ForgeConfig = {
   },
   rebuildConfig: {},
   hooks: {
-    postPackage: async (forgeConfig: ResolvedForgeConfig, options: { platform: string, arch: string, outputPaths: Array<string> }) => {
+    postPackage: async (
+      forgeConfig: ResolvedForgeConfig,
+      options: { platform: string; arch: string; outputPaths: Array<string> },
+    ) => {
       // remove unnecessary node_modules
       const { platform, outputPaths } = options
       for (const outputPath of outputPaths) {
-        const nodeModulesPath = platform !== 'darwin'
-          ? join(outputPath, 'node_modules')
-          : join(outputPath, `${forgeConfig.packagerConfig.name}.app`, 'Contents', 'node_modules')
+        const nodeModulesPath =
+          platform !== 'darwin'
+            ? join(outputPath, 'node_modules')
+            : join(outputPath, `${forgeConfig.packagerConfig.name}.app`, 'Contents', 'node_modules')
         if (existsSync(nodeModulesPath)) {
           await rm(nodeModulesPath, { recursive: true })
         }
       }
-    }
+    },
   },
   makers: [
     {
       name: '@electron-forge/maker-squirrel',
       config: {
-        name: 'VillageKit-Studio'
+        name: 'VillageKit-Studio',
       },
     },
     {
@@ -41,7 +45,7 @@ const config: ForgeConfig = {
     {
       name: '@electron-forge/maker-deb',
       config: {
-        bin: 'VillageKit-Studio'
+        bin: 'VillageKit-Studio',
       },
     },
   ],
@@ -51,11 +55,11 @@ const config: ForgeConfig = {
       config: {
         repository: {
           owner: 'villagekit',
-          name: 'villagekit'
+          name: 'villagekit',
         },
-        prerelease: true
-      }
-    }
+        prerelease: true,
+      },
+    },
   ],
   plugins: [
     {
