@@ -8,27 +8,49 @@ Open source software to power [Village Kit](https://villagekit.com/):
 
 To get started with the CAD-as-code modular design app.
 
+Download the [latest app release](https://github.com/villagekit/villagekit/releases).
+
+For an example workspace of modular products, see [`villagekit/products`](https://github.com/villagekit/products).
+
 ## Code Overview
 
-### `apps`: Applications
+### `apps`
 
-#### `@villagekit/studio`: A CAD-as-code app for designing products
+Applications
 
-#### `@villagekit/storybook`: A Storybook app
+#### `@villagekit/studio`
+
+A CAD-as-code app for designing products
+
+#### `@villagekit/storybook`
+
+A Storybook app
 
 ### `ui`: User interface
 
-#### `@villagekit/ui`: Base Component Library
+#### `@villagekit/ui`
 
-#### `@villagekit/parameters`: Module Parameters
+Base component library
 
-#### `@villagekit/part`: Modular Part Type Dispatcher
+#### `@villagekit/parameters`:
 
-#### `@villagekit/product`: Modular Product Type Dispatcher
+Module parameters
 
-#### `@villagekit/sandbox`: Product Renderer
+#### `@villagekit/part`:
 
-#### `@villagekit/design`: User-facing modeling interface
+Modular part type dispatcher
+
+#### `@villagekit/product`:
+
+Modular product type dispatcher
+
+#### `@villagekit/sandbox`:
+
+WebGL product renderer
+
+#### `@villagekit/design`:
+
+User-facing code-as-CAD modeling interface
 
 ### `part`: Modular Part Types
 
@@ -38,13 +60,19 @@ To get started with the CAD-as-code modular design app.
 
 ### `product`: Modular Product Types
 
-#### `@villagekit/part-kit`
+#### `@villagekit/product-kit`
+
+### `util`: Utility libraries
+
+#### `@villagekit/util-units`
+
+#### `@villagekit/util-math`
 
 ### `dev` Developer tools
 
 #### `@villagekit/tsconfig`
 
-Shared TypeScript configs.
+Shared TypeScript configs
 
 ## Development
 
@@ -105,5 +133,4 @@ npm run format
 
 ## Code Decisions
 
-- Published JavaScript modules must be in Node.js-compatible ESM-only format, due to [dual package hazard](https://nodejs.org/api/packages.html#packages_dual_package_hazard)
-  - For example, if your module exports a singleton (e.g. a symbol or React Context), when you publish separate ESM and CJS modules, it's possible (if transitive dependencies are either CJS or ESM) to end up with unequal singletons.
+- Published JavaScript modules are in Node.js-compatible ESM-only format, due to [dual package hazard](https://nodejs.org/api/packages.html#packages_dual_package_hazard)
