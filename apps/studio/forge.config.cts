@@ -17,12 +17,18 @@ const config: ForgeConfig = {
     postPackage: async (forgeConfig: ResolvedForgeConfig, options: { platform: string, arch: string, outputPaths: Array<string> }) => {
       // remove unnecessary node_modules
       const { platform, outputPaths } = options
+      console.log('ooooOOoooOOoOooOOoOoo')
       for (const outputPath of outputPaths) {
+        console.log('output path', outputPath)
         const nodeModulesPath = platform !== 'darwin'
           ? join(outputPath, 'node_modules')
           : join(outputPath, `${forgeConfig.packagerConfig.name}.app`, 'Contents', 'node_modules')
+        console.log('node modules path', nodeModulesPath)
         if (existsSync(nodeModulesPath)) {
+          console.log('exists rm')
           await rm(nodeModulesPath, { recursive: true })
+        } else {
+          console.log('no exists rm')
         }
       }
     }
