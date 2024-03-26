@@ -1,7 +1,7 @@
 import { FusesPlugin } from '@electron-forge/plugin-fuses'
 import { FuseV1Options, FuseVersion } from '@electron/fuses'
 import type { ForgeConfig, ResolvedForgeConfig } from '@electron-forge/shared-types'
-import { rm } from 'node:fs/promises'
+import { readdir, rm } from 'node:fs/promises'
 import { join } from 'node:path'
 import { existsSync } from 'node:fs'
 
@@ -15,14 +15,27 @@ const config: ForgeConfig = {
   hooks: {
     postPackage: async (_forgeConfig: ResolvedForgeConfig, options: { platform: string, arch: string, outputPaths: Array<string> }) => {
       // remove unnecessary node_modules
-      const { platform, outputPaths } = options
+      // const { platform, outputPaths } = options
+      const { outputPaths } = options
       for (const outputPath of outputPaths) {
+        console.log('oOoOoOoOoOoOo')
+        console.log('output path', outputPath)
+        console.log('readdir', await readdir(outputPath))
+        for (const dir of await readdir(outputPath)) {
+          console.log('-> readdir', await readdir(dir))
+          for (const dir2 of await readdir(dir)) {
+            console.log('--> readdir', await readdir(dir2))
+          }
+        }
+        throw new Error('failed')
+        /*
         const nodeModulesPath = platform !== 'darwin'
           ? join(outputPath, 'node_modules')
           : join(outputPath, 'Contents', 'node_modules')
         if (existsSync(nodeModulesPath)) {
           await rm(nodeModulesPath, { recursive: true })
         }
+        */
       }
     }
   },
