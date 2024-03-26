@@ -1,9 +1,10 @@
 import { FusesPlugin } from '@electron-forge/plugin-fuses'
 import { FuseV1Options, FuseVersion } from '@electron/fuses'
 import type { ForgeConfig, ResolvedForgeConfig } from '@electron-forge/shared-types'
-import { readdir, rm } from 'node:fs/promises'
-import { join } from 'node:path'
-import { existsSync } from 'node:fs'
+// import { readdir, rm } from 'node:fs/promises'
+import { readdir } from 'node:fs/promises'
+// import { join } from 'node:path'
+// import { existsSync } from 'node:fs'
 
 const config: ForgeConfig = {
   packagerConfig: {
