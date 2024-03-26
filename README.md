@@ -26,49 +26,59 @@ A CAD-as-code app for designing products
 
 A Storybook app
 
-### `ui`: User interface
+### `core`
+
+Core modules
 
 #### `@villagekit/ui`
 
 Base component library
 
-#### `@villagekit/parameters`:
+#### `@villagekit/parameters`
 
 Module parameters
 
-#### `@villagekit/part`:
+#### `@villagekit/part`
 
 Modular part type dispatcher
 
-#### `@villagekit/product`:
+#### `@villagekit/product`
 
 Modular product type dispatcher
 
-#### `@villagekit/sandbox`:
+#### `@villagekit/sandbox`
 
 WebGL product renderer
 
-#### `@villagekit/design`:
+#### `@villagekit/design`
 
 User-facing code-as-CAD modeling interface
 
-### `part`: Modular Part Types
+### `part`
+
+Modular part types
 
 #### `@villagekit/part-gridbeam`
 
 #### `@villagekit/part-gridpanel`
 
-### `product`: Modular Product Types
+### `product`
+
+Modular product types
 
 #### `@villagekit/product-kit`
 
-### `util`: Utility libraries
+### `util`
+
+Utility libraries
 
 #### `@villagekit/util-units`
 
 #### `@villagekit/util-math`
 
-### `dev` Developer tools
+### `dev`
+
+Developer tools
 
 #### `@villagekit/tsconfig`
 
@@ -78,20 +88,17 @@ Shared TypeScript configs
 
 To get started, first we need to install [`nvm`](https://github.com/nvm-sh/nvm) (or similar).
 
-```shell
-nvm install --lts
-```
-
 Then clone this git repo:
 
 ```shell
 git clone https://github.com/villagekit/villagekit
 ```
 
-Then move inside and install the dependencies.
+Then move inside, install Node, and install the project dependencies.
 
 ```shell
 cd villagekit
+nvm install
 npm install
 ```
 
