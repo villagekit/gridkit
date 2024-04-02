@@ -58,8 +58,14 @@ export const router = t.router({
     .input(z.object({ workspace: workspaceConfigSchema }))
     .mutation(async function addWorkspace(opts) {
       const { workspace } = opts.input
+
+      const workspacePath = workspace.path
+      const workspaceProductsPath = join(workspacePath, 'products')
+      await mkdir(workspaceProductsPath, { recursive: true })
+
       const config = await loadAppConfig()
       config.workspaces.push(workspace)
+
       await saveAppConfig(config)
     }),
   removeWorkspace: t.procedure
