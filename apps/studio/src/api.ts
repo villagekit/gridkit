@@ -63,6 +63,10 @@ export const router = t.router({
       const workspaceProductsPath = join(workspacePath, 'products')
       await mkdir(workspaceProductsPath, { recursive: true })
 
+      // TODO create villagekit.toml file
+      // [workspace]
+      // products = "products/*"
+
       const config = await loadAppConfig()
       config.workspaces.push(workspace)
 
@@ -81,6 +85,9 @@ export const router = t.router({
     .output(z.array(productIndexSchema))
     .query(async function listProduct(opts) {
       const { workspacePath } = opts.input
+
+      // TODO lookup villagekit.toml to get workspace products path matcher
+
       const workspaceProductsPath = join(workspacePath, 'products')
       const products = []
       const dirEntries = await readdir(workspaceProductsPath)
@@ -93,6 +100,9 @@ export const router = t.router({
       }
       return products
     }),
+
+  // TODO createProduct({ productPath, productMeta })
+
   getProductMeta: t.procedure
     .input(z.object({ productPath: productPathSchema }))
     .query(async function getProductMeta(opts) {
@@ -103,7 +113,6 @@ export const router = t.router({
       const productMeta = productMetaFile.product
       return productMeta
     }),
-
   getProductFile: t.procedure
     .input(z.object({ productPath: productPathSchema, filePath: pathSchema }))
     .query(async function getProductFile(opts) {
@@ -111,6 +120,13 @@ export const router = t.router({
       const productFilePath = join(productPath, filePath)
       const fileData = await readFile(productFilePath, 'utf8')
       return fileData
+    }),
+  putProductFile: t.procedure
+    .input(z.object({ productPath: productPathSchema, filePath: pathSchema, fileData: z.string() }))
+    .query(async function putProductFile(opts) {
+      const { productPath, filePath, fileData } = opts.input
+      const productFilePath = join(productPath, filePath)
+      await writeFile(productFilePath, fileData, 'utf8')
     }),
 })
 
