@@ -113,6 +113,15 @@ export const router = t.router({
       const productMeta = productMetaFile.product
       return productMeta
     }),
+  putProductMeta: t.procedure
+    .input(z.object({ productPath: productPathSchema, productMeta: productMetaSchema }))
+    .mutation(async function getProductMeta(opts) {
+      const { productPath, productMeta } = opts.input
+      const productMetaPath = join(productPath, 'villagekit.toml')
+      const productMetaFile = { product: productMeta }
+      await writeTomlFile(productMetaPath, productMetaFile)
+    }),
+
   getProductFile: t.procedure
     .input(z.object({ productPath: productPathSchema, filePath: pathSchema }))
     .query(async function getProductFile(opts) {
@@ -123,7 +132,7 @@ export const router = t.router({
     }),
   putProductFile: t.procedure
     .input(z.object({ productPath: productPathSchema, filePath: pathSchema, fileData: z.string() }))
-    .query(async function putProductFile(opts) {
+    .mutation(async function putProductFile(opts) {
       const { productPath, filePath, fileData } = opts.input
       const productFilePath = join(productPath, filePath)
       await writeFile(productFilePath, fileData, 'utf8')
