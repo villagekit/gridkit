@@ -19,6 +19,7 @@ export interface GridPanelVariant {
 
 export type GridPanelFit = 'top' | 'bottom'
 export type GridPanelHoles = boolean | Array<[number, number]>
+export type GridPanelHoleVariant = 'half' | 'through'
 
 export interface GridPanelState extends BaseGridPartState {
   type: GridPanelType
@@ -31,11 +32,13 @@ export interface GridPanelState extends BaseGridPartState {
   crossLength: number
   thicknessAxis: AxisId
   thicknessStart: number
-  fit?: GridPanelFit
-  holes?: GridPanelHoles
+  fit: GridPanelFit
+  holes: GridPanelHoles
+  holeVariant: GridPanelHoleVariant
 }
 
 export interface GridPanelGlValue extends GridPanelState {
+  fit: GridPanelFit
   gridLengthInMeters: number
   holeDiameterInMeters: number
   thicknessInMeters: number

@@ -14,7 +14,7 @@ import type { GridPanelGlValue, GridPanelState, GridPanelSummaryValue } from './
 export function calculateGlValue(state: GridPanelState): GridPanelGlValue {
   const {
     variant: { gridLength, holeDiameter, thickness },
-    fit = 'bottom',
+    fit,
     mainAxis,
     mainStart,
     mainLength,
@@ -56,7 +56,6 @@ export function calculateGlValue(state: GridPanelState): GridPanelGlValue {
     ...state,
     crossAxis,
     crossLength,
-    fit,
     gridLengthInMeters,
     holeDiameterInMeters,
     locationInGrids,

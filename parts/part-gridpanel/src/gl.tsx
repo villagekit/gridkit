@@ -19,7 +19,7 @@ import {
   Vector3,
 } from 'three'
 import { getEveryHolePosition } from './helpers'
-import type { GridPanelGlValue } from './types'
+import type { GridPanelFit, GridPanelGlValue, GridPanelHoleVariant } from './types'
 
 export function PartsGl(props: PartsGlProps<GridPanelGlValue>) {
   const { parts, ...restProps } = props
@@ -51,7 +51,9 @@ export function PartGl(props: PartGlProps) {
       thicknessAxis,
       locationInMeters,
       sizeInMeters,
-      holes = true,
+      fit,
+      holes,
+      holeVariant,
       variant: { id: variantId, materials },
     },
   } = props
@@ -77,7 +79,9 @@ export function PartGl(props: PartGlProps) {
             gridLengthInMeters={gridLengthInMeters}
             holeDiameterInMeters={holeDiameterInMeters}
             thicknessInMeters={thicknessInMeters}
+            fit={fit}
             holes={holes}
+            holeVariant={holeVariant}
           />
         )}
       </Panel>
@@ -201,7 +205,9 @@ interface HolesProps {
   gridLengthInMeters: number
   holeDiameterInMeters: number
   thicknessInMeters: number
+  fit: GridPanelFit
   holes: true | Array<[number, number]>
+  holeVariant: GridPanelHoleVariant
 }
 
 function Holes(props: HolesProps) {
@@ -214,7 +220,9 @@ function Holes(props: HolesProps) {
     gridLengthInMeters,
     holeDiameterInMeters,
     thicknessInMeters,
+    fit,
     holes,
+    holeVariant,
   } = props
   const holeRadius = holeDiameterInMeters / 2
 
@@ -243,7 +251,9 @@ function Holes(props: HolesProps) {
   const mesh = useMemo(() => {
     const holePositions = holes === true ? getEveryHolePosition([mainLength, crossLength]) : holes
 
-    const m = new InstancedMesh(geometry, material, 2 * holePositions.length)
+    const numHoleMeshes =
+      holeVariant === 'through' ? 2 * holePositions.length : holePositions.length
+    const m = new InstancedMesh(geometry, material, numHoleMeshes)
     const dummy = new Object3D()
 
     for (let holePositionIndex = 0; holePositionIndex < holePositions.length; holePositionIndex++) {
@@ -252,29 +262,35 @@ function Holes(props: HolesProps) {
       const [mainIndex, crossIndex] = holePosition
       const mIndex = 2 * holePositionIndex
 
+      console.log('holeVariant', holeVariant)
+
       // up
-      dummy.setRotationFromQuaternion(upQuaternion)
-      dummy.position.set(
-        ...axisValuesToVector({
-          [crossAxis]: (1 / 2 + crossIndex) * gridLengthInMeters,
-          [mainAxis]: (1 / 2 + mainIndex) * gridLengthInMeters,
-          [thicknessAxis]: 1e-4 + thicknessInMeters,
-        } as AxisValues),
-      )
-      dummy.updateMatrix()
-      m.setMatrixAt(mIndex, dummy.matrix)
+      if (holeVariant === 'through' || (holeVariant === 'half' && fit === 'top')) {
+        dummy.setRotationFromQuaternion(upQuaternion)
+        dummy.position.set(
+          ...axisValuesToVector({
+            [crossAxis]: (1 / 2 + crossIndex) * gridLengthInMeters,
+            [mainAxis]: (1 / 2 + mainIndex) * gridLengthInMeters,
+            [thicknessAxis]: 1e-4 + thicknessInMeters,
+          } as AxisValues),
+        )
+        dummy.updateMatrix()
+        m.setMatrixAt(mIndex, dummy.matrix)
+      }
 
       // down
-      dummy.setRotationFromQuaternion(downQuaternion)
-      dummy.position.set(
-        ...axisValuesToVector({
-          [crossAxis]: (1 / 2 + crossIndex) * gridLengthInMeters,
-          [mainAxis]: (1 / 2 + mainIndex) * gridLengthInMeters,
-          [thicknessAxis]: -1e-4,
-        } as AxisValues),
-      )
-      dummy.updateMatrix()
-      m.setMatrixAt(mIndex + 1, dummy.matrix)
+      if (holeVariant === 'through' || (holeVariant === 'half' && fit === 'bottom')) {
+        dummy.setRotationFromQuaternion(downQuaternion)
+        dummy.position.set(
+          ...axisValuesToVector({
+            [crossAxis]: (1 / 2 + crossIndex) * gridLengthInMeters,
+            [mainAxis]: (1 / 2 + mainIndex) * gridLengthInMeters,
+            [thicknessAxis]: -1e-4,
+          } as AxisValues),
+        )
+        dummy.updateMatrix()
+        m.setMatrixAt(mIndex + 1, dummy.matrix)
+      }
     }
 
     return m
@@ -290,7 +306,9 @@ function Holes(props: HolesProps) {
     material,
     upQuaternion,
     downQuaternion,
+    fit,
     holes,
+    holeVariant,
   ])
 
   return <primitive name="gridpanel-holes" object={mesh} />

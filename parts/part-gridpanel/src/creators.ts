@@ -1,17 +1,21 @@
 import type { BasePartCreator } from '@villagekit/part-base'
 import { AxisId } from '@villagekit/util-math'
-import type { GridPanelState } from './types'
+import type { GridPanelFit, GridPanelHoleVariant, GridPanelHoles, GridPanelState } from './types'
 import { gridPanelVariants } from './variants'
 
 export type GridPanelCreator = GridPanelXY | GridPanelYZ | GridPanelXZ
 
 const getDefaultVariantId = (): keyof typeof gridPanelVariants => '40mm:8mm:12mm:douglas-fir'
+const DEFAULT_FIT: GridPanelFit = 'bottom'
+const DEFAULT_HOLES: GridPanelHoles = true
+const DEFAULT_HOLE_VARIANT: GridPanelHoleVariant = 'half'
 
 interface BaseGridPanelOptions extends BasePartCreator {
   id: string
   variant?: keyof typeof gridPanelVariants
   fit?: GridPanelState['fit']
   holes?: GridPanelState['holes']
+  holeVariant?: GridPanelState['holeVariant']
 }
 
 interface GridPanelXY extends BaseGridPanelOptions {
@@ -22,7 +26,16 @@ interface GridPanelXY extends BaseGridPanelOptions {
 }
 
 function calculateXYState(creator: GridPanelXY): GridPanelState {
-  const { id, x, y, z, variant: variantId = getDefaultVariantId(), fit, holes } = creator
+  const {
+    id,
+    x,
+    y,
+    z,
+    variant: variantId = getDefaultVariantId(),
+    fit = DEFAULT_FIT,
+    holes = DEFAULT_HOLES,
+    holeVariant = DEFAULT_HOLE_VARIANT,
+  } = creator
 
   const mainAxis = AxisId.X
   const mainStart = Math.min(x[0], x[1])
@@ -42,6 +55,7 @@ function calculateXYState(creator: GridPanelXY): GridPanelState {
     crossStart,
     fit,
     holes,
+    holeVariant,
     id,
     mainAxis,
     mainLength,
@@ -61,7 +75,17 @@ interface GridPanelYZ extends BaseGridPanelOptions {
 }
 
 function calculateYZState(creator: GridPanelYZ): GridPanelState {
-  const { id, x, y, z, variant: variantId = getDefaultVariantId(), fit, holes } = creator
+  const {
+    id,
+    x,
+    y,
+    z,
+    variant: variantId = getDefaultVariantId(),
+
+    fit = DEFAULT_FIT,
+    holes = DEFAULT_HOLES,
+    holeVariant = DEFAULT_HOLE_VARIANT,
+  } = creator
 
   const mainAxis = AxisId.Y
   const mainStart = Math.min(y[0], y[1])
@@ -81,6 +105,7 @@ function calculateYZState(creator: GridPanelYZ): GridPanelState {
     crossStart,
     fit,
     holes,
+    holeVariant,
     id,
     mainAxis,
     mainLength,
@@ -100,7 +125,17 @@ interface GridPanelXZ extends BaseGridPanelOptions {
 }
 
 function calculateXZState(creator: GridPanelXZ): GridPanelState {
-  const { id, x, y, z, variant: variantId = getDefaultVariantId(), fit, holes } = creator
+  const {
+    id,
+    x,
+    y,
+    z,
+    variant: variantId = getDefaultVariantId(),
+
+    fit = DEFAULT_FIT,
+    holes = DEFAULT_HOLES,
+    holeVariant = DEFAULT_HOLE_VARIANT,
+  } = creator
 
   const mainAxis = AxisId.X
   const mainStart = Math.min(x[0], x[1])
@@ -120,6 +155,7 @@ function calculateXZState(creator: GridPanelXZ): GridPanelState {
     crossStart,
     fit,
     holes,
+    holeVariant,
     id,
     mainAxis,
     mainLength,
