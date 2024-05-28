@@ -5,7 +5,7 @@ import {
   type ProductModule,
 } from '@villagekit/product'
 import { ProductKit } from '@villagekit/product-kit'
-import { type PropsWithChildren, useEffect } from 'react'
+import { type PropsWithChildren, useCallback, useEffect } from 'react'
 import { useEditorContext } from './editor'
 
 export type ProductOptions = {
@@ -55,6 +55,11 @@ function useProductEntry(options: ProductOptions): ProductEntry {
     setEditorCode(productExportsQuery.data)
   }, [productExportsQuery.isSuccess, productExportsQuery.data, setEditorCode])
 
+  const putProductMetaMutation = client.putProductMeta.useMutation()
+  const putProductFileMutation = client.putProductFile.useMutation()
+
+  const createProduct = useCallback((productName: string) => {}, [])
+
   if (!productMetaQuery.isSuccess) return null
   if (!productExportsQuery.isSuccess) return null
 
@@ -63,3 +68,26 @@ function useProductEntry(options: ProductOptions): ProductEntry {
     code: editorCode,
   }
 }
+
+/*
+
+  putProductMeta: t.procedure
+    .input(z.object({ productPath: productPathSchema, productMeta: productMetaSchema }))
+    .mutation(async function getProductMeta(opts) {
+      const { productPath, productMeta } = opts.input
+      const productMetaPath = join(productPath, 'villagekit.toml')
+      const productMetaFile = { product: productMeta }
+      await writeTomlFile(productMetaPath, productMetaFile)
+    }),
+
+  getProductFile: t.procedure
+    .input(z.object({ productPath: productPathSchema, filePath: pathSchema }))
+    .query(async function getProductFile(opts) {
+      const { productPath, filePath } = opts.input
+      const productFilePath = join(productPath, filePath)
+      const fileData = await readFile(productFilePath, 'utf8')
+      return fileData
+    }),
+  putProductFile: t.procedure
+    .input(z.object({ productPath: productPathSchema, filePath: pathSchema, fileData: z.string() }))
+*/
