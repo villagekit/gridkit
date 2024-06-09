@@ -5,7 +5,7 @@
     "postinstall": "patch-package",
     "build:app": "turbo build:app",
     "build:pkg": "turbo build:pkg",
-    "dev:pkg": "tsx ./watch.ts",
+    "dev:pkg": "turbo watch build:pkg",
     "dev:app": "turbo dev:app",
     "dev": "concurrently 'npm:dev:*'",
     "lint": "turbo lint",
@@ -32,15 +32,21 @@
     "publint": "^0.2.7",
     "tsup": "^8.0.2",
     "tsx": "^4.7.0",
-    "turbo": "^1.12.5",
-    "turbotree": "^1.0.1",
-    "turbowatch": "^2.29.4",
+    "turbo": "^2.0.3",
     "vite": "^5.0.0",
     "vite-tsconfig-paths": "^4.3.1"
   },
-  "workspaces": ["dev/*", "core/*", "util/*", "parts/*", "products/*", "apps/*"],
+  "workspaces": [
+    "dev/*",
+    "core/*",
+    "util/*",
+    "parts/*",
+    "products/*",
+    "apps/*"
+  ],
   "overrides": {
     "three": "^0.150.1"
   },
-  "version": "0.0.2"
+  "version": "0.0.2",
+  "packageManager": "npm@10.5.0"
 }
