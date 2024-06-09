@@ -29,11 +29,11 @@
     },
     "types": {},
     "test": {},
-    "lint": {},
-    "publint": {},
-    "dev:pkg": {
-      "cache": false,
-      "persistent": true
+    "lint": {
+      "dependsOn": ["^lint"]
+    },
+    "publint": {
+      "dependsOn": ["^publint"]
     },
     "dev:app": {
       "cache": false,
