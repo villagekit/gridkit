@@ -11,9 +11,7 @@ export interface FloorProps {
   shouldDisplayGrid?: boolean
 }
 
-export default Floor
-
-function Floor(props: FloorProps) {
+export function Floor(props: FloorProps) {
   const {
     gridLengthInMeters = 0.04,
     centerInMeters = [0, 0],

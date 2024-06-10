@@ -1,5 +1,5 @@
 import { ResizeObserver } from '@juggle/resize-observer'
-import { AdaptiveDpr, useContextBridge, useDetectGPU } from '@react-three/drei'
+import { AccumulativeShadows, AdaptiveDpr, useContextBridge, useDetectGPU } from '@react-three/drei'
 import { Canvas } from '@react-three/fiber'
 import type { ProductViewProps } from '@villagekit/product'
 import { Box, useDisclosure } from '@villagekit/ui'
@@ -9,7 +9,9 @@ import { type PropsWithChildren, useMemo, useRef } from 'react'
 import { type Box3, Group, Matrix4, Vector3 } from 'three'
 import { CameraControls, type CameraControlsRef } from './camera/index'
 import { SandboxControls } from './controls/index'
+import Floor from './scenery/floor'
 import { SceneryGl } from './scenery/index'
+import Lights from './scenery/lights'
 import { useDefaultSandboxControlSettings, useSaveSandboxControlSettings } from './settings'
 
 export type SandboxMode = 'default' | 'screenshot'
@@ -107,20 +109,21 @@ export function Sandbox(props: SandboxProps) {
         <ContextBridge>
           {isDebug && mode !== 'screenshot' && <Perf />}
           <AdaptiveDpr />
-          <SceneryGl
-            gridLengthInMeters={gridLengthInMeters}
-            centerInMeters={sceneryCenterInMeters}
-            mode={mode}
-            shouldDisplayGrid={shouldDisplayGrid}
-          />
           <CameraControls
             ref={cameraControlsRef}
             boundingBox={boundingBox}
             mode={mode}
             shouldAutoRotate={shouldAutoRotate}
           />
-
-          <ChangeOfBasis matrix={zUpToYUpMatrix}>{children}</ChangeOfBasis>
+          <ChangeOfBasis matrix={zUpToYUpMatrix}>
+            <Floor
+              centerInMeters={sceneryCenterInMeters}
+              gridLengthInMeters={gridLengthInMeters}
+              shouldDisplayGrid={shouldDisplayGrid && mode !== 'screenshot'}
+            />
+            {children}
+          </ChangeOfBasis>
+          <Lights />
         </ContextBridge>
       </Canvas>
 
