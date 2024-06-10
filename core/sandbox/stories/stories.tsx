@@ -2,7 +2,7 @@ import '@villagekit/part-gridbeam'
 import '@villagekit/part-gridpanel'
 
 import type { Meta, StoryObj } from '@storybook/react'
-import type { Parts } from '@villagekit/product-kit'
+import { type Design, type DesignPart, DesignWrapper } from '@villagekit/design'
 import React from 'react'
 
 import { Sandbox, type SandboxProps } from '../src'
@@ -25,12 +25,12 @@ type Story = StoryObj<typeof Sandbox>
 
 interface StoryExample {
   id: string
-  parts: Array<Parts>
+  parts: Array<DesignPart>
 }
 
 function createStory(example: StoryExample) {
   const { id, parts } = example
-  const design:  = {
+  const design: Design = {
     meta: { id, name: id, description: '' },
     assembly: {
       type: 'static',
