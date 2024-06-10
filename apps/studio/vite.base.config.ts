@@ -109,19 +109,21 @@ export const quietUseClientDirective: RollupOnWarn = (warning, warn) => {
 export async function workspaceAliases() {
   const aliases: Record<string, string> = {}
   const workspacePkgs = await readdir(join(__dirname, '../../node_modules/@villagekit'))
-  for (const pkgName of workspacePkgs) {
-    const pkgBase = await realpath(join(__dirname, '../../node_modules/@villagekit', pkgName))
-    const pkgJson = JSON.parse(await readFile(join(pkgBase, 'package.json'), 'utf8'))
-    type ExportMap = string | { source?: string; import: string }
-    if (pkgJson['exports'] == null) continue
-    const exportEntries = Object.entries<ExportMap>(pkgJson['exports'])
-    for (const [exportKey, exportMap] of exportEntries) {
-      const aliasKey = join('@villagekit', pkgName, exportKey)
-      const aliasTo =
-        typeof exportMap === 'string' ? exportMap : exportMap.source || exportMap.import
-      const aliasValue = join(pkgBase, aliasTo)
-      aliases[aliasKey] = aliasValue
-    }
-  }
+  await Promise.all(
+    workspacePkgs.map(async (pkgName) => {
+      const pkgBase = await realpath(join(__dirname, '../../node_modules/@villagekit', pkgName))
+      const pkgJson = JSON.parse(await readFile(join(pkgBase, 'package.json'), 'utf8'))
+      type ExportMap = string | { source?: string; import: string }
+      if (pkgJson['exports'] == null) return
+      const exportEntries = Object.entries<ExportMap>(pkgJson['exports'])
+      for (const [exportKey, exportMap] of exportEntries) {
+        const aliasKey = join('@villagekit', pkgName, exportKey)
+        const aliasTo =
+          typeof exportMap === 'string' ? exportMap : exportMap.source || exportMap.import
+        const aliasValue = join(pkgBase, aliasTo)
+        aliases[aliasKey] = aliasValue
+      }
+    }),
+  )
   return aliases
 }
