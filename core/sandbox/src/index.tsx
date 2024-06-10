@@ -1,5 +1,3 @@
-import './globals'
-
 import { ResizeObserver } from '@juggle/resize-observer'
 import { AdaptiveDpr, useContextBridge, useDetectGPU } from '@react-three/drei'
 import { Canvas } from '@react-three/fiber'
@@ -7,8 +5,8 @@ import type { ProductViewProps } from '@villagekit/product'
 import { Box, useDisclosure } from '@villagekit/ui'
 import { Perf } from 'r3f-perf'
 import type React from 'react'
-import { useMemo, useRef } from 'react'
-import { type Box3, Vector3 } from 'three'
+import { type PropsWithChildren, useMemo, useRef } from 'react'
+import { type Box3, Group, Matrix4, Vector3 } from 'three'
 import { CameraControls, type CameraControlsRef } from './camera/index'
 import { SandboxControls } from './controls/index'
 import { SceneryGl } from './scenery/index'
@@ -121,7 +119,8 @@ export function Sandbox(props: SandboxProps) {
             mode={mode}
             shouldAutoRotate={shouldAutoRotate}
           />
-          {children}
+
+          <ChangeOfBasis matrix={zUpToYUpMatrix}>{children}</ChangeOfBasis>
         </ContextBridge>
       </Canvas>
 
@@ -142,4 +141,22 @@ export function Sandbox(props: SandboxProps) {
       )}
     </Box>
   )
+}
+
+const zUpToYUpMatrix = new Matrix4().set(1, 0, 0, 0, 0, 0, 1, 0, 0, -1, 0, 0, 0, 0, 0, 1)
+
+type ChangeOfBasisProps = PropsWithChildren<{
+  matrix: Matrix4
+}>
+
+function ChangeOfBasis(props: ChangeOfBasisProps) {
+  const { matrix, children } = props
+
+  const group = useMemo(() => {
+    const g = new Group()
+    matrix.decompose(g.position, g.quaternion, g.scale)
+    return g
+  }, [matrix])
+
+  return <primitive object={group}>{children}</primitive>
 }

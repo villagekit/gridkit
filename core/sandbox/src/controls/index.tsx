@@ -1,5 +1,3 @@
-import '../globals'
-
 import { ParamControls } from '@villagekit/parameters'
 import { ProductInfo } from '@villagekit/product'
 import {
