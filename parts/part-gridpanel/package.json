@@ -28,7 +28,7 @@
     "zod": "^3.23.8"
   },
   "devDependencies": {
-    "@storybook/react": "^7.6.19"
+    "@storybook/react": "^8.1.6"
   },
   "peerDependencies": {
     "@react-three/fiber": "^8.16.8",
