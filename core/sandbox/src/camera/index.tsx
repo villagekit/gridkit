@@ -103,13 +103,14 @@ export const Camera = forwardRef<CameraRef, CameraProps>(function Camera(props, 
   return (
     <CameraControls
       ref={controlsRef}
+      makeDefault
       enabled={isControlEnabled}
-      dampingFactor={0.1}
+      smoothTime={0.25}
       azimuthRotateSpeed={0.5}
       polarRotateSpeed={0.5}
+      dollySpeed={2}
       minDistance={0.15}
       maxDistance={10}
-      {...props}
     />
   )
 })
