@@ -12,15 +12,15 @@ export function Lights(_props: LightsProps) {
         groundColor={new Color(0xb97a20)}
         intensity={3}
       />
-      <AccumulativeShadows frames={40} scale={10}>
-        <RandomizedLight
-          amount={8}
-          position={[10, 50, 30]}
-          mapSize={2048}
-          bias={-0.000001}
-          size={5}
-        />
-      </AccumulativeShadows>
+      <RandomizedLight
+        amount={4}
+        radius={10}
+        position={[10, 50, 30]}
+        bias={-0.000001}
+        size={5}
+        mapSize={4096}
+        intensity={2}
+      />
     </>
   )
 }
