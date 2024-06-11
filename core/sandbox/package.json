@@ -22,7 +22,6 @@
     "@villagekit/product": "*",
     "@villagekit/parameters": "*",
     "@villagekit/ui": "*",
-    "camera-controls": "^1.38.2",
     "constate": "^3.3.2",
     "dnum": "^2.13.1",
     "lodash-es": "^4.17.21",

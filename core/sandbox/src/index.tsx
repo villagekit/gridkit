@@ -1,5 +1,5 @@
 import { ResizeObserver } from '@juggle/resize-observer'
-import { AccumulativeShadows, AdaptiveDpr, useContextBridge, useDetectGPU } from '@react-three/drei'
+import { AdaptiveDpr, useContextBridge, useDetectGPU } from '@react-three/drei'
 import { Canvas } from '@react-three/fiber'
 import type { ProductViewProps } from '@villagekit/product'
 import { Box, useDisclosure } from '@villagekit/ui'
@@ -7,11 +7,10 @@ import { Perf } from 'r3f-perf'
 import type React from 'react'
 import { type PropsWithChildren, useMemo, useRef } from 'react'
 import { type Box3, Group, Matrix4, Vector3 } from 'three'
-import { CameraControls, type CameraControlsRef } from './camera/index'
-import { SandboxControls } from './controls/index'
-import Floor from './scenery/floor'
-import { SceneryGl } from './scenery/index'
-import Lights from './scenery/lights'
+import { Camera, type CameraRef } from './camera'
+import { SandboxControls } from './controls'
+import { Floor } from './scenery/floor'
+import { Lights } from './scenery/lights'
 import { useDefaultSandboxControlSettings, useSaveSandboxControlSettings } from './settings'
 
 export type SandboxMode = 'default' | 'screenshot'
@@ -51,7 +50,7 @@ export function Sandbox(props: SandboxProps) {
   useSaveSandboxControlSettings(shouldAutoRotate, shouldDisplayGrid)
 
   const containerRef = useRef<HTMLDivElement>(null)
-  const cameraControlsRef = useRef<CameraControlsRef | null>(null)
+  const cameraRef = useRef<CameraRef | null>(null)
 
   const ContextBridge = useContextBridge(...bridgeContexts)
 
@@ -109,8 +108,8 @@ export function Sandbox(props: SandboxProps) {
         <ContextBridge>
           {isDebug && mode !== 'screenshot' && <Perf />}
           <AdaptiveDpr />
-          <CameraControls
-            ref={cameraControlsRef}
+          <Camera
+            ref={cameraRef}
             boundingBox={boundingBox}
             mode={mode}
             shouldAutoRotate={shouldAutoRotate}
@@ -133,7 +132,7 @@ export function Sandbox(props: SandboxProps) {
           onToggleAutoRotate={onToggleAutoRotate}
           shouldDisplayGrid={shouldDisplayGrid}
           onToggleDisplayGrid={onToggleDisplayGrid}
-          cameraControlsRef={cameraControlsRef}
+          cameraRef={cameraRef}
           containerRef={containerRef}
           showParamControls={showParamControls}
           alwaysShowFullscreenControls={alwaysShowFullscreenControls}
