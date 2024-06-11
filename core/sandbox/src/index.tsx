@@ -25,7 +25,7 @@ export type SandboxProps = ProductViewProps & {
 export function Sandbox(props: SandboxProps) {
   const {
     label,
-    boundingBox,
+    boundingBox: boundingBoxZUp,
     mode = 'default',
     isDebug = false,
     showParamControls = false,
@@ -55,13 +55,9 @@ export function Sandbox(props: SandboxProps) {
   const ContextBridge = useContextBridge(...bridgeContexts)
 
   const gridLengthInMeters = 0.04
-
-  const center: [number, number, number] = useMemo(() => {
-    const centerVector = new Vector3()
-    boundingBox.getCenter(centerVector)
-    return [centerVector.x, centerVector.y, centerVector.z]
-  }, [boundingBox])
-  const sceneryCenterInMeters: [number, number] = useMemo(() => [center[0], center[1]], [center])
+  const boundingBoxYUp = useMemo(() => {
+    return boundingBoxZUp.applyMatrix4(zUpToYUpMatrix)
+  }, [boundingBoxZUp])
 
   if (gpu == null) return null
   const perfMax = gpu.tier / maxTiers
@@ -110,13 +106,13 @@ export function Sandbox(props: SandboxProps) {
           <AdaptiveDpr />
           <Camera
             ref={cameraRef}
-            boundingBox={boundingBox}
+            boundingBox={boundingBoxYUp}
             mode={mode}
             shouldAutoRotate={shouldAutoRotate}
           />
           <ChangeOfBasis matrix={zUpToYUpMatrix}>
             <Floor
-              centerInMeters={sceneryCenterInMeters}
+              boundingBox={boundingBoxZUp}
               gridLengthInMeters={gridLengthInMeters}
               shouldDisplayGrid={shouldDisplayGrid && mode !== 'screenshot'}
             />

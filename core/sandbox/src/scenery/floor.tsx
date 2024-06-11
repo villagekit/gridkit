@@ -1,11 +1,11 @@
 import type { ReactThreeFiber } from '@react-three/fiber'
 import { useMemo } from 'react'
-import { Color, Vector2, Vector3 } from 'three'
+import { Box3, Color, Vector2, Vector3 } from 'three'
 import { Grid } from './grid'
 
 export interface FloorProps {
   gridLengthInMeters?: number
-  centerInMeters?: ReactThreeFiber.Vector2
+  boundingBox?: Box3
   lengthInGridUnits?: number
   shouldDisplayAxes?: boolean
   shouldDisplayGrid?: boolean
@@ -14,7 +14,7 @@ export interface FloorProps {
 export function Floor(props: FloorProps) {
   const {
     gridLengthInMeters = 0.04,
-    centerInMeters = [0, 0],
+    boundingBox = new Box3(),
     lengthInGridUnits = 50,
     shouldDisplayAxes = false,
     shouldDisplayGrid = true,
@@ -25,13 +25,15 @@ export function Floor(props: FloorProps) {
   }, [gridLengthInMeters, lengthInGridUnits])
 
   const center = useMemo(() => {
-    const vector: Vector2 = (centerInMeters as Vector2).isVector2
-      ? (centerInMeters as Vector2)
-      : new Vector2(...(centerInMeters as Array<number>))
+    const vector3 = new Vector3()
+    boundingBox.getCenter(vector3)
+    const vector2 = new Vector2(vector3.x, vector3.y)
+
     // quantize to grid units
-    vector.divideScalar(gridLengthInMeters).floor().multiplyScalar(gridLengthInMeters)
-    return vector
-  }, [gridLengthInMeters, centerInMeters])
+    vector2.divideScalar(gridLengthInMeters).floor().multiplyScalar(gridLengthInMeters)
+
+    return vector2
+  }, [gridLengthInMeters, boundingBox])
 
   const position = useMemo(() => {
     return new Vector3(center.x, center.y, 0)
