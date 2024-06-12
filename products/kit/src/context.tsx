@@ -1,6 +1,7 @@
 import {
   type ExtractValuesFromParams,
   type Params,
+  useClearParams,
   useParamsValues,
   useUpdateParams,
 } from '@villagekit/parameters'
@@ -13,10 +14,10 @@ import {
   calculateStateForAll,
   getPartVariants,
 } from '@villagekit/part'
-import {
-  type ProductError,
-  type ProductTypeProviderProps,
-  useUpdateProductError,
+import type {
+  ProductError,
+  ProductTypeProviderProps,
+  // useUpdateProductError,
 } from '@villagekit/product'
 import { map, uniq } from 'lodash-es'
 import pDebounce from 'p-debounce'
@@ -25,7 +26,7 @@ import type { Box3 } from 'three'
 import { getPartCreatorsFromKitParts } from './helpers'
 import { generatePartsForPlugins } from './plugins'
 import { useRender } from './renders/index'
-import { partsSchema } from './schema'
+// import { partsSchema } from './schema'
 import type { Parts, Plugins, ProductKitRender } from './types'
 
 import '@villagekit/part-gridbeam'
@@ -40,14 +41,19 @@ type ProductKitState = {
 
 function useProductKit(): ProductKitState {
   const render = useRender()
+  console.log('render', render)
 
+  const clearParams = useClearParams()
   const updateParams = useUpdateParams()
   useEffect(() => {
     if (render == null) return
-    const { parameters: params, presets } = render
-    if (params == null || presets == null) return
-    updateParams(params, presets)
-  }, [render, updateParams])
+    if (render.type === 'static') {
+      clearParams()
+    } else {
+      const { parameters: params, presets } = render
+      updateParams(params, presets)
+    }
+  }, [render, clearParams, updateParams])
 
   const paramsValues = useParamsValues()
 
@@ -94,28 +100,39 @@ const noPlugins: Plugins = []
 function useParts<Ps extends Params>(options: UsePartsOptions<Ps>): UsePartsValue {
   const { render, paramsValues } = options
 
-  const updateProductError = useUpdateProductError()
+  // const updateProductError = useUpdateProductError()
 
   const partVariants = useMemo(() => getPartVariants(), [])
 
   const [kitParts, setKitParts] = useState<Parts>([])
   useEffect(() => {
     if (render == null) return
-    if (paramsValues == null) return
-    render.parts(paramsValues, partVariants).then((parts) => {
-      const result = partsSchema.safeParse(parts)
-      if (result.success) {
-        setKitParts(result.data)
-      } else {
-        updateProductError({
-          type: 'error:validation',
-          errors: {
-            parts: result.error,
-          },
+    if (render.type === 'static') {
+      setKitParts(render.parts)
+    } else {
+      if (paramsValues == null) return
+      // @ts-ignore
+      render.parts(paramsValues, partVariants).then((parts) => {
+        // NOTE ignore for now
+        setKitParts(parts)
+        // TODO fix
+        /*
+        partsSchema.safeParseAsync(parts).then((result) => {
+          if (result.success) {
+            setKitParts(result.data)
+          } else {
+            updateProductError({
+              type: 'error:validation',
+              errors: {
+                parts: result.error,
+              },
+            })
+          }
         })
-      }
-    })
-  }, [render, paramsValues, partVariants, updateProductError])
+        */
+      })
+    }
+  }, [render, paramsValues, partVariants /*, updateProductError*/])
 
   const [partCreators, setPartCreators] = useState<Array<PartCreator>>([])
   const [isLoading, setLoading] = useState(false)

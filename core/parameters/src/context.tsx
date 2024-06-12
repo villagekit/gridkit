@@ -29,7 +29,13 @@ function useParamsActor(): ActorRefFrom<typeof paramsMachine> {
   return actor
 }
 
-export const useHasParams = () => useContext(ParamsContext) != null
+export const useHasParams = () => {
+  const actor = useContext(ParamsContext)
+  if (actor == null) return false
+  const snapshot = actor.getSnapshot()
+  if (snapshot.context.params == null || snapshot.context.presets == null) return false
+  return true
+}
 
 type ParamsSnapshot = SnapshotFrom<typeof paramsMachine>
 const selectParams = (snapshot: ParamsSnapshot) => snapshot.context.params
@@ -42,6 +48,11 @@ const selectParamsValues = (snapshot: ParamsSnapshot) => snapshot.context.params
 export const useParamsValues = () => useSelector(useParamsActor(), selectParamsValues)
 const selectShowControls = (snapshot: ParamsSnapshot) => snapshot.context.showControls
 export const useShowControls = () => useSelector(useParamsActor(), selectShowControls)
+
+export function useClearParams() {
+  const actorRef = useParamsActor()
+  return useCallback(() => actorRef.send({ type: 'clearParams' }), [actorRef])
+}
 
 export function useUpdateParams() {
   const actorRef = useParamsActor()

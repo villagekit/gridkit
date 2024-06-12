@@ -53,24 +53,35 @@ export const javascriptRenderer = fromCallback<RenderEvent, RendererMachineEvent
       }
 
       if (jsModule == null) return
+      console.log('js module', jsModule)
 
-      const { parameters, presets } = jsModule
+      const { parameters, presets, parts } = jsModule
 
-      const event: RendererMachineEvent = {
-        type: 'renderer.success',
-        render: {
-          parameters,
-          presets,
-          parts: async (paramsValues: ParamsValues, partVariants: PartVariantsByType) => {
-            try {
-              return await evaluator.evaluateParts(paramsValues, partVariants)
-            } catch (error) {
-              sendEvaluationError(error)
-              return []
+      const event: RendererMachineEvent =
+        parts == null || presets == null
+          ? {
+              type: 'renderer.success',
+              render: {
+                type: 'static',
+                parts: parts != null ? parts : [],
+              },
             }
-          },
-        },
-      }
+          : {
+              type: 'renderer.success',
+              render: {
+                type: 'parametric',
+                parameters,
+                presets,
+                parts: async (paramsValues: ParamsValues, partVariants: PartVariantsByType) => {
+                  try {
+                    return await evaluator.evaluateParts(paramsValues, partVariants)
+                  } catch (error) {
+                    sendEvaluationError(error)
+                    return []
+                  }
+                },
+              },
+            }
       sendBack(event)
 
       function sendEvaluationError(error: unknown) {
@@ -127,16 +138,18 @@ const createEvaulatorWorkerSrc = () => `
 
     const { parameters, presets, parts } = module
 
-    return {
-      parameters,
-      presets,
+    if (typeof parts === 'function') {
+      return {
+        parameters,
+        presets,
+      }
+    } else {
+      return { parts }
     }
   }
 
   function evaluateParts(parameters, partVariants) {
-    return typeof module.parts === 'function'
-      ? module.parts(parameters, partVariants)
-      : module.parts
+    return module.parts(parameters, partVariants)
   }
 
   const exports = {
