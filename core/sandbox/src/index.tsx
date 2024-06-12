@@ -1,17 +1,22 @@
-import './globals'
-
 import { ResizeObserver } from '@juggle/resize-observer'
-import { AdaptiveDpr, useContextBridge, useDetectGPU } from '@react-three/drei'
+import {
+  AdaptiveDpr,
+  GizmoHelper,
+  GizmoViewport,
+  useContextBridge,
+  useDetectGPU,
+} from '@react-three/drei'
 import { Canvas } from '@react-three/fiber'
 import type { ProductViewProps } from '@villagekit/product'
 import { Box, useDisclosure } from '@villagekit/ui'
 import { Perf } from 'r3f-perf'
 import type React from 'react'
-import { useMemo, useRef } from 'react'
-import { type Box3, Vector3 } from 'three'
-import { CameraControls, type CameraControlsRef } from './camera/index'
-import { SandboxControls } from './controls/index'
-import { SceneryGl } from './scenery/index'
+import { type PropsWithChildren, useMemo, useRef } from 'react'
+import { type Box3, Group, Matrix4 } from 'three'
+import { Camera, type CameraRef } from './camera'
+import { SandboxControls } from './controls'
+import { Floor } from './scenery/floor'
+import { Lights } from './scenery/lights'
 import { useDefaultSandboxControlSettings, useSaveSandboxControlSettings } from './settings'
 
 export type SandboxMode = 'default' | 'screenshot'
@@ -26,7 +31,7 @@ export type SandboxProps = ProductViewProps & {
 export function Sandbox(props: SandboxProps) {
   const {
     label,
-    boundingBox,
+    boundingBox: boundingBoxZUp,
     mode = 'default',
     isDebug = false,
     showParamControls = false,
@@ -51,18 +56,14 @@ export function Sandbox(props: SandboxProps) {
   useSaveSandboxControlSettings(shouldAutoRotate, shouldDisplayGrid)
 
   const containerRef = useRef<HTMLDivElement>(null)
-  const cameraControlsRef = useRef<CameraControlsRef | null>(null)
+  const cameraRef = useRef<CameraRef | null>(null)
 
   const ContextBridge = useContextBridge(...bridgeContexts)
 
   const gridLengthInMeters = 0.04
-
-  const center: [number, number, number] = useMemo(() => {
-    const centerVector = new Vector3()
-    boundingBox.getCenter(centerVector)
-    return [centerVector.x, centerVector.y, centerVector.z]
-  }, [boundingBox])
-  const sceneryCenterInMeters: [number, number] = useMemo(() => [center[0], center[1]], [center])
+  const boundingBoxYUp = useMemo(() => {
+    return boundingBoxZUp.applyMatrix4(zUpToYUpMatrix)
+  }, [boundingBoxZUp])
 
   if (gpu == null) return null
   const perfMax = gpu.tier / maxTiers
@@ -94,7 +95,7 @@ export function Sandbox(props: SandboxProps) {
         shadows
         orthographic
         camera={{
-          near: 0.01,
+          near: 0,
         }}
         raycaster={{
           // @ts-ignore
@@ -109,19 +110,18 @@ export function Sandbox(props: SandboxProps) {
         <ContextBridge>
           {isDebug && mode !== 'screenshot' && <Perf />}
           <AdaptiveDpr />
-          <SceneryGl
-            gridLengthInMeters={gridLengthInMeters}
-            centerInMeters={sceneryCenterInMeters}
-            mode={mode}
-            shouldDisplayGrid={shouldDisplayGrid}
-          />
-          <CameraControls
-            ref={cameraControlsRef}
-            boundingBox={boundingBox}
+          <Camera
+            ref={cameraRef}
+            boundingBox={boundingBoxYUp}
             mode={mode}
             shouldAutoRotate={shouldAutoRotate}
           />
-          {children}
+          <Lights />
+          <Floor shouldDisplayGrid={shouldDisplayGrid} gridLengthInMeters={gridLengthInMeters} />
+          <ChangeOfBasis matrix={zUpToYUpMatrix}>{children}</ChangeOfBasis>
+          <GizmoHelper alignment="bottom-right" margin={[80, 80]}>
+            <GizmoViewport axisColors={['#9d4b4b', '#2f7f4f', '#3b5b9d']} labelColor="white" />
+          </GizmoHelper>
         </ContextBridge>
       </Canvas>
 
@@ -131,7 +131,7 @@ export function Sandbox(props: SandboxProps) {
           onToggleAutoRotate={onToggleAutoRotate}
           shouldDisplayGrid={shouldDisplayGrid}
           onToggleDisplayGrid={onToggleDisplayGrid}
-          cameraControlsRef={cameraControlsRef}
+          cameraRef={cameraRef}
           containerRef={containerRef}
           showParamControls={showParamControls}
           alwaysShowFullscreenControls={alwaysShowFullscreenControls}
@@ -142,4 +142,22 @@ export function Sandbox(props: SandboxProps) {
       )}
     </Box>
   )
+}
+
+const zUpToYUpMatrix = new Matrix4().set(1, 0, 0, 0, 0, 0, 1, 0, 0, -1, 0, 0, 0, 0, 0, 1)
+
+type ChangeOfBasisProps = PropsWithChildren<{
+  matrix: Matrix4
+}>
+
+function ChangeOfBasis(props: ChangeOfBasisProps) {
+  const { matrix, children } = props
+
+  const group = useMemo(() => {
+    const g = new Group()
+    matrix.decompose(g.position, g.quaternion, g.scale)
+    return g
+  }, [matrix])
+
+  return <primitive object={group}>{children}</primitive>
 }

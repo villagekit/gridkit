@@ -1,5 +1,3 @@
-import '../globals'
-
 import { ParamControls } from '@villagekit/parameters'
 import { ProductInfo } from '@villagekit/product'
 import {
@@ -25,7 +23,7 @@ import {
   FaUndoAlt,
 } from 'react-icons/fa'
 import screenfull from 'screenfull'
-import type { CameraControlsRef } from '../camera'
+import type { CameraRef } from '../camera'
 import { ControlsContextProvider } from './context'
 import { Control } from './control'
 
@@ -34,7 +32,7 @@ export interface SandboxControlsProps {
   onToggleAutoRotate: () => void
   shouldDisplayGrid: boolean
   onToggleDisplayGrid: () => void
-  cameraControlsRef: React.MutableRefObject<CameraControlsRef | null>
+  cameraRef: React.MutableRefObject<CameraRef | null>
   containerRef: React.RefObject<HTMLDivElement>
   showParamControls?: boolean
   alwaysShowFullscreenControls?: boolean
@@ -47,7 +45,7 @@ export function SandboxControls(props: SandboxControlsProps) {
     onToggleAutoRotate,
     shouldDisplayGrid,
     onToggleDisplayGrid,
-    cameraControlsRef,
+    cameraRef,
     containerRef,
     showParamControls = false,
     alwaysShowFullscreenControls = false,
@@ -55,16 +53,16 @@ export function SandboxControls(props: SandboxControlsProps) {
   } = props
 
   const handleZoomIn = useCallback(() => {
-    cameraControlsRef.current?.zoomIn()
-  }, [cameraControlsRef])
+    cameraRef.current?.zoomIn()
+  }, [cameraRef])
 
   const handleZoomOut = useCallback(() => {
-    cameraControlsRef.current?.zoomOut()
-  }, [cameraControlsRef])
+    cameraRef.current?.zoomOut()
+  }, [cameraRef])
 
   const handleResetView = useCallback(() => {
-    cameraControlsRef.current?.reset()
-  }, [cameraControlsRef])
+    cameraRef.current?.reset()
+  }, [cameraRef])
 
   const orientationMediaQuery = useMemo(() => window.matchMedia('(orientation: landscape)'), [])
 
