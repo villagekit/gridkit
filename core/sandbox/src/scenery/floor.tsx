@@ -1,68 +1,54 @@
-import type { ReactThreeFiber } from '@react-three/fiber'
-import { useMemo } from 'react'
-import { Box3, Color, Vector2, Vector3 } from 'three'
-import { Grid } from './grid'
+import { Grid } from '@react-three/drei'
+import { Color } from 'three'
 
-export interface FloorProps {
-  gridLengthInMeters?: number
-  boundingBox?: Box3
-  lengthInGridUnits?: number
-  shouldDisplayAxes?: boolean
-  shouldDisplayGrid?: boolean
+type FloorProps = {
+  shouldDisplayGrid: boolean
+  gridLengthInMeters: number
 }
-
 export function Floor(props: FloorProps) {
-  const {
-    gridLengthInMeters = 0.04,
-    boundingBox = new Box3(),
-    lengthInGridUnits = 50,
-    shouldDisplayAxes = false,
-    shouldDisplayGrid = true,
-  } = props
-
-  const floorLength = useMemo(() => {
-    return gridLengthInMeters * lengthInGridUnits
-  }, [gridLengthInMeters, lengthInGridUnits])
-
-  const center = useMemo(() => {
-    const vector3 = new Vector3()
-    boundingBox.getCenter(vector3)
-    const vector2 = new Vector2(vector3.x, vector3.y)
-
-    // quantize to grid units
-    vector2.divideScalar(gridLengthInMeters).floor().multiplyScalar(gridLengthInMeters)
-
-    return vector2
-  }, [gridLengthInMeters, boundingBox])
-
-  const position = useMemo(() => {
-    return new Vector3(center.x, center.y, 0)
-  }, [center])
-
+  const { shouldDisplayGrid, gridLengthInMeters } = props
   return (
-    <group name="floor" position={position}>
-      {shouldDisplayAxes && <axesHelper args={[floorLength]} position={[0, 0, 1e-3]} />}
+    <group name="floor">
       {shouldDisplayGrid && (
         <Grid
-          axisLength={floorLength}
-          smallSize={gridLengthInMeters}
-          largeSize={gridLengthInMeters * 10}
-          color={new Color('#d9e0e8')}
-          // render before shadow floor
-          renderOrder={1}
+          // render after shadow floor
+          renderOrder={2}
+          /** Cell size, default: 0.5 */
+          cellSize={gridLengthInMeters}
+          /** Cell thickness, default: 0.5 */
+          cellThickness={0.5}
+          /** Cell color, default: black */
+          cellColor={new Color('#d9e0e8')}
+          /** Section size, default: 1 */
+          sectionSize={10 * gridLengthInMeters}
+          /** Section thickness, default: 1 */
+          sectionThickness={1}
+          /** Section color, default: #2080ff */
+          sectionColor={new Color('#9caec3')}
+          /** Follow camera, default: false */
+          followCamera={false}
+          /** Display the grid infinitely, default: false */
+          infiniteGrid={true}
+          /** Fade distance, default: 100 */
+          fadeDistance={40}
+          /** Fade strength, default: 1 */
+          fadeStrength={10}
+          /** Fade from camera (1) or origin (0), or somewhere in between, default: camera */
+          fadeFrom={0.5}
         />
       )}
-      <FloorShadow floorLength={floorLength} />
+      <ShadowFloor floorLength={gridLengthInMeters * 100} />
     </group>
   )
 }
 
-function FloorShadow({ floorLength }: { floorLength: number }) {
+function ShadowFloor({ floorLength }: { floorLength: number }) {
   return (
     <mesh
       receiveShadow
-      // render after grid
-      renderOrder={2}
+      rotation={[-Math.PI / 2, 0, 0]}
+      // render before grid
+      renderOrder={1}
     >
       <shadowMaterial
         args={[{ opacity: 0.5 }]}

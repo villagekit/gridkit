@@ -1,4 +1,4 @@
-import { CameraControls } from '@react-three/drei'
+import { CameraControls, OrthographicCamera } from '@react-three/drei'
 import { useFrame } from '@react-three/fiber'
 import { useActorRef } from '@xstate/react'
 import { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo, useRef } from 'react'

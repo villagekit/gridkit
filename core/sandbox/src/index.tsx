@@ -1,12 +1,18 @@
 import { ResizeObserver } from '@juggle/resize-observer'
-import { AdaptiveDpr, useContextBridge, useDetectGPU } from '@react-three/drei'
+import {
+  AdaptiveDpr,
+  GizmoHelper,
+  GizmoViewport,
+  useContextBridge,
+  useDetectGPU,
+} from '@react-three/drei'
 import { Canvas } from '@react-three/fiber'
 import type { ProductViewProps } from '@villagekit/product'
 import { Box, useDisclosure } from '@villagekit/ui'
 import { Perf } from 'r3f-perf'
 import type React from 'react'
 import { type PropsWithChildren, useMemo, useRef } from 'react'
-import { type Box3, Group, Matrix4, Vector3 } from 'three'
+import { type Box3, Group, Matrix4 } from 'three'
 import { Camera, type CameraRef } from './camera'
 import { SandboxControls } from './controls'
 import { Floor } from './scenery/floor'
@@ -89,7 +95,7 @@ export function Sandbox(props: SandboxProps) {
         shadows
         orthographic
         camera={{
-          near: 0.01,
+          near: 0,
         }}
         raycaster={{
           // @ts-ignore
@@ -110,15 +116,12 @@ export function Sandbox(props: SandboxProps) {
             mode={mode}
             shouldAutoRotate={shouldAutoRotate}
           />
-          <ChangeOfBasis matrix={zUpToYUpMatrix}>
-            <Floor
-              boundingBox={boundingBoxZUp}
-              gridLengthInMeters={gridLengthInMeters}
-              shouldDisplayGrid={shouldDisplayGrid && mode !== 'screenshot'}
-            />
-            {children}
-          </ChangeOfBasis>
           <Lights />
+          <Floor shouldDisplayGrid={shouldDisplayGrid} gridLengthInMeters={gridLengthInMeters} />
+          <ChangeOfBasis matrix={zUpToYUpMatrix}>{children}</ChangeOfBasis>
+          <GizmoHelper alignment="bottom-right" margin={[80, 80]}>
+            <GizmoViewport axisColors={['#9d4b4b', '#2f7f4f', '#3b5b9d']} labelColor="white" />
+          </GizmoHelper>
         </ContextBridge>
       </Canvas>
 

@@ -15,7 +15,7 @@ export function Lights(_props: LightsProps) {
       <RandomizedLight
         amount={4}
         radius={10}
-        position={[10, 50, 30]}
+        position={[10, 50, -30]}
         bias={-0.000001}
         size={5}
         mapSize={4096}
