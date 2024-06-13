@@ -46,7 +46,6 @@ export function ProductProvider(props: ProductProviderProps) {
 
   // handle updateInput
   useEffect(() => {
-    console.log('input', input)
     actorRef.send({ type: 'updateInput', input })
   }, [actorRef, input])
 
