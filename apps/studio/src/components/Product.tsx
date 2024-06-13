@@ -1,4 +1,4 @@
-import { ParamControls, useHasParams } from '@villagekit/parameters'
+import { ParamControls, useHasParams, useParams } from '@villagekit/parameters'
 import {
   ProductErrorDisplay,
   ProductInfo,

@@ -32,8 +32,9 @@ function useParamsActor(): ActorRefFrom<typeof paramsMachine> {
 export const useHasParams = () => {
   const actor = useContext(ParamsContext)
   if (actor == null) return false
-  const snapshot = actor.getSnapshot()
-  if (snapshot.context.params == null || snapshot.context.presets == null) return false
+  const params = useParams()
+  const presets = usePresets()
+  if (params == null || presets == null) return false
   return true
 }
 

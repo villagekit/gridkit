@@ -2,6 +2,7 @@ import {
   type ExtractValuesFromParams,
   type Params,
   useClearParams,
+  useParamsActor,
   useParamsValues,
   useUpdateParams,
 } from '@villagekit/parameters'
