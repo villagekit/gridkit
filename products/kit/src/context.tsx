@@ -2,7 +2,6 @@ import {
   type ExtractValuesFromParams,
   type Params,
   useClearParams,
-  useParamsActor,
   useParamsValues,
   useUpdateParams,
 } from '@villagekit/parameters'
@@ -108,31 +107,33 @@ function useParts<Ps extends Params>(options: UsePartsOptions<Ps>): UsePartsValu
   useEffect(() => {
     if (render == null) return
     if (render.type === 'static') {
-      setKitParts(render.parts)
+      validateThenSet(render.parts)
     } else {
       if (paramsValues == null) return
-      // @ts-ignore
       render.parts(paramsValues, partVariants).then((parts) => {
-        // NOTE ignore for now
-        setKitParts(parts)
-        // TODO fix
-        /*
-        partsSchema.safeParseAsync(parts).then((result) => {
-          if (result.success) {
-            setKitParts(result.data)
-          } else {
-            updateProductError({
-              type: 'error:validation',
-              errors: {
-                parts: result.error,
-              },
-            })
-          }
-        })
-        */
+        validateThenSet(parts)
       })
     }
-  }, [render, paramsValues, partVariants /*, updateProductError*/])
+
+    function validateThenSet(parts: Parts) {
+      setKitParts(parts)
+      // TODO fix
+      /*
+      partsSchema.safeParseAsync(parts).then((result) => {
+        if (result.success) {
+          setKitParts(result.data)
+        } else {
+          updateProductError({
+            type: 'error:validation',
+            errors: {
+              parts: result.error,
+            },
+          })
+        }
+      })
+      */
+    }
+  }, [render, paramsValues, partVariants /*, updateProductError */])
 
   const [partCreators, setPartCreators] = useState<Array<PartCreator>>([])
   const [isLoading, setLoading] = useState(false)
