@@ -53,12 +53,11 @@ export const javascriptRenderer = fromCallback<RenderEvent, RendererMachineEvent
       }
 
       if (jsModule == null) return
-      console.log('js module', jsModule)
 
       const { parameters, presets, parts } = jsModule
 
       const event: RendererMachineEvent =
-        parts == null || presets == null
+        parameters == null || presets == null
           ? {
               type: 'renderer.success',
               render: {

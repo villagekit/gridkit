@@ -41,7 +41,6 @@ type ProductKitState = {
 
 function useProductKit(): ProductKitState {
   const render = useRender()
-  console.log('render', render)
 
   const clearParams = useClearParams()
   const updateParams = useUpdateParams()
