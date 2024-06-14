@@ -41,6 +41,7 @@ export interface GridPanelGlValue extends GridPanelState {
   thicknessInMeters: number
   locationInGrids: Location
   locationInMeters: Location
+  directionInMeters: [number, number, number]
   sizeInMeters: [number, number, number]
 }
 

@@ -51,6 +51,7 @@ export function PartGl(props: PartGlProps) {
       thicknessAxis,
       locationInMeters,
       sizeInMeters,
+      directionInMeters,
       holes = true,
       variant: { id: variantId, materials },
     },
@@ -66,7 +67,12 @@ export function PartGl(props: PartGlProps) {
       name={`gridpanel-container-${id}`}
       position={locationInMeters as [number, number, number]}
     >
-      <Panel id={id} sizeInMeters={sizeInMeters} material={panelMaterial}>
+      <Panel
+        id={id}
+        sizeInMeters={sizeInMeters}
+        directionInMeters={directionInMeters}
+        material={panelMaterial}
+      >
         {holes && (
           <Holes
             mainAxis={mainAxis}
@@ -88,6 +94,7 @@ export function PartGl(props: PartGlProps) {
 interface PanelProps {
   id: string
   sizeInMeters: [number, number, number]
+  directionInMeters: [number, number, number]
   material: PartMaterial
   children: React.ReactNode | Array<React.ReactNode>
 }
@@ -96,20 +103,20 @@ interface PanelProps {
 const TEXTURE_SIZE = 0.4
 
 function Panel(props: PanelProps) {
-  const { id, sizeInMeters, material, children } = props
+  const { id, sizeInMeters, directionInMeters, material, children } = props
 
   const uniqueNumericId = useMemo(() => {
     return [...id].reduce((sofar, _, i) => sofar + id.charCodeAt(i), 0)
   }, [id])
 
   const geometry = useMemo(() => {
-    const geometry = new BoxGeometry(sizeInMeters[0], sizeInMeters[1], sizeInMeters[2])
+    const geometry = new BoxGeometry(1, 1, 1)
 
     const panelScale = 0.995
     geometry.scale(panelScale, panelScale, panelScale)
 
     // translate geometry so position starts at (0, 0, 0)
-    geometry.translate(sizeInMeters[0] / 2, sizeInMeters[1] / 2, sizeInMeters[2] / 2)
+    geometry.translate(1 / 2, 1 / 2, 1 / 2)
 
     // set uvs such that texture maps to world units
 
@@ -181,7 +188,13 @@ function Panel(props: PanelProps) {
   return (
     <group name={`gridpanel-${id}`}>
       <group name="gridpanel-panel">
-        <mesh name="gridpanel-panel-texture" geometry={geometry} castShadow receiveShadow>
+        <mesh
+          name="gridpanel-panel-texture"
+          scale={directionInMeters}
+          geometry={geometry}
+          castShadow
+          receiveShadow
+        >
           <meshLambertMaterial map={texture} />
         </mesh>
       </group>

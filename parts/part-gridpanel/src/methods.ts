@@ -29,11 +29,17 @@ export function calculateGlValue(state: GridPanelState): GridPanelGlValue {
   const holeDiameterInMeters = convert(holeDiameter, meter).value
   const thicknessInMeters = convert(thickness, meter).value
 
-  const sizeInMeters = axisValuesToVector({
+  const directionInMeters = axisValuesToVector({
     [crossAxis]: crossLength * gridLengthInMeters,
     [mainAxis]: mainLength * gridLengthInMeters,
     [thicknessAxis]: thicknessInMeters,
-  } as AxisValues) as GridPanelGlValue['sizeInMeters']
+  } as AxisValues) as GridPanelGlValue['directionInMeters']
+
+  const sizeInMeters = [
+    Math.abs(directionInMeters[0]),
+    Math.abs(directionInMeters[1]),
+    Math.abs(directionInMeters[2]),
+  ] as GridPanelGlValue['sizeInMeters']
 
   const fitAdjustment = axisValuesToVector({
     [crossAxis]: 0,
@@ -63,6 +69,7 @@ export function calculateGlValue(state: GridPanelState): GridPanelGlValue {
     locationInMeters,
     mainAxis,
     mainLength,
+    directionInMeters,
     sizeInMeters,
     thicknessAxis,
     thicknessInMeters,
@@ -70,11 +77,11 @@ export function calculateGlValue(state: GridPanelState): GridPanelGlValue {
 }
 
 export function calculateBoundingBox(value: GridPanelGlValue): Box3 {
-  const { sizeInMeters, locationInMeters } = value
+  const { locationInMeters, directionInMeters } = value
 
   return new Box3().setFromPoints([
     new Vector3(...locationInMeters),
-    new Vector3(...locationInMeters).add(new Vector3(...sizeInMeters)),
+    new Vector3(...locationInMeters).add(new Vector3(...directionInMeters)),
   ])
 }
 
