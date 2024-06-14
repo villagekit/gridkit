@@ -26,6 +26,7 @@ type ClearParamsEvent = {
 }
 type UpdateParamsEvent = {
   type: 'updateParams'
+  productId: string
   params: Params
   presets: Presets<any>
 }
@@ -76,10 +77,10 @@ const queryParamsActor = fromCallback<QueryParamsEvent, ParamsMachineInput>(
     }
 
     function setupParams(event: UpdateParamsEvent) {
-      const { params, presets } = event
+      const { productId, params, presets } = event
 
       assertPresets(params, presets)
-      current = { params, presets }
+      current = { productId, params, presets }
 
       const defaultPreset = presets[0]
       queryParamDefinitions = calculateQueryParamDefinitions(params, defaultPreset)
@@ -136,6 +137,7 @@ const queryParamsActor = fromCallback<QueryParamsEvent, ParamsMachineInput>(
 )
 
 type ParamsMachineContext = ParamsMachineInput & {
+  productId: string | null
   params: Params | null
   presets: Presets<any> | null
   presetId: string | null
@@ -181,6 +183,7 @@ export const paramsMachine = setup({
       type: 'unset',
       onLocationUpdate,
       showControls: false,
+      productId: null,
       params: null,
       presets: null,
       presetId: null,
@@ -196,6 +199,7 @@ export const paramsMachine = setup({
             type: 'unset',
             onLocationUpdate,
             showControls,
+            productId: null,
             params: null,
             presets: null,
             presetId: null,
@@ -208,16 +212,26 @@ export const paramsMachine = setup({
       actions: [
         assign(({ context, event }) => {
           const { onLocationUpdate, showControls, presetId, paramsValues } = context
-          const { params, presets } = event
+          const { productId, params, presets } = event
           assertPresets(params, presets)
           const defaultPreset = presets[0]
+          const defaults =
+            productId === context.productId
+              ? {
+                  presetId: presetId ?? defaultPreset.id,
+                  values: paramsValues ?? defaultPreset.values,
+                }
+              : {
+                  presetId: defaultPreset.id,
+                  paramsValues: defaultPreset.values,
+                }
           return {
             onLocationUpdate,
             showControls,
+            productId,
             params,
             presets,
-            presetId: presetId ?? defaultPreset.id,
-            values: paramsValues ?? defaultPreset.values,
+            ...defaults,
           }
         }),
 
