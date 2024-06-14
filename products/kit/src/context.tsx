@@ -14,10 +14,9 @@ import {
   calculateStateForAll,
   getPartVariants,
 } from '@villagekit/part'
-import {
-  type ProductError,
-  type ProductTypeProviderProps,
-  useProductMeta,
+import type {
+  ProductError,
+  ProductTypeProviderProps,
   // useUpdateProductError,
 } from '@villagekit/product'
 import { map, uniq } from 'lodash-es'
@@ -41,7 +40,6 @@ type ProductKitState = {
 }
 
 function useProductKit(): ProductKitState {
-  const productId = useProductMeta().name
   const render = useRender()
 
   const clearParams = useClearParams()
@@ -52,9 +50,9 @@ function useProductKit(): ProductKitState {
       clearParams()
     } else {
       const { parameters: params, presets } = render
-      updateParams(productId, params, presets)
+      updateParams(params, presets)
     }
-  }, [render, productId, clearParams, updateParams])
+  }, [render, clearParams, updateParams])
 
   const paramsValues = useParamsValues()
 

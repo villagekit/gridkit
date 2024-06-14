@@ -58,8 +58,8 @@ export function useClearParams() {
 export function useUpdateParams() {
   const actorRef = useParamsActor()
   return useCallback(
-    <Ps extends Params>(productId: string, params: Ps, presets: Presets<Ps>) =>
-      actorRef.send({ type: 'updateParams', productId, params, presets }),
+    <Ps extends Params>(params: Ps, presets: Presets<Ps>) =>
+      actorRef.send({ type: 'updateParams', params, presets }),
     [actorRef],
   )
 }
