@@ -2,6 +2,7 @@ import { readFile, readdir, realpath } from 'node:fs/promises'
 import { builtinModules } from 'node:module'
 import type { AddressInfo } from 'node:net'
 import { join } from 'node:path'
+import { reverse, sortBy } from 'lodash-es'
 import type { BuildOptions, ConfigEnv, Plugin, UserConfig } from 'vite'
 
 export const builtins = ['electron', ...builtinModules.flatMap((m) => [m, `node:${m}`])]
@@ -116,7 +117,10 @@ export async function workspaceAliases() {
       const pkgJson = JSON.parse(await readFile(join(pkgBase, 'package.json'), 'utf8'))
       type ExportMap = string | { source?: string; import: string }
       if (pkgJson['exports'] == null) return
-      const exportEntries = Object.entries<ExportMap>(pkgJson['exports'])
+      let exportEntries = Object.entries<ExportMap>(pkgJson['exports'])
+      // NOTE (mw): sort so ./sub comes before ./
+      //   important for module like @villagekit/part/base
+      exportEntries = reverse(sortBy(exportEntries, ['[0]']))
       for (const [exportKey, exportMap] of exportEntries) {
         const aliasKey = join('@villagekit', pkgName, exportKey)
         const aliasTo =
