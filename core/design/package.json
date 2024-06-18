@@ -4,10 +4,10 @@
   "type": "module",
   "exports": {
     "./kit": {
-      "types": "./dist/kit.d.mts",
+      "types": "./dist/kit.d.ts",
       "source": "./src/kit.ts",
-      "import": "./dist/kit.mjs",
-      "default": "./dist/kit.mjs"
+      "import": "./dist/kit.js",
+      "default": "./dist/kit.js"
     },
     "./type-bundles/kit.d.ts": {
       "import": "./dist-type-bundles/kit.d.ts",

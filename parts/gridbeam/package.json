@@ -4,14 +4,14 @@
   "type": "module",
   "exports": {
     ".": {
-      "types": "./dist/index.d.mts",
+      "types": "./dist/index.d.ts",
       "source": "./src/index.ts",
-      "import": "./dist/index.mjs",
-      "default": "./dist/index.mjs"
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
     },
     "./package.json": "./package.json"
   },
-  "sideEffects": ["./dist/index.js", "./dist/index.mjs"],
+  "sideEffects": ["./dist/index.js", "./dist/index.js"],
   "scripts": {
     "build:pkg": "tsup src",
     "lint": "biome check .",
