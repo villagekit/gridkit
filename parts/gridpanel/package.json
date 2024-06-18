@@ -20,8 +20,8 @@
   "dependencies": {
     "@villagekit/part": "*",
     "@villagekit/ui": "*",
-    "@villagekit/util-math": "*",
-    "@villagekit/util-units": "*",
+    "@villagekit/math": "*",
+    "@villagekit/units": "*",
     "deadbeef": "github:ahdinosaur/deadbeef#fix-typescript-declarations",
     "zod": "^3.23.8"
   },

@@ -5,7 +5,7 @@ import {
   type AxisValues,
   axisIdToDirection,
   axisValuesToVector,
-} from '@villagekit/util-math'
+} from '@villagekit/math'
 import type React from 'react'
 import { useMemo } from 'react'
 import {

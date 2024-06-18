@@ -5,8 +5,8 @@ import {
   axisValuesToVector,
   flipAxisId,
   mapRange,
-} from '@villagekit/util-math'
-import { convert, meter } from '@villagekit/util-units'
+} from '@villagekit/math'
+import { convert, meter } from '@villagekit/units'
 import generateKey, { sorted as generateKeySorted } from 'deadbeef'
 import { Box3, Vector3 } from 'three'
 import type { GridPanelGlValue, GridPanelState, GridPanelSummaryValue } from './types'

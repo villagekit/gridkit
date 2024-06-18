@@ -20,8 +20,8 @@
   "dependencies": {
     "@villagekit/part": "*",
     "@villagekit/ui": "*",
-    "@villagekit/util-math": "*",
-    "@villagekit/util-units": "*",
+    "@villagekit/math": "*",
+    "@villagekit/units": "*",
     "zod": "^3.23.8"
   },
   "devDependencies": {

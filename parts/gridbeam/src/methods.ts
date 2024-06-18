@@ -5,8 +5,8 @@ import {
   axisIdToDirection,
   axisIdToDirectionVector,
   mapRange,
-} from '@villagekit/util-math'
-import { convert, meter } from '@villagekit/util-units'
+} from '@villagekit/math'
+import { convert, meter } from '@villagekit/units'
 import { Box3, Quaternion, Vector3 } from 'three'
 import type { GridBeamGlValue, GridBeamState, GridBeamSummaryValue } from './types'
 
