@@ -108,10 +108,11 @@ export const quietUseClientDirective: RollupOnWarn = (warning, warn) => {
 
 export async function workspaceAliases() {
   const aliases: Record<string, string> = {}
-  const workspacePkgs = await readdir(join(__dirname, '../../node_modules/@villagekit'))
+  const workspacePkgsDir = join(__dirname, '../../node_modules/@villagekit')
+  const workspacePkgs = await readdir(workspacePkgsDir)
   await Promise.all(
     workspacePkgs.map(async (pkgName) => {
-      const pkgBase = await realpath(join(__dirname, '../../node_modules/@villagekit', pkgName))
+      const pkgBase = await realpath(join(workspacePkgsDir, pkgName))
       const pkgJson = JSON.parse(await readFile(join(pkgBase, 'package.json'), 'utf8'))
       type ExportMap = string | { source?: string; import: string }
       if (pkgJson['exports'] == null) return

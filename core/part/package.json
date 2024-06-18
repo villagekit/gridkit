@@ -10,16 +10,16 @@
       "default": "./dist/index.mjs"
     },
     "./base": {
-      "source": "./src/base.ts",
-      "types": "./dist/base.d.ts",
-      "import": "./dist/base.mjs",
-      "default": "./dist/base.mjs"
+      "source": "./src/base/index.ts",
+      "types": "./dist/base/index.d.ts",
+      "import": "./dist/base/index.mjs",
+      "default": "./dist/base/index.mjs"
     },
     "./base/grid": {
-      "source": "./src/base/grid.ts",
-      "types": "./dist/base/grid.d.ts",
-      "import": "./dist/base/grid.mjs",
-      "default": "./dist/base/grid.mjs"
+      "source": "./src/base/grid/index.ts",
+      "types": "./dist/base/grid/index.d.ts",
+      "import": "./dist/base/grid/index.mjs",
+      "default": "./dist/base/grid/index.mjs"
     },
     "./package.json": "./package.json"
   },
