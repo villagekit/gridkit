@@ -1,11 +1,11 @@
 {
   "name": "@villagekit/design",
-  "version": "0.0.2",
-  "private": true,
+  "version": "0.0.18",
+  "type": "module",
   "exports": {
     "./kit": {
+      "types": "./dist/kit.d.mts",
       "source": "./src/kit.ts",
-      "types": "./dist/kit.d.ts",
       "import": "./dist/kit.mjs",
       "default": "./dist/kit.mjs"
     },

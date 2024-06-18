@@ -1,23 +1,23 @@
 {
   "name": "@villagekit/part",
-  "version": "0.0.2",
-  "private": true,
+  "version": "0.0.18",
+  "type": "module",
   "exports": {
     ".": {
+      "types": "./dist/index.d.mts",
       "source": "./src/index.ts",
-      "types": "./dist/index.d.ts",
       "import": "./dist/index.mjs",
       "default": "./dist/index.mjs"
     },
     "./base": {
+      "types": "./dist/base/index.d.mts",
       "source": "./src/base/index.ts",
-      "types": "./dist/base/index.d.ts",
       "import": "./dist/base/index.mjs",
       "default": "./dist/base/index.mjs"
     },
     "./base/grid": {
+      "types": "./dist/base/grid/index.d.mts",
       "source": "./src/base/grid/index.ts",
-      "types": "./dist/base/grid/index.d.ts",
       "import": "./dist/base/grid/index.mjs",
       "default": "./dist/base/grid/index.mjs"
     },

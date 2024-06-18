@@ -1,11 +1,11 @@
 {
   "name": "@villagekit/product",
-  "version": "0.0.2",
-  "private": true,
+  "version": "0.0.18",
+  "type": "module",
   "exports": {
     ".": {
+      "types": "./dist/index.d.mts",
       "source": "./src/index.ts",
-      "types": "./dist/index.d.ts",
       "import": "./dist/index.mjs",
       "default": "./dist/index.mjs"
     },
