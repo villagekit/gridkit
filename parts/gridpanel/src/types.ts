@@ -1,6 +1,6 @@
+import type { AxisId, Location } from '@villagekit/math'
 import type { BasePartSummaryValue } from '@villagekit/part/base'
 import type { BaseGridPartState } from '@villagekit/part/base/grid'
-import type { AxisId, Location } from '@villagekit/math'
 import type { Length } from '@villagekit/units'
 
 export type GridPanelType = 'gridpanel'

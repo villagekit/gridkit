@@ -1,4 +1,3 @@
-import type { FasteningPoint } from '@villagekit/part'
 import {
   type AxisValues,
   axisIdToDirection,
@@ -6,6 +5,7 @@ import {
   flipAxisId,
   mapRange,
 } from '@villagekit/math'
+import type { FasteningPoint } from '@villagekit/part'
 import { convert, meter } from '@villagekit/units'
 import generateKey, { sorted as generateKeySorted } from 'deadbeef'
 import { Box3, Vector3 } from 'three'

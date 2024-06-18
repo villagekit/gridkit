@@ -1,5 +1,5 @@
-import type { BasePartCreator } from '@villagekit/part/base'
 import { AxisId } from '@villagekit/math'
+import type { BasePartCreator } from '@villagekit/part/base'
 import type { GridPanelState } from './types'
 import { gridPanelVariants } from './variants'
 
