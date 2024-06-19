@@ -9,10 +9,7 @@
       "import": "./dist/kit.js",
       "default": "./dist/kit.js"
     },
-    "./type-bundles/kit.d.ts": {
-      "import": "./dist-type-bundles/kit.d.ts",
-      "require": "./dist-type-bundles/kit.d.ts"
-    }
+    "./type-bundles/kit.d.ts": "./dist-type-bundles/kit.d.ts"
   },
   "sideEffects": false,
   "scripts": {
