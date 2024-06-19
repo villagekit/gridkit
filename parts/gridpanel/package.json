@@ -1,6 +1,6 @@
 {
   "name": "@villagekit/part-gridpanel",
-  "version": "0.0.18",
+  "version": "0.0.17",
   "type": "module",
   "exports": {
     ".": {
