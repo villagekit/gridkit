@@ -1,5 +1,5 @@
 {
-  "extends": "@villagekit/tsconfig/react-library.json",
+  "extends": "@villagekit/tsconfig/base.json",
   "compilerOptions": {
     "outDir": "dist"
   },
