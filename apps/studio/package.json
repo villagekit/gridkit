@@ -46,7 +46,7 @@
     "@typescript/vfs": "^1.5.3",
     "@valtown/codemirror-ts": "^2.1.1",
     "@villagekit/design": "*",
-    "@villagekit/kit-smart-fasteners": "*",
+    "@villagekit/plugin-smart-fasteners": "*",
     "@villagekit/parameters": "*",
     "@villagekit/part": "*",
     "@villagekit/part-gridbeam": "*",

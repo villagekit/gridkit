@@ -1,5 +1,5 @@
 {
-  "name": "@villagekit/kit-smart-fasteners",
+  "name": "@villagekit/plugin-smart-fasteners",
   "version": "0.1.0",
   "type": "module",
   "exports": {
