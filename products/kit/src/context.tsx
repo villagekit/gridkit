@@ -29,9 +29,6 @@ import { useRender } from './renders/index'
 // import { partsSchema } from './schema'
 import type { Parts, ProductKitRender } from './types'
 
-import '@villagekit/part-gridbeam'
-import '@villagekit/part-gridpanel'
-import '@villagekit/part-fastener'
 import type { Plugin } from './plugin'
 
 type ProductKitState = {
@@ -152,6 +149,7 @@ function useParts<Ps extends Params>(options: UsePartsOptions<Ps>): UsePartsValu
     }
     return ps
   }, [render])
+  console.log('plugins', plugins)
   const generatePluginParts = useMemo(() => {
     return pDebounce((partCreators: Array<PartCreator>) => {
       return generatePartsForPlugins(plugins, partCreators)

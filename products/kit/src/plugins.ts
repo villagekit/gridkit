@@ -8,6 +8,7 @@ type PluginsById = Record<string, Plugin>
 const plugins: PluginsById = {}
 
 export function registerPlugin<PluginState>(plugin: Plugin<PluginState>) {
+  console.log('register', plugin)
   plugins[plugin.id] = plugin
 }
 

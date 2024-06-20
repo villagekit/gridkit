@@ -1,7 +1,6 @@
 import type { PartCreator, PartState } from '@villagekit/part'
-import type { Plugin } from '@villagekit/product-kit'
+import { type Plugin, registerPlugin } from '@villagekit/product-kit'
 import Deferred, { type DeferredPromise } from 'p-defer'
-
 import type { WorkerRequestData, WorkerResponseData } from './worker'
 
 export type { PossibleFastener } from './lib'
@@ -62,3 +61,5 @@ export const SmartFastenerPlugin: Plugin<SmartFastenerPluginState> = {
 
   state: null,
 }
+
+registerPlugin(SmartFastenerPlugin)

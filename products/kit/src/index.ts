@@ -5,6 +5,7 @@ import { ProductKitSummary } from './summary'
 import { ProductKitView } from './view'
 
 export { ProductKitContext } from './context'
+export { registerPlugin } from './plugins'
 export type {
   Params,
   Part,
