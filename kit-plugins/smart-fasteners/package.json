@@ -1,0 +1,44 @@
+{
+  "name": "@villagekit/smart-fasteners",
+  "version": "0.1.0",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "source": "./src/index.tsx",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "sideEffects": false,
+  "scripts": {
+    "build:pkg": "tsup src",
+    "lint": "biome check .",
+    "publint": "publint"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/villagekit/villagekit.git"
+  },
+  "author": "Village Kit <dev@villagekit.com>",
+  "license": "UNLICENSED",
+  "bugs": {
+    "url": "https://github.com/villagekit/villagekit/issues"
+  },
+  "homepage": "https://github.com/villagekit/villagekit/tree/main/kit-plugins/smart-fasteners#readme",
+  "dependencies": {
+    "@villagekit/part": "*",
+    "@villagekit/part-gridbeam": "*",
+    "@villagekit/part-gridpanel": "*",
+    "@villagekit/part-fastener": "*",
+    "@villagekit/product-kit": "*",
+    "@villagekit/math": "",
+    "lodash-es": "^4.17.21",
+    "p-defer": "^4.0.0"
+  },
+  "devDependencies": {},
+  "peerDependencies": {
+    "three": "^0.165.0"
+  }
+}

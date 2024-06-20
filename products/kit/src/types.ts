@@ -1,6 +1,6 @@
 import type { ExtractValuesFromParams, Params, ParamsValues, Presets } from '@villagekit/parameters'
 import type { PartCreator, PartVariantsByType } from '@villagekit/part'
-import type { Plugin } from './plugins'
+import type { Plugin } from './plugin'
 
 export type ProductKit<Ps extends Params = never> = {
   parameters: Ps extends never ? null : Ps

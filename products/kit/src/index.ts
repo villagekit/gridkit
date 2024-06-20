@@ -6,6 +6,7 @@ import { ProductKitView } from './view'
 
 export { ProductKitContext } from './context'
 export type { Params, Part, Parts, PartsFn, Presets } from './types'
+export type { Plugin } from './plugin'
 
 export const ProductKitModule: ProductModule = {
   id: 'kit',

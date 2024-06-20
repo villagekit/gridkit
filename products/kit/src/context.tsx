@@ -31,6 +31,7 @@ import type { Parts, Plugins, ProductKitRender } from './types'
 
 import '@villagekit/part-gridbeam'
 import '@villagekit/part-gridpanel'
+import '@villagekit/part-fastener'
 
 type ProductKitState = {
   boundingBox: Box3
