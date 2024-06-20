@@ -1,7 +1,7 @@
 import '@villagekit/part-gridbeam'
 import '@villagekit/part-gridpanel'
 import '@villagekit/part-fastener'
-import '@villagekit/kit-smart-fasteners'
+import '@villagekit/plugin-smart-fasteners'
 
 export type {
   Params,
