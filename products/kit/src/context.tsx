@@ -149,7 +149,6 @@ function useParts<Ps extends Params>(options: UsePartsOptions<Ps>): UsePartsValu
     }
     return ps
   }, [render])
-  console.log('plugins', plugins)
   const generatePluginParts = useMemo(() => {
     return pDebounce((partCreators: Array<PartCreator>) => {
       return generatePartsForPlugins(plugins, partCreators)
