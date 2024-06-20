@@ -9,12 +9,6 @@
       "import": "./dist/index.js",
       "default": "./dist/index.js"
     },
-    "./plugin": {
-      "types": "./dist/plugin.d.ts",
-      "source": "./src/plugin.ts",
-      "import": "./dist/plugin.js",
-      "default": "./dist/plugin.js"
-    },
     "./package.json": "./package.json"
   },
   "sideEffects": false,

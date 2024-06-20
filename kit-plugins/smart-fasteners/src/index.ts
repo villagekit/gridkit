@@ -1,10 +1,20 @@
 import type { PartCreator, PartState } from '@villagekit/part'
-import type { Plugin } from '@villagekit/product-kit/plugin'
+import type { Plugin } from '@villagekit/product-kit'
 import Deferred, { type DeferredPromise } from 'p-defer'
 
 import type { WorkerRequestData, WorkerResponseData } from './worker'
 
 export type { PossibleFastener } from './lib'
+
+export type SmartFastenersPluginId = 'smart-fasteners'
+
+declare global {
+  namespace VK {
+    export interface EveryPluginId {
+      'smart-fasteners': 'smart-fasteners'
+    }
+  }
+}
 
 type SmartFastenerPluginState = null | {
   nextRequestId: number
@@ -13,6 +23,7 @@ type SmartFastenerPluginState = null | {
 }
 
 export const SmartFastenerPlugin: Plugin<SmartFastenerPluginState> = {
+  id: 'smart-fasteners',
   generateParts(partStates: Array<PartState>): Promise<Array<PartCreator>> {
     if (this.state === null) return Promise.reject('Plugin not initialised!')
 

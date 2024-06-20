@@ -3,6 +3,18 @@ import { flatten } from 'lodash-es'
 
 import type { Plugin } from './plugin'
 
+type PluginsById = Record<string, Plugin>
+
+const plugins: PluginsById = {}
+
+export function registerPlugin<PluginState>(plugin: Plugin<PluginState>) {
+  plugins[plugin.id] = plugin
+}
+
+export function getPlugin(pluginId: string): Plugin | undefined {
+  return plugins[pluginId]
+}
+
 export async function generatePartsForPlugins(
   plugins: Array<Plugin>,
   partCreators: Array<PartCreator>,

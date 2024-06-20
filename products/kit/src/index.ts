@@ -5,8 +5,17 @@ import { ProductKitSummary } from './summary'
 import { ProductKitView } from './view'
 
 export { ProductKitContext } from './context'
-export type { Params, Part, Parts, PartsFn, Presets } from './types'
-export type { Plugin } from './plugin'
+export type {
+  Params,
+  Part,
+  Parts,
+  Plugins,
+  Plugin,
+  PluginIds,
+  PartsFn,
+  Preset,
+  Presets,
+} from './types'
 
 export const ProductKitModule: ProductModule = {
   id: 'kit',
