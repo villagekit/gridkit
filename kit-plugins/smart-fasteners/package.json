@@ -5,13 +5,13 @@
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "source": "./src/index.tsx",
+      "source": "./src/index.ts",
       "import": "./dist/index.js",
       "default": "./dist/index.js"
     },
     "./package.json": "./package.json"
   },
-  "sideEffects": ["./src/index.tsx", "./dist/index.js"],
+  "sideEffects": ["./src/index.ts", "./dist/index.js"],
   "scripts": {
     "build:pkg": "tsup src",
     "lint": "biome check .",
