@@ -24,6 +24,10 @@
   "homepage": "https://github.com/villagekit/villagekit/tree/main/util/math#readme",
   "dependencies": {
     "@types/serve-handler": "^6.1.4",
+    "@villagekit/part-gridbeam": "*",
+    "@villagekit/part-gridpanel": "*",
+    "@villagekit/part-fastener": "*",
+    "@villagekit/plugin-smart-fasteners": "*",
     "@villagekit/product": "*",
     "@villagekit/product-kit": "*",
     "@villagekit/sandbox": "*",
@@ -35,6 +39,7 @@
     "react-dom": "^18.2.0",
     "run-series": "^1.1.9",
     "serve-handler": "^6.1.5",
+    "smol-toml": "^1.2.1",
     "tsx": "^4.15.6"
   },
   "peerDependencies": {

@@ -1,4 +1,9 @@
-import { CSSReset, ChakraProvider, extendTheme } from '@villagekit/ui'
+import '@villagekit/part-gridbeam'
+import '@villagekit/part-gridpanel'
+import '@villagekit/part-fastener'
+import '@villagekit/plugin-smart-fasteners'
+
+import { CSSReset, ChakraProvider, theme as baseTheme, extendTheme } from '@villagekit/ui'
 import React from 'react'
 import { createRoot } from 'react-dom/client'
 
@@ -22,12 +27,14 @@ document.addEventListener('DOMContentLoaded', () => {
   const rootEl = document.getElementById('root')
   const root = createRoot(rootEl as HTMLElement)
 
+  console.log('Product Kit', ProductKitModule)
+
   root.render(
     <React.StrictMode>
       <Provider>
         <ProductProvider code={code} meta={meta} Products={[ProductKitModule]}>
           <React.Suspense fallback={null}>
-            <ProductView />
+            <ProductView mode="screenshot" />
           </React.Suspense>
         </ProductProvider>
       </Provider>
@@ -36,6 +43,7 @@ document.addEventListener('DOMContentLoaded', () => {
 })
 
 const theme = extendTheme({
+  ...baseTheme,
   styles: {
     global: {
       body: {
