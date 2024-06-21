@@ -41,8 +41,6 @@ export const SmartFastenerPlugin: Plugin<SmartFastenerPluginState> = {
 
   init() {
     if (this.state !== null) return
-    const url = new URL('./worker.ts', import.meta.url)
-    console.log('plugin worker url', url)
     const worker = new Worker(new URL('./worker.ts', import.meta.url), {
       type: 'module',
     })
