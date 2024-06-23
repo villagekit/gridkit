@@ -27,8 +27,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const rootEl = document.getElementById('root')
   const root = createRoot(rootEl as HTMLElement)
 
-  console.log('Product Kit', ProductKitModule)
-
   root.render(
     <React.StrictMode>
       <Provider>
