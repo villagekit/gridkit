@@ -19,12 +19,6 @@ const server = http.createServer((request, response) => {
 server.listen(PORT, () => {
   // console.log(`Running at http://localhost:${PORT}`)
 })
-server.on('error', (err) => {
-  throw err
-})
-server.on('clientError', (err) => {
-  throw err
-})
 
 const browser = await puppeteer.launch()
 
