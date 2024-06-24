@@ -12,17 +12,16 @@ import { ProductKitModule } from '@villagekit/product-kit'
 
 document.addEventListener('DOMContentLoaded', () => {
   const urlParams = new URLSearchParams(window.location.search)
-
   const metaJson = urlParams.get('meta')
   if (metaJson == null) {
     throw Error('Product.meta not provided!')
   }
-  const meta = JSON.parse(metaJson)
+  const meta = JSON.parse(atob(metaJson))
 
-  const code = urlParams.get('code')
-  if (code == null) {
+  if (window.location.hash === '') {
     throw Error('Product.code not provided!')
   }
+  const code = atob(window.location.hash.substring(1))
 
   const rootEl = document.getElementById('root')
   const root = createRoot(rootEl as HTMLElement)

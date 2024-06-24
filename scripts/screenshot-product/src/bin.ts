@@ -12,18 +12,26 @@ const PORT = 8678
 const server = http.createServer((request, response) => {
   return serve(request, response, {
     public: join(import.meta.dirname, '../dist/'),
+    directoryListing: false,
   })
 })
 
 server.listen(PORT, () => {
-  console.log(`Running at http://localhost:${PORT}`)
+  // console.log(`Running at http://localhost:${PORT}`)
+})
+server.on('error', (err) => {
+  throw err
+})
+server.on('clientError', (err) => {
+  throw err
 })
 
-const browser = await puppeteer.launch({ headless: false })
+const browser = await puppeteer.launch()
 
 const workspaceDir = join(import.meta.dirname, '../../../../products')
 const productsDir = join(workspaceDir, 'products')
 for (const productId of await readdir(productsDir)) {
+  console.log(`Capturing screenshot of ${productId}`)
   const productDir = join(productsDir, productId)
   const productMetaPath = join(productDir, 'villagekit.toml')
   const productMetaStr = await readFile(productMetaPath, 'utf8')
@@ -33,24 +41,22 @@ for (const productId of await readdir(productsDir)) {
   const productCodePath = join(productDir, productMeta.exports)
   const productCode = await readFile(productCodePath, 'utf8')
 
-  const qs = `meta=${encodeURIComponent(JSON.stringify(productMeta))}&code=${encodeURIComponent(productCode)}`
+  const qs = `meta=${encodeURIComponent(btoa(JSON.stringify(productMeta)))}`
+  const hash = btoa(productCode)
   const page = await browser.newPage()
-  await page.setViewport({ width: 800, height: 600, deviceScaleFactor: 1 })
-  await page.goto(`http://localhost:${PORT}?${qs}`)
+  await page.setViewport({ width: 1600, height: 1200, deviceScaleFactor: 1 })
+  await page.goto(`http://localhost:${PORT}?${qs}#${hash}`)
 
-  /*
-  // wait 10 seconds
-  await new Promise((resolve) => setTimeout(resolve, 20000))
+  // wait 5 seconds
+  await new Promise((resolve) => setTimeout(resolve, 5000))
 
-  const screenshotPath = join(productDir, 'screenshot.png')
+  const screenshotPath = join(productDir, `${productId}.png`)
+  console.log(`Writing screenshot to ${screenshotPath}`)
   await page.screenshot({
     path: screenshotPath,
     omitBackground: true,
   })
-  */
-
-  break
 }
 
-// await browser.close()
+await browser.close()
 server.close()
