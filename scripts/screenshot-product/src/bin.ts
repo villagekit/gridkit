@@ -19,6 +19,12 @@ const argsOptions: ArgscloptsParseArgsOptionsConfig = {
     short: 'w',
     help: 'The Village Kit workspace to generate screenshots for',
   },
+  product: {
+    type: 'string',
+    short: 'p',
+    help: 'The Village Kit product(s) to generate screenshots for',
+    multiple: true,
+  },
   help: {
     type: 'boolean',
     short: 'h',
@@ -29,7 +35,7 @@ const argsOptions: ArgscloptsParseArgsOptionsConfig = {
 const args = process.argv.slice(2)
 const { values } = parseArgs({ args, options: argsOptions })
 
-if (values.help) {
+if (values.help || values.workspace == null) {
   await printHelpText({ options: argsOptions, pkgPath })
 } else {
   await run()
@@ -38,7 +44,7 @@ if (values.help) {
 async function run() {
   const server = http.createServer((request, response) => {
     return serve(request, response, {
-      public: join(import.meta.dirname, '../dist/'),
+      public: values.workspace as string,
       directoryListing: false,
     })
   })
@@ -52,6 +58,10 @@ async function run() {
   const workspaceDir = join(import.meta.dirname, '../../../../products')
   const productsDir = join(workspaceDir, 'products')
   for (const productId of await readdir(productsDir)) {
+    if (values.product && !(values.product as Array<string>).includes(productId)) {
+      continue
+    }
+
     console.log(`Capturing screenshot of ${productId}`)
     const productDir = join(productsDir, productId)
     const productMetaPath = join(productDir, 'villagekit.toml')
