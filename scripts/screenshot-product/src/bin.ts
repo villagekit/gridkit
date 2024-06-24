@@ -44,18 +44,23 @@ if (values.help || values.workspace == null) {
 async function run() {
   const server = http.createServer((request, response) => {
     return serve(request, response, {
-      public: values.workspace as string,
+      public: join(import.meta.dirname, '../dist'),
       directoryListing: false,
     })
   })
 
-  server.listen(PORT, () => {
-    // console.log(`Running at http://localhost:${PORT}`)
+  await new Promise<void>((resolve, reject) => {
+    server.listen(PORT)
+    server.once('listening', () => {
+      console.log(`Server at http://localhost:${PORT}`)
+      resolve()
+    })
+    server.once('error', reject)
   })
 
   const browser = await puppeteer.launch()
 
-  const workspaceDir = join(import.meta.dirname, '../../../../products')
+  const workspaceDir = values.workspace as string
   const productsDir = join(workspaceDir, 'products')
   for (const productId of await readdir(productsDir)) {
     if (values.product && !(values.product as Array<string>).includes(productId)) {
@@ -90,5 +95,7 @@ async function run() {
   }
 
   await browser.close()
-  server.close()
+  await new Promise<void>((resolve, reject) => {
+    server.close((err) => (err ? reject(err) : resolve()))
+  })
 }
