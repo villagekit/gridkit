@@ -182,7 +182,7 @@ function Panel(props: PanelProps) {
     <group name={`gridpanel-${id}`}>
       <group name="gridpanel-panel">
         <mesh name="gridpanel-panel-texture" geometry={geometry} castShadow receiveShadow>
-          <meshLambertMaterial map={texture} needsUpdate />
+          <meshLambertMaterial map={texture} />
         </mesh>
       </group>
       {children}
