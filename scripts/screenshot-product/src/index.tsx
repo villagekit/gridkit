@@ -30,9 +30,7 @@ document.addEventListener('DOMContentLoaded', () => {
     <React.StrictMode>
       <Provider>
         <ProductProvider code={code} meta={meta} Products={[ProductKitModule]}>
-          <React.Suspense fallback={null}>
-            <ProductView mode="screenshot" />
-          </React.Suspense>
+          <ProductView mode="screenshot" />
         </ProductProvider>
       </Provider>
     </React.StrictMode>,
