@@ -82,6 +82,8 @@ export function useTexture(
     texture.magFilter = NearestFilter
     texture.anisotropy = 16
 
+    // TODO (mw): use mesh uvs instead of this
+    // https://discourse.threejs.org/t/use-the-same-texture-with-different-offsets-on-different-materials/19270/11
     texture.repeat.set(...options.repeat)
   }, [texture, options])
 
