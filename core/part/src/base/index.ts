@@ -1,5 +1,5 @@
 import { useLoader } from '@react-three/fiber'
-import { useEffect } from 'react'
+import { useLayoutEffect } from 'react'
 import { NearestFilter, RepeatWrapping, type Texture, TextureLoader } from 'three'
 
 export * from './context/index'
@@ -75,7 +75,7 @@ export function useTexture(
 ): Texture {
   const texture = useLoader(TextureLoader, partMaterial.textureUrl)
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     texture.wrapS = RepeatWrapping
     texture.wrapT = RepeatWrapping
     texture.needsUpdate = true
