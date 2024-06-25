@@ -1,5 +1,5 @@
 {
-  "name": "@villagekit/script-screenshot-product",
+  "name": "@villagekit/screenshot",
   "version": "0.1.0",
   "type": "module",
   "bin": "./src/bin.ts",

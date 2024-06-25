@@ -44,7 +44,7 @@
     "products/*",
     "apps/*",
     "kit-plugins/*",
-    "scripts/*"
+    "commands/*"
   ],
   "overrides": {
     "three": "^0.165.0"
