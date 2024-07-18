@@ -22,11 +22,13 @@ export type PartTransform =
       direction?: [number, number, number]
     }
 
-export class PartCreator {
+export class BasePartCreator {
+  type: string
   id?: string
   transforms: Array<PartTransform>
 
-  constructor(id?: string, transforms: Array<PartTransform> = []) {
+  constructor(type: string, id?: string, transforms: Array<PartTransform> = []) {
+    this.type = type
     this.id = id
     this.transforms = transforms
   }

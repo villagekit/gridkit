@@ -6,7 +6,6 @@ import type {
   PartGlValue,
   PartModulesByType,
   PartState,
-  PartSummaryValue,
 } from './types'
 
 export function calculateState(partCreator: PartCreator): PartState {
@@ -41,20 +40,6 @@ export function calculateBoundingBoxForAll(partGlValues: Array<PartGlValue>) {
     new Box3(),
   )
   return boundingBox
-}
-
-export function calculateSummaryValue(partState: PartState): PartSummaryValue {
-  const partModule = getPartModule(partState.type)
-  // @ts-ignore
-  return partModule.methods.calculateSummaryValue(partState)
-}
-export function calculateSummaryKey(partSummaryValue: PartSummaryValue): string {
-  const partModule = getPartModule(partSummaryValue.type)
-  // @ts-ignore
-  return partModule.methods.calculateSummaryKey(partState)
-}
-export function calculateSummaryValueForAll(partStates: Array<PartState>): Array<PartSummaryValue> {
-  return partStates.map(calculateSummaryValue)
 }
 
 export function calculateFasteningPoints(partState: PartState): Array<FasteningPoint> {

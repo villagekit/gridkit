@@ -1,4 +1,3 @@
-import type { BasePartSummaryValue } from './base'
 import type {
   PartCreator,
   PartModule,
@@ -16,9 +15,8 @@ export function registerPartModule<
   Creator extends PartCreator,
   State extends PartState,
   GlValue,
-  SummaryValue extends BasePartSummaryValue,
   Variants,
->(partModule: PartModule<Id, Creator, State, GlValue, SummaryValue, Variants>) {
+>(partModule: PartModule<Id, Creator, State, GlValue, Variants>) {
   // @ts-ignore
   partModules[partModule.id] = partModule
 }

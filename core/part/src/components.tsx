@@ -1,7 +1,7 @@
 import { groupBy, map } from 'lodash-es'
 import type React from 'react'
 import { useMemo } from 'react'
-import { type PartGlValue, type PartState, type PartSummaryValue, getPartModule } from './index'
+import { type PartCreator, type PartGlValue, type PartState, getPartModule } from './index'
 
 export interface PartsGlForAllProps {
   partGlValues: Array<PartGlValue>
@@ -16,11 +16,14 @@ export function PartsGlForAll(props: PartsGlForAllProps): React.ReactElement {
 
   return (
     <>
-      {map(partsByType, (partGlValuesForType, partType: PartGlValue['type']) => {
-        return (
-          <PartsGlForType key={partType} partType={partType} partGlValues={partGlValuesForType} />
-        )
-      })}
+      {map(
+        partsByType,
+        (partGlValuesForType: Array<PartGlValue>, partType: PartGlValue['type']) => {
+          return (
+            <PartsGlForType key={partType} partType={partType} partGlValues={partGlValuesForType} />
+          )
+        },
+      )}
     </>
   )
 }
@@ -41,26 +44,20 @@ export function PartsGlForType(props: PartsGlForTypeProps): React.ReactElement {
 }
 
 export interface PartsSummaryForAllProps {
-  partSummaryValues: Array<PartSummaryValue>
+  parts: Array<PartCreator>
 }
 
 export function PartsSummaryForAll(props: PartsSummaryForAllProps): React.ReactElement {
-  const { partSummaryValues } = props
+  const { parts } = props
 
   const partsByType = useMemo(() => {
-    return groupBy(partSummaryValues, 'type')
-  }, [partSummaryValues])
+    return groupBy(parts, 'type')
+  }, [parts])
 
   return (
     <>
-      {map(partsByType, (partSummaryValuesForType, partType: PartSummaryValue['type']) => {
-        return (
-          <PartsSummaryForType
-            key={partType}
-            partType={partType}
-            partSummaryValues={partSummaryValuesForType}
-          />
-        )
+      {map(partsByType, (partsForType: Array<PartCreator>, partType: PartCreator['type']) => {
+        return <PartsSummaryForType key={partType} partType={partType} parts={partsForType} />
       })}
     </>
   )
@@ -68,15 +65,15 @@ export function PartsSummaryForAll(props: PartsSummaryForAllProps): React.ReactE
 
 export interface PartsSummaryForTypeProps {
   partType: PartState['type']
-  partSummaryValues: Array<PartSummaryValue>
+  parts: Array<PartCreator>
 }
 
 export function PartsSummaryForType(props: PartsSummaryForTypeProps): React.ReactElement {
-  const { partType, partSummaryValues } = props
+  const { partType, parts } = props
 
   const partModule = getPartModule(partType)
   const PartsSummary = partModule.components.PartsSummary
 
   // @ts-ignore
-  return <PartsSummary parts={partSummaryValues} />
+  return <PartsSummary parts={parts} />
 }

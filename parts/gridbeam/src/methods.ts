@@ -5,12 +5,48 @@ import {
   axisIdToDirectionVector,
   mapRange,
 } from '@villagekit/math'
-import type { FasteningPoint } from '@villagekit/part'
+import type { FasteningPoint, WithRequiredId } from '@villagekit/part'
 import { convert, meter } from '@villagekit/units'
 import { Box3, Quaternion, Vector3 } from 'three'
+import type { GridBeam } from './creators'
 import type { GridBeamGlValue, GridBeamState, GridBeamSummaryValue } from './types'
 
 const X_AXIS = axisIdToDirectionVector(AxisId.X)
+
+export function calculateState(creator: WithRequiredId<GridBeam>): GridBeamState {
+  const { type, id, variant, lengthInGrids, transforms } = creator
+
+  const quaternion = new Quaternion()
+  const locationInGrids = [0, 0, 0]
+
+  for (const transform of transforms) {
+    switch (transform.type) {
+      case 'translation':
+        locationInGrids[0] += transform.vector
+        break
+      case 'rotation':
+        break
+    }
+  }
+
+  /*
+  id: string
+  type: GridBeamType
+  variant: GridBeamVariant
+  axis: AxisId
+  locationInGrids: Location
+  lengthInGrids: ScaleX
+  */
+
+  return {
+    id,
+    type,
+    variant,
+    axis,
+    locationInGrids,
+    lengthInGrids,
+  }
+}
 
 export function calculateGlValue(state: GridBeamState): GridBeamGlValue {
   const {

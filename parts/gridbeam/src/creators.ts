@@ -7,7 +7,7 @@ export type GridBeamCreator = GridBeamXOptions | GridBeamYOptions | GridBeamZOpt
 
 const getDefaultVariantId = () => '40mm:8mm:douglas-fir'
 
-class GridBeam extends PartCreator {
+export class GridBeam extends PartCreator {
   variant?: keyof typeof gridBeamVariants
   lengthInGrids: number
 
