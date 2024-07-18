@@ -1,36 +1,26 @@
 import { useLoader } from '@react-three/fiber'
-import { Data } from 'dataclass'
 import { useLayoutEffect } from 'react'
 import { NearestFilter, RepeatWrapping, type Texture, TextureLoader } from 'three'
 
 export * from './context/index'
 export * from './svg/index'
 
-export class PartCreator extends Data {
-  id?: string
-}
-
-export class PartVariantSelector extends Data {}
-
-export class PartMaterial extends Data {
-  textureUrl: string
-}
-
-export interface PartMaterials {
-  [key: string]: PartMaterial
-}
-
-export class PartVariant extends Data {
-  id: string
-  materials: PartMaterials
-}
-
 export type PartId = string
 export type PartType = string
 export type PartCreatorType = string
 export type PartVariantId = string
 
-export interface PartVariant {}
+export interface PartMaterial {
+  textureUrl: string
+}
+export interface PartMaterials {
+  [key: string]: PartMaterial
+}
+
+export interface PartVariant {
+  id: string
+  materials: PartMaterials
+}
 
 export interface BasePartState {
   id: PartId
