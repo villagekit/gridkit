@@ -1,12 +1,11 @@
 import type { AxisId, Direction, Location, ScaleX } from '@villagekit/math'
-import type { BasePartSummaryValue } from '@villagekit/part/base'
-import type { BaseGridPartState } from '@villagekit/part/base/grid'
 import type { Length } from '@villagekit/units'
 import type { Quaternion } from 'three'
+import type { gridBeamVariants } from './variants'
 
 export type GridBeamType = 'gridbeam'
 
-export interface GridBeamVariant {
+export type GridBeamVariant = {
   id: string
   gridLength: Length
   holeDiameter: Length
@@ -17,15 +16,20 @@ export interface GridBeamVariant {
   }
 }
 
-export interface GridBeamState extends BaseGridPartState {
+export type GridBeamCreator = {
+  id?: string
   type: GridBeamType
-  variant: GridBeamVariant
+  variant?: keyof typeof gridBeamVariants
   axis: AxisId
   locationInGrids: Location
   lengthInGrids: ScaleX
 }
 
-export interface GridBeamGlValue extends GridBeamState {
+export type GridBeamState = GridBeamCreator & {
+  variant: GridBeamVariant
+}
+
+export type GridBeamGlValue = GridBeamState & {
   // variant
   gridLengthInMeters: number
   holeDiameterInMeters: number
@@ -43,7 +47,7 @@ export interface GridBeamGlValue extends GridBeamState {
   sizeInMeters: [number, number, number]
 }
 
-export interface GridBeamSummaryValue extends BasePartSummaryValue {
+export type GridBeamSummaryValue = {
   type: GridBeamType
   variant: GridBeamVariant
   lengthInGrids: ScaleX

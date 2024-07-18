@@ -10,6 +10,44 @@ export type PartType = string
 export type PartCreatorType = string
 export type PartVariantId = string
 
+export type PartTransform =
+  | {
+      type: 'translation'
+      vector: [number, number, number]
+    }
+  | {
+      type: 'rotation'
+      angle: number
+      origin?: [number, number, number]
+      direction?: [number, number, number]
+    }
+
+export class PartCreator {
+  id?: string
+  transforms: Array<PartTransform>
+
+  constructor(id?: string, transforms: Array<PartTransform> = []) {
+    this.id = id
+    this.transforms = transforms
+  }
+
+  translate(vector: [number, number, number]) {
+    this.transforms.push({
+      type: 'translation',
+      vector,
+    })
+  }
+
+  rotate(angle: number, origin?: [number, number, number], direction?: [number, number, number]) {
+    this.transforms.push({
+      type: 'rotation',
+      angle,
+      origin,
+      direction,
+    })
+  }
+}
+
 export interface PartMaterial {
   textureUrl: string
 }
@@ -22,46 +60,28 @@ export interface PartVariant {
   materials: PartMaterials
 }
 
-export interface BasePartState {
-  id: PartId
-  type: PartType
-  variant: PartVariant
-}
-
-export interface BasePartCreator {
-  id?: PartId
-  type: PartCreatorType
-  variant?: PartVariantId
-}
-
-export interface BasePartSummaryValue {
-  type: PartType
-}
-
 export interface PartsGlProps<PartGlValue> {
   parts: Array<PartGlValue>
 }
 
-export type PartSummaryEntry<T extends BasePartSummaryValue> = [string, T]
+export type PartSummaryEntry<T> = [string, T]
 
-export type PartSummaryQuotaSingle<T extends BasePartSummaryValue> = {
+export type PartSummaryQuotaSingle<T> = {
   type: 'single'
   key: string
   part: T
 }
 
-export type PartSummaryQuotaGrouped<T extends BasePartSummaryValue> = {
+export type PartSummaryQuotaGrouped<T> = {
   type: 'grouped'
   key: string
   part: T
   count: number
 }
 
-export type PartSummaryQuota<T extends BasePartSummaryValue> =
-  | PartSummaryQuotaSingle<T>
-  | PartSummaryQuotaGrouped<T>
+export type PartSummaryQuota<T> = PartSummaryQuotaSingle<T> | PartSummaryQuotaGrouped<T>
 
-export interface PartsSummaryProps<T extends BasePartSummaryValue> {
+export interface PartsSummaryProps<T> {
   parts: Array<T>
 }
 
@@ -90,7 +110,7 @@ export function useTexture(
   return texture
 }
 
-export function partsToPartQuotas<T extends BasePartSummaryValue>(
+export function partsToPartQuotas<T>(
   type: PartSummaryQuota<T>['type'],
   entries: Array<PartSummaryEntry<T>>,
 ): Array<PartSummaryQuota<T>> {
