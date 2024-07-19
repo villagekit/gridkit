@@ -1,8 +1,30 @@
-import { BasePartCreator, type PartTransform } from '@villagekit/part/base'
+import { BasePartCreator, type PartTransform } from '@villagekit/part/creator'
 import { convert, meter } from '@villagekit/units'
-import { gridBeamVariants } from './variants'
 
-export type GridBeamCreator = GridBeamXOptions | GridBeamYOptions | GridBeamZOptions
+import { millimeter } from '@villagekit/units'
+import type { GridBeamVariant } from './types'
+
+const gridBeamVariants: Record<string, GridBeamVariant> = {
+  '40mm:8mm:douglas-fir': {
+    gridLength: {
+      type: 'quantity',
+      unit: millimeter,
+      value: 40,
+    },
+    holeDiameter: {
+      type: 'quantity',
+      unit: millimeter,
+      value: 8,
+    },
+    id: '40mm:8mm:douglas-fir',
+    materials: {
+      beam: {
+        textureUrl:
+          'https://res.cloudinary.com/villagekit/image/upload/dpr_auto,f_auto,q_auto:good/v1/textures/douglas-fir_adsycy',
+      },
+    },
+  },
+}
 
 const getDefaultVariantId = () => '40mm:8mm:douglas-fir'
 

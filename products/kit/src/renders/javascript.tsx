@@ -6,6 +6,11 @@ import { comlinkDataUrl } from '../comlink'
 import type { Params, ParamsValues, PartVariantsByType, Parts, Presets } from '../types'
 import type { RenderEvent, RendererMachineEvent } from './'
 
+import partCreatorRaw from '../../../../core/part/dist/creator.js?raw'
+import gridbeamCreatorRaw from '../../../../parts/gridbeam/dist/creator.js?raw'
+import mathRaw from '../../../../util/math/dist/index.js?raw'
+import unitsRaw from '../../../../util/units/dist/index.js?raw'
+
 type Evaluator = {
   loadModule: (code: string) => Promise<string>
   evaluateModule: () => Promise<{
@@ -56,6 +61,8 @@ export const javascriptRenderer = fromCallback<RenderEvent, RendererMachineEvent
       if (jsModule == null) return
 
       const { parameters, presets, parts, plugins } = jsModule
+
+      console.log('js module', jsModule)
 
       const event: RendererMachineEvent =
         parameters == null || presets == null
@@ -167,8 +174,14 @@ const createEvaluatorIframeSrc = () =>
 {
   "imports": {
     "comlink": "${comlinkDataUrl}",
-    "@villagekit/design": "data:,${encodeURI('')}",
-    "@villagekit/part-gridbeam/creator": "data:,${encodeURI('')}"
+    "three": "https://cdn.jsdelivr.net/npm/three@0.165.0/+esm",
+    "react": "https://cdn.jsdelivr.net/npm/react@18.3.1/+esm",
+    "@react-three/fiber": "https://cdn.jsdelivr.net/npm/react-three-fiber@6.0.13/+esm",
+    "@villagekit/math": "data:application/javascript;base64,${encodeURI(encodeBase64(mathRaw))}",
+    "@villagekit/units": "data:application/javascript;base64,${encodeURI(encodeBase64(unitsRaw))}",
+    "@villagekit/part/creator": "data:application/javascript;base64,${encodeURI(encodeBase64(partCreatorRaw))}",
+    "@villagekit/part-gridbeam/creator": "data:application/javascript;base64,${encodeURI(encodeBase64(gridbeamCreatorRaw))}",
+    "@villagekit/design/kit": "data:,${encodeURI('')}"
   }
 }
 </script>
@@ -186,6 +199,16 @@ const createEvaluatorIframeSrc = () =>
 </script>
 </html>
 `
+
+const textEncoder = new TextEncoder()
+function encodeBase64(text: string) {
+  return bytesToBase64(textEncoder.encode(text))
+}
+
+function bytesToBase64(bytes: Uint8Array) {
+  const binString = Array.from(bytes, (byte) => String.fromCodePoint(byte)).join('')
+  return btoa(binString)
+}
 
 function getTraceMap(code: string) {
   const sourceMapLine = code.substring(code.lastIndexOf('\n', code.length - 1) + 1, code.length)
