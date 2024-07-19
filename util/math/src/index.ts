@@ -62,12 +62,20 @@ export function flipAxisId(axisId: AxisId) {
 export function directionToAxisId(direction: Direction): AxisId | undefined {
   return axisIds.find((axisId) => {
     const axisDirection = directionByAxisId[axisId]
-    return (
-      direction[0] === axisDirection[0] &&
-      direction[1] === axisDirection[1] &&
-      direction[2] === axisDirection[2]
-    )
+    return vectorFloatsEquals(direction, axisDirection)
   })
+}
+
+function floatEquals(a: number, b: number, epsilon = Number.EPSILON): boolean {
+  return Math.abs(a - b) < epsilon
+}
+
+function vectorFloatsEquals(a: Vector3, b: Vector3, epsilon = Number.EPSILON): boolean {
+  return (
+    floatEquals(a[0], b[0], epsilon) &&
+    floatEquals(a[1], b[1], epsilon) &&
+    floatEquals(a[2], b[2], epsilon)
+  )
 }
 
 export function isStandardDirection(direction: Direction): boolean {

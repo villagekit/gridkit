@@ -3,40 +3,60 @@ import {
   type Location,
   axisIdToDirection,
   axisIdToDirectionVector,
+  directionToAxisId,
   mapRange,
 } from '@villagekit/math'
 import type { FasteningPoint, WithRequiredId } from '@villagekit/part'
 import { convert, meter } from '@villagekit/units'
-import { Box3, Quaternion, Vector3 } from 'three'
+import { Box3, Matrix4, Quaternion, Vector3 } from 'three'
 import type { GridBeam } from './creators'
-import type { GridBeamGlValue, GridBeamState, GridBeamSummaryValue } from './types'
+import type { GridBeamGlValue, GridBeamState, GridBeamVariant } from './types'
+import { gridBeamVariants } from './variants'
 
 const X_AXIS = axisIdToDirectionVector(AxisId.X)
 
 export function calculateState(creator: WithRequiredId<GridBeam>): GridBeamState {
-  const { type, id, variant, lengthInGrids, transforms } = creator
+  const { type, id, variantId, lengthInGrids, transforms } = creator
 
-  const quaternion = new Quaternion()
-  const locationInGrids = [0, 0, 0]
+  const variant = gridBeamVariants[variantId]
+  if (variant == null) {
+    throw new Error(`Unknown gridbeam variant: ${variantId}`)
+  }
 
+  const matrix = new Matrix4()
   for (const transform of transforms) {
     switch (transform.type) {
       case 'translation':
-        locationInGrids[0] += transform.vector
+        matrix.premultiply(new Matrix4().setPosition(new Vector3(...transform.vector)))
         break
-      case 'rotation':
+      case 'rotation': {
+        // https://stackoverflow.com/a/55138754
+        const pivotMatrix = new Matrix4().setPosition(new Vector3(...transform.origin))
+        const pivotInverseMatrix = pivotMatrix.invert()
+        matrix.premultiply(pivotInverseMatrix)
+        const rotationMatrix = new Matrix4().makeRotationFromQuaternion(
+          new Quaternion().setFromAxisAngle(new Vector3(...transform.direction), transform.angle),
+        )
+        matrix.premultiply(rotationMatrix)
+        matrix.premultiply(pivotMatrix)
         break
+      }
     }
   }
+  const position = new Vector3()
+  const quaternion = new Quaternion()
+  const scale = new Vector3()
+  matrix.decompose(position, quaternion, scale)
 
-  /*
-  id: string
-  type: GridBeamType
-  variant: GridBeamVariant
-  axis: AxisId
-  locationInGrids: Location
-  lengthInGrids: ScaleX
-  */
+  const gridLengthInMeters = getGridLengthInMeters(variant)
+  const locationInGrids = position.divideScalar(gridLengthInMeters).round().toArray()
+
+  const direction = X_AXIS.clone().applyQuaternion(quaternion).toArray()
+  const axis = directionToAxisId(direction)
+
+  if (axis == null) {
+    throw new Error(`gridbeam direction axis is not standard: [${direction.join(', ')}]`)
+  }
 
   return {
     id,
@@ -56,7 +76,7 @@ export function calculateGlValue(state: GridBeamState): GridBeamGlValue {
     variant: { holeDiameter },
   } = state
 
-  const gridLengthInMeters = getGridLengthInMeters(state)
+  const gridLengthInMeters = getGridLengthInMeters(state.variant)
   const holeDiameterInMeters = convert(holeDiameter, meter).value
 
   const direction = axisIdToDirection(axis)
@@ -107,16 +127,10 @@ export function calculateBoundingBox(value: GridBeamGlValue): Box3 {
   ])
 }
 
-export function calculateSummaryValue(state: GridBeamState): GridBeamSummaryValue {
-  const { type, variant, lengthInGrids } = state
+export function calculateSummaryKey(creator: GridBeam): string {
+  const { type, variantId, lengthInGrids } = creator
 
-  return { lengthInGrids, type, variant }
-}
-
-export function calculateSummaryKey(summary: GridBeamSummaryValue): string {
-  const { type, variant, lengthInGrids } = summary
-
-  return `${type}::${variant.id}::${lengthInGrids}`
+  return `${type}::${variantId}::${lengthInGrids}`
 }
 
 const fasteningAxesByAxisId: Record<AxisId, Array<AxisId>> = {
@@ -183,10 +197,8 @@ export function calculateNumFastenersToFasten(_state: GridBeamState): number {
   return 2
 }
 
-function getGridLengthInMeters(state: GridBeamState): number {
-  const {
-    variant: { gridLength },
-  } = state
+function getGridLengthInMeters(variant: GridBeamVariant): number {
+  const { gridLength } = variant
 
   return convert(gridLength, meter).value
 }

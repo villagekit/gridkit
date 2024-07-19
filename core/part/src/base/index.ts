@@ -6,7 +6,6 @@ export * from './context/index'
 export * from './svg/index'
 
 export type PartId = string
-export type PartType = string
 export type PartCreatorType = string
 export type PartVariantId = string
 
@@ -18,16 +17,16 @@ export type PartTransform =
   | {
       type: 'rotation'
       angle: number
-      origin?: [number, number, number]
-      direction?: [number, number, number]
+      origin: [number, number, number]
+      direction: [number, number, number]
     }
 
-export class BasePartCreator {
-  type: string
+export class BasePartCreator<PartType extends string> {
+  type: PartType
   id?: string
   transforms: Array<PartTransform>
 
-  constructor(type: string, id?: string, transforms: Array<PartTransform> = []) {
+  constructor(type: PartType, id?: string, transforms: Array<PartTransform> = []) {
     this.type = type
     this.id = id
     this.transforms = transforms
@@ -40,7 +39,11 @@ export class BasePartCreator {
     })
   }
 
-  rotate(angle: number, origin?: [number, number, number], direction?: [number, number, number]) {
+  rotate(
+    angle: number,
+    origin: [number, number, number] = [0, 0, 0],
+    direction: [number, number, number] = [0, 0, 1],
+  ) {
     this.transforms.push({
       type: 'rotation',
       angle,

@@ -1,5 +1,5 @@
 import '@villagekit/part-gridbeam'
-import '@villagekit/part-gridpanel'
+// import '@villagekit/part-gridpanel'
 import '@villagekit/part-fastener'
 import '@villagekit/plugin-smart-fasteners'
 

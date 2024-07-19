@@ -44,7 +44,9 @@ export type FasteningPoint = {
   gradient: number
 }
 
-export type CalculatePartState<Creator, State> = (creator: Creator) => State
+export type CalculatePartState<Creator extends { id?: string }, State> = (
+  creator: WithRequiredId<Creator>,
+) => State
 export type CalculatePartGlValue<State, GlValue> = (state: State) => GlValue
 export type CalculatePartBoundingBox<Value> = (value: Value) => Box3
 export type CalculatePartFasteningPoints<State> = (state: State) => Array<FasteningPoint>

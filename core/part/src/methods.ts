@@ -1,17 +1,9 @@
 import { Box3 } from 'three'
 import { getPartModule } from './modules'
-import type {
-  FasteningPoint,
-  PartCreator,
-  PartGlValue,
-  PartModulesByType,
-  PartState,
-} from './types'
+import type { FasteningPoint, PartCreator, PartGlValue, PartState, WithRequiredId } from './types'
 
-export function calculateState(partCreator: PartCreator): PartState {
-  const { type } = partCreator
-  const partModuleType = (type.includes(':') ? type.split(':')[0] : type) as keyof PartModulesByType
-  const partModule = getPartModule(partModuleType)
+export function calculateState(partCreator: WithRequiredId<PartCreator>): PartState {
+  const partModule = getPartModule(partCreator.type)
   // @ts-ignore
   return partModule.methods.calculateState(partCreator)
 }

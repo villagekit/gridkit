@@ -1,13 +1,12 @@
 import { registerPartModule } from '@villagekit/part'
-import { type GridBeamCreator, calculateState } from './creators'
+import type { GridBeam } from './creators'
 import { PartsGl } from './gl'
 import {
   calculateBoundingBox,
   calculateFasteningPoints,
   calculateGlValue,
   calculateNumFastenersToFasten,
-  calculateSummaryKey,
-  calculateSummaryValue,
+  calculateState,
 } from './methods'
 import { gridBeamSchemas } from './schemas'
 import { PartsSummary } from './summary'
@@ -25,7 +24,7 @@ declare global {
       gridbeam: GridBeamType
     }
     interface EveryPartCreator {
-      gridbeam: GridBeamCreator
+      gridbeam: GridBeam
     }
     interface EveryPartState {
       gridbeam: GridBeamState
@@ -54,8 +53,6 @@ registerPartModule({
     calculateGlValue,
     calculateNumFastenersToFasten,
     calculateState,
-    calculateSummaryKey,
-    calculateSummaryValue,
   },
   variants: gridBeamVariants,
   schemas: gridBeamSchemas,

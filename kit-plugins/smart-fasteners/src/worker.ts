@@ -1,4 +1,4 @@
-import '@villagekit/part-gridpanel'
+// import '@villagekit/part-gridpanel'
 import '@villagekit/part-gridbeam'
 import '@villagekit/part-fastener'
 
