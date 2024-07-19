@@ -123,6 +123,68 @@ const createEvaulatorIframe = () => {
   return iframe
 }
 
+const createEvaluatorIframeSrc = () =>
+  `
+<!doctype html>
+<script type="importmap">
+{
+  "imports": {
+    "comlink": "${comlinkDataUrl}",
+    "three": "https://cdn.jsdelivr.net/npm/three@165.0/build/three.module.js",
+    "@villagekit/math": "data:application/javascript;base64,${encodeURI(encodeBase64(mathRaw))}",
+    "@villagekit/units": "data:application/javascript;base64,${encodeURI(encodeBase64(unitsRaw))}",
+    "@villagekit/part/creator": "data:application/javascript;base64,${encodeURI(encodeBase64(partCreatorRaw))}",
+    "@villagekit/part-gridbeam/creator": "data:application/javascript;base64,${encodeURI(encodeBase64(gridbeamCreatorRaw))}",
+    "@villagekit/design/kit": "data:,${encodeURI('')}"
+  }
+}
+</script>
+<script type="module">
+  import * as Comlink from "comlink"
+
+  let moduleUrl = null
+  let module = null
+
+  function loadModule(code) {
+    if (moduleUrl != null) {
+      URL.revokeObjectURL(moduleUrl)
+    }
+
+    moduleUrl = URL.createObjectURL(
+      new Blob([code], { type: 'text/javascript' }),
+    )
+
+    return moduleUrl
+  }
+
+  async function evaluateModule() {
+    module = await import(moduleUrl)
+
+    const { parameters, presets, parts, plugins } = module
+
+    if (typeof parts === 'function') {
+      return { parameters, presets, plugins }
+    } else {
+      return { parts, plugins }
+    }
+  }
+
+  function evaluateParts(parameters, partVariants) {
+    return module.parts(parameters, partVariants)
+  }
+
+  const exports = {
+    loadModule,
+    evaluateModule,
+    evaluateParts,
+  }
+
+  Comlink.expose(exports, Comlink.windowEndpoint(self.parent))
+</script>
+</html>
+`
+
+/*
 const createEvaulatorWorkerSrc = () => `
   // web workers don't yet support importmaps
   import * as Comlink from "${comlinkDataUrl}"
@@ -199,6 +261,7 @@ const createEvaluatorIframeSrc = () =>
 </script>
 </html>
 `
+*/
 
 const textEncoder = new TextEncoder()
 function encodeBase64(text: string) {
