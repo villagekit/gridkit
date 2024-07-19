@@ -167,7 +167,8 @@ const createEvaluatorIframeSrc = () =>
 {
   "imports": {
     "comlink": "${comlinkDataUrl}",
-    "@villagekit/design": "data:,${encodeURI('')}"
+    "@villagekit/design": "data:,${encodeURI('')}",
+    "@villagekit/part-gridbeam/creator": "data:,${encodeURI('')}"
   }
 }
 </script>

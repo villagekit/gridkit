@@ -9,7 +9,7 @@ import {
 import type { FasteningPoint, WithRequiredId } from '@villagekit/part'
 import { convert, meter } from '@villagekit/units'
 import { Box3, Matrix4, Quaternion, Vector3 } from 'three'
-import type { GridBeam } from './creators'
+import type { GridBeam } from './creator'
 import type { GridBeamGlValue, GridBeamState, GridBeamVariant } from './types'
 import { gridBeamVariants } from './variants'
 

@@ -9,6 +9,12 @@
       "import": "./dist/index.js",
       "default": "./dist/index.js"
     },
+    "./creator": {
+      "types": "./dist/creator.d.ts",
+      "source": "./src/creator.ts",
+      "import": "./dist/creator.js",
+      "default": "./dist/creator.js"
+    },
     "./package.json": "./package.json"
   },
   "files": ["./src", "./dist"],

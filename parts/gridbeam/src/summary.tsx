@@ -8,7 +8,7 @@ import {
 } from '@villagekit/part/base'
 import { HStack, Text, VStack } from '@villagekit/ui'
 import { useMemo } from 'react'
-import type { GridBeam } from './creators'
+import type { GridBeam } from './creator'
 import { calculateSummaryKey } from './methods'
 import { SummaryGridBeamSvg } from './svg/summary-grid-beam-svg'
 

@@ -1,5 +1,5 @@
 import { registerPartModule } from '@villagekit/part'
-import type { GridBeam } from './creators'
+import type { GridBeam } from './creator'
 import { PartsGl } from './gl'
 import {
   calculateBoundingBox,

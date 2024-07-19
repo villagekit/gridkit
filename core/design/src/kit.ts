@@ -1,7 +1,7 @@
 import '@villagekit/part-gridbeam'
 // import '@villagekit/part-gridpanel'
-import '@villagekit/part-fastener'
-import '@villagekit/plugin-smart-fasteners'
+// import '@villagekit/part-fastener'
+// import '@villagekit/plugin-smart-fasteners'
 
 export type {
   Params,
@@ -11,6 +11,8 @@ export type {
   Parts,
   PartsFn,
 } from '@villagekit/product-kit'
+
+export { GridBeam } from '@villagekit/part-gridbeam/creator'
 
 import type { PluginIds } from '@villagekit/product-kit'
 export type Plugins = PluginIds
