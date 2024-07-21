@@ -9,6 +9,7 @@ import {
 import type { FasteningPoint, WithRequiredId } from '@villagekit/part'
 import { convert, meter } from '@villagekit/units'
 import { Box3, Matrix4, Quaternion, Vector3 } from 'three'
+import { degToRad } from 'three/src/math/MathUtils.js'
 import type { GridBeam } from './creator'
 import type { GridBeamGlValue, GridBeamState, GridBeamVariant } from './types'
 import { gridBeamVariants } from './variants'
@@ -31,14 +32,17 @@ export function calculateState(creator: WithRequiredId<GridBeam>): GridBeamState
         break
       case 'rotation': {
         // https://stackoverflow.com/a/55138754
-        const pivotMatrix = new Matrix4().setPosition(new Vector3(...transform.origin))
-        const pivotInverseMatrix = pivotMatrix.invert()
-        matrix.premultiply(pivotInverseMatrix)
+        // const pivotMatrix = new Matrix4().setPosition(new Vector3(...transform.origin))
+        // const pivotInverseMatrix = pivotMatrix.clone().invert()
+        // matrix.premultiply(pivotInverseMatrix)
         const rotationMatrix = new Matrix4().makeRotationFromQuaternion(
-          new Quaternion().setFromAxisAngle(new Vector3(...transform.direction), transform.angle),
+          new Quaternion().setFromAxisAngle(
+            new Vector3(...transform.direction),
+            degToRad(transform.angle),
+          ),
         )
         matrix.premultiply(rotationMatrix)
-        matrix.premultiply(pivotMatrix)
+        // matrix.premultiply(pivotMatrix)
         break
       }
     }
@@ -53,6 +57,7 @@ export function calculateState(creator: WithRequiredId<GridBeam>): GridBeamState
 
   const direction = X_AXIS.clone().applyQuaternion(quaternion).toArray()
   const axis = directionToAxisId(direction)
+  console.log('axis', axis, locationInGrids, lengthInGrids)
 
   if (axis == null) {
     throw new Error(`gridbeam direction axis is not standard: [${direction.join(', ')}]`)

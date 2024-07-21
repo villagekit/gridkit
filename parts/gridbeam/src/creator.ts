@@ -109,7 +109,7 @@ export class GridBeam extends BasePartCreator<'gridbeam'> {
       transforms: [
         {
           type: 'rotation',
-          angle: z[0] <= z[1] ? 90 : -90,
+          angle: z[0] <= z[1] ? -90 : 90,
           origin: [halfGridUnit, halfGridUnit, halfGridUnit],
           direction: Y_AXIS,
         },

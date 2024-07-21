@@ -62,7 +62,7 @@ export function flipAxisId(axisId: AxisId) {
 export function directionToAxisId(direction: Direction): AxisId | undefined {
   return axisIds.find((axisId) => {
     const axisDirection = directionByAxisId[axisId]
-    return vectorFloatsEquals(direction, axisDirection)
+    return vectorFloatsEquals(direction, axisDirection, Number.EPSILON * 100)
   })
 }
 
