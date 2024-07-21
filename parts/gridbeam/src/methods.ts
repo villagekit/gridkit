@@ -28,18 +28,18 @@ export function calculateState(creator: WithRequiredId<GridBeam>): GridBeamState
   for (const transform of transforms) {
     switch (transform.type) {
       case 'translation':
-        matrix.premultiply(new Matrix4().setPosition(new Vector3(...transform.vector)))
+        matrix.premultiply(new Matrix4().makeTranslation(...transform.vector))
         break
       case 'rotation': {
         // https://stackoverflow.com/a/55138754
-        // const pivotMatrix = new Matrix4().setPosition(new Vector3(...transform.origin))
-        // const pivotInverseMatrix = pivotMatrix.clone().invert()
-        // matrix.premultiply(pivotInverseMatrix)
-        const rotationMatrix = new Matrix4().makeRotationFromQuaternion(
-          new Quaternion().setFromAxisAngle(
-            new Vector3(...transform.direction),
-            degToRad(transform.angle),
-          ),
+        /*
+        const pivotMatrix = new Matrix4().makeTranslation(...transform.origin)
+        const pivotInverseMatrix = pivotMatrix.clone().invert()
+        matrix.premultiply(pivotInverseMatrix)
+        */
+        const rotationMatrix = new Matrix4().makeRotationAxis(
+          new Vector3(...transform.direction),
+          degToRad(transform.angle),
         )
         matrix.premultiply(rotationMatrix)
         // matrix.premultiply(pivotMatrix)
@@ -57,7 +57,6 @@ export function calculateState(creator: WithRequiredId<GridBeam>): GridBeamState
 
   const direction = X_AXIS.clone().applyQuaternion(quaternion).toArray()
   const axis = directionToAxisId(direction)
-  console.log('axis', axis, locationInGrids, lengthInGrids)
 
   if (axis == null) {
     throw new Error(`gridbeam direction axis is not standard: [${direction.join(', ')}]`)
