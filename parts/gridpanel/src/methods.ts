@@ -60,31 +60,43 @@ export function calculateState(creator: WithRequiredId<GridPanel>): GridPanelSta
   const startInGrids = position.divideScalar(gridLengthInMeters).round().toArray()
 
   const mainDirection = X_AXIS.clone().applyQuaternion(quaternion).toArray()
-  const mainAxis = directionToAxisId(mainDirection)
+  let mainAxis = directionToAxisId(mainDirection)
   if (mainAxis == null) {
     throw new Error(`gridpanel main direction axis is not standard: [${mainDirection.join(', ')}]`)
   }
-  const mainStart = getAxisStart(mainAxis, startInGrids)
+  let mainStart = getAxisStart(mainAxis, startInGrids)
   const mainLength = sizeInGrids[0]
+  if (isNegativeAxis(mainAxis)) {
+    mainAxis = flipAxisId(mainAxis)
+    mainStart = mainStart - mainLength + 1
+  }
 
   const crossDirection = Y_AXIS.clone().applyQuaternion(quaternion).toArray()
-  const crossAxis = directionToAxisId(crossDirection)
+  let crossAxis = directionToAxisId(crossDirection)
   if (crossAxis == null) {
     throw new Error(
       `gridpanel cross direction axis is not standard: [${crossDirection.join(', ')}]`,
     )
   }
-  const crossStart = getAxisStart(crossAxis, startInGrids)
+  let crossStart = getAxisStart(crossAxis, startInGrids)
   const crossLength = sizeInGrids[1]
+  if (isNegativeAxis(crossAxis)) {
+    crossAxis = flipAxisId(crossAxis)
+    crossStart = crossStart - crossLength + 1
+  }
 
   const thicknessDirection = Z_AXIS.clone().applyQuaternion(quaternion).toArray()
-  const thicknessAxis = directionToAxisId(thicknessDirection)
+  let thicknessAxis = directionToAxisId(thicknessDirection)
   if (thicknessAxis == null) {
     throw new Error(
       `gridpanel thickness direction axis is not standard: [${thicknessDirection.join(', ')}]`,
     )
   }
+  console.log('thickness axis', thicknessAxis)
   const thicknessStart = getAxisStart(thicknessAxis, startInGrids)
+  if (isNegativeAxis(thicknessAxis)) {
+    thicknessAxis = flipAxisId(thicknessAxis)
+  }
 
   return {
     type,
@@ -299,16 +311,26 @@ function getGridLengthInMeters(variant: GridPanelVariant): number {
 function getAxisStart(axisId: AxisId, startInGrids: [number, number, number]) {
   switch (axisId) {
     case AxisId.X:
-      return startInGrids[0]
     case AxisId['-X']:
-      return startInGrids[0] + 1
+      return startInGrids[0]
     case AxisId.Y:
-      return startInGrids[1]
     case AxisId['-Y']:
-      return startInGrids[1] + 1
+      return startInGrids[1]
     case AxisId.Z:
-      return startInGrids[2]
     case AxisId['-Z']:
-      return startInGrids[2] + 1
+      return startInGrids[2]
+  }
+}
+
+function isNegativeAxis(axisId: AxisId) {
+  switch (axisId) {
+    case AxisId.X:
+    case AxisId.Y:
+    case AxisId.Z:
+      return false
+    case AxisId['-X']:
+    case AxisId['-Y']:
+    case AxisId['-Z']:
+      return true
   }
 }
