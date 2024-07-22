@@ -1,12 +1,13 @@
 import { registerPartModule } from '@villagekit/part'
 import { gridPanelVariants } from './creator'
-import { type GridPanelCreator, calculateState } from './creators'
+import type { GridPanel } from './creator'
 import { PartsGl } from './gl'
 import {
   calculateBoundingBox,
   calculateFasteningPoints,
   calculateGlValue,
   calculateNumFastenersToFasten,
+  calculateState,
 } from './methods'
 import { gridPanelSchemas } from './schemas'
 import { PartsSummary } from './summary'
@@ -14,7 +15,7 @@ import type { GridPanelGlValue, GridPanelState, GridPanelType } from './types'
 
 export * from './svg/index'
 export * from './types'
-export * from './variants'
+export { gridPanelVariants }
 
 /* eslint-disable @typescript-eslint/no-namespace */
 declare global {
@@ -23,7 +24,7 @@ declare global {
       gridpanel: GridPanelType
     }
     interface EveryPartCreator {
-      gridpanel: GridPanelCreator
+      gridpanel: GridPanel
     }
     interface EveryPartState {
       gridpanel: GridPanelState

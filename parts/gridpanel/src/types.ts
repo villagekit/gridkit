@@ -30,8 +30,8 @@ export type GridPanelState = {
   crossLength: number
   thicknessAxis: AxisId
   thicknessStart: number
-  fit?: GridPanelFit
-  holes?: GridPanelHoles
+  fit: GridPanelFit
+  holes: GridPanelHoles
 }
 
 export type GridPanelGlValue = GridPanelState & {

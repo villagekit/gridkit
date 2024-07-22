@@ -1,22 +1,111 @@
 import {
+  AxisId,
   type AxisValues,
   axisIdToDirection,
+  axisIdToDirectionVector,
   axisValuesToVector,
+  directionToAxisId,
   flipAxisId,
   mapRange,
 } from '@villagekit/math'
-import type { FasteningPoint } from '@villagekit/part'
+import type { FasteningPoint, WithRequiredId } from '@villagekit/part'
 import { convert, meter } from '@villagekit/units'
-import generateKey, { sorted as generateKeySorted } from 'deadbeef'
-import { Box3, Vector3 } from 'three'
-import type { GridPanelGlValue, GridPanelState, GridPanelSummaryValue } from './types'
+import { Box3, Matrix4, Quaternion, Vector3 } from 'three'
+import { degToRad } from 'three/src/math/MathUtils.js'
+import { type GridPanel, gridPanelVariants } from './creator'
+import type { GridPanelGlValue, GridPanelState, GridPanelVariant } from './types'
 
-export function calculateState(creator: WithRequiredId<GridPanel>): GridPanelState {}
+const X_AXIS = axisIdToDirectionVector(AxisId.X)
+const Y_AXIS = axisIdToDirectionVector(AxisId.Y)
+const Z_AXIS = axisIdToDirectionVector(AxisId.Z)
+
+export function calculateState(creator: WithRequiredId<GridPanel>): GridPanelState {
+  const { type, id, variantId, sizeInGrids, fit, holes, transforms } = creator
+
+  const variant = gridPanelVariants[variantId]
+  if (variant == null) {
+    throw new Error(`Unknown gridbeam variant: ${variantId}`)
+  }
+
+  const matrix = new Matrix4()
+  for (const transform of transforms) {
+    switch (transform.type) {
+      case 'translation':
+        matrix.premultiply(new Matrix4().makeTranslation(...transform.vector))
+        break
+      case 'rotation': {
+        // https://stackoverflow.com/a/55138754
+        /*
+        const pivotMatrix = new Matrix4().makeTranslation(...transform.origin)
+        const pivotInverseMatrix = pivotMatrix.clone().invert()
+        matrix.premultiply(pivotInverseMatrix)
+        */
+        const rotationMatrix = new Matrix4().makeRotationAxis(
+          new Vector3(...transform.direction),
+          degToRad(transform.angle),
+        )
+        matrix.premultiply(rotationMatrix)
+        // matrix.premultiply(pivotMatrix)
+        break
+      }
+    }
+  }
+  const position = new Vector3()
+  const quaternion = new Quaternion()
+  const scale = new Vector3()
+  matrix.decompose(position, quaternion, scale)
+
+  const gridLengthInMeters = getGridLengthInMeters(variant)
+  const startInGrids = position.divideScalar(gridLengthInMeters).round().toArray()
+
+  const mainDirection = X_AXIS.clone().applyQuaternion(quaternion).toArray()
+  const mainAxis = directionToAxisId(mainDirection)
+  if (mainAxis == null) {
+    throw new Error(`gridpanel main direction axis is not standard: [${mainDirection.join(', ')}]`)
+  }
+  const mainStart = getAxisStart(mainAxis, startInGrids)
+  const mainLength = sizeInGrids[0]
+
+  const crossDirection = Y_AXIS.clone().applyQuaternion(quaternion).toArray()
+  const crossAxis = directionToAxisId(crossDirection)
+  if (crossAxis == null) {
+    throw new Error(
+      `gridpanel cross direction axis is not standard: [${crossDirection.join(', ')}]`,
+    )
+  }
+  const crossStart = getAxisStart(crossAxis, startInGrids)
+  const crossLength = sizeInGrids[1]
+
+  const thicknessDirection = Z_AXIS.clone().applyQuaternion(quaternion).toArray()
+  const thicknessAxis = directionToAxisId(thicknessDirection)
+  if (thicknessAxis == null) {
+    throw new Error(
+      `gridpanel thickness direction axis is not standard: [${thicknessDirection.join(', ')}]`,
+    )
+  }
+  const thicknessStart = getAxisStart(thicknessAxis, startInGrids)
+
+  return {
+    type,
+    id,
+    variant,
+    mainAxis,
+    mainStart,
+    mainLength,
+    crossAxis,
+    crossStart,
+    crossLength,
+    thicknessAxis,
+    thicknessStart,
+    fit,
+    holes,
+  }
+}
 
 export function calculateGlValue(state: GridPanelState): GridPanelGlValue {
   const {
     variant: { gridLength, holeDiameter, thickness },
-    fit = 'bottom',
+    fit,
     mainAxis,
     mainStart,
     mainLength,
@@ -78,41 +167,6 @@ export function calculateBoundingBox(value: GridPanelGlValue): Box3 {
     new Vector3(...locationInMeters),
     new Vector3(...locationInMeters).add(new Vector3(...sizeInMeters)),
   ])
-}
-
-export function calculateSummaryValue(state: GridPanelState): GridPanelSummaryValue {
-  const { type, variant, mainLength, crossLength } = state
-
-  let sizeInGrids: [number, number] = [mainLength, crossLength]
-  let { holes } = state
-
-  if (crossLength > mainLength) {
-    // need to "rotate" panel so main length is larger side
-    sizeInGrids = [crossLength, mainLength]
-    holes =
-      typeof holes === 'undefined' || typeof holes === 'boolean'
-        ? holes
-        : holes.map((hole) => [hole[1], hole[0]])
-  }
-
-  return {
-    holes,
-    sizeInGrids,
-    type,
-    variant,
-  }
-}
-
-export function calculateSummaryKey(summary: GridPanelSummaryValue): string {
-  const { type, holes = true, sizeInGrids, variant } = summary
-
-  if (typeof holes === 'boolean') {
-    return generateKey(type, variant.id, ...sizeInGrids, holes)
-  }
-  return (
-    generateKey(type, variant.id, ...sizeInGrids) +
-    generateKeySorted(...holes.map(([a, b]) => `${a},${b}`))
-  )
 }
 
 export function calculateFasteningPoints(state: GridPanelState): Array<FasteningPoint> {
@@ -214,4 +268,27 @@ function getHolesMap(holes: Array<[number, number]>): Record<number, Record<numb
 
 export function calculateNumFastenersToFasten(_state: GridPanelState): number {
   return 2
+}
+
+function getGridLengthInMeters(variant: GridPanelVariant): number {
+  const { gridLength } = variant
+
+  return convert(gridLength, meter).value
+}
+
+function getAxisStart(axisId: AxisId, startInGrids: [number, number, number]) {
+  switch (axisId) {
+    case AxisId.X:
+      return startInGrids[0]
+    case AxisId['-X']:
+      return startInGrids[0] + 1
+    case AxisId.Y:
+      return startInGrids[1]
+    case AxisId['-Y']:
+      return startInGrids[1] + 1
+    case AxisId.Z:
+      return startInGrids[2]
+    case AxisId['-Z']:
+      return startInGrids[2] + 1
+  }
 }

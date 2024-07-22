@@ -40,12 +40,16 @@ const Z_AXIS: [number, number, number] = [0, 0, 1]
 export class GridPanel extends BasePartCreator<'gridpanel'> {
   variantId: keyof typeof gridPanelVariants
   sizeInGrids: [number, number]
+  fit: GridPanelState['fit']
+  holes: GridPanelState['holes']
 
   constructor(options: GridPanelOptions) {
-    const { id, variantId, sizeInGrids, transforms } = options
+    const { id, variantId, sizeInGrids, fit, holes, transforms } = options
     super('gridpanel', id, transforms)
     this.variantId = variantId ?? getDefaultVariantId()
     this.sizeInGrids = sizeInGrids
+    this.fit = fit ?? 'bottom'
+    this.holes = holes ?? true
   }
 
   static create(options: GridPanelOptions) {
@@ -154,13 +158,13 @@ export class GridPanel extends BasePartCreator<'gridpanel'> {
 
 interface BaseOptions {
   id?: string
+  fit?: GridPanelState['fit']
+  holes?: GridPanelState['holes']
 }
 
 interface GridPanelOptions extends BaseOptions {
   variantId: keyof typeof gridPanelVariants
   sizeInGrids: [number, number]
-  fit?: GridPanelState['fit']
-  holes?: GridPanelState['holes']
   transforms?: Array<PartTransform>
 }
 

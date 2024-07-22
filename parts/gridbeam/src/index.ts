@@ -10,12 +10,12 @@ import {
 } from './methods'
 import { gridBeamSchemas } from './schemas'
 import { PartsSummary } from './summary'
-import type { GridBeamGlValue, GridBeamState, GridBeamSummaryValue, GridBeamType } from './types'
+import type { GridBeamGlValue, GridBeamState, GridBeamType } from './types'
 import { gridBeamVariants } from './variants'
 
 export * from './svg/index'
 export * from './types'
-export * from './variants'
+export { gridBeamVariants }
 
 /* eslint-disable @typescript-eslint/no-namespace */
 declare global {
@@ -34,9 +34,6 @@ declare global {
     }
     interface EveryPartGlValue {
       gridbeam: GridBeamGlValue
-    }
-    interface EveryPartSummaryValue {
-      gridbeam: GridBeamSummaryValue
     }
   }
 }
