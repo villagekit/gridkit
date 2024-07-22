@@ -50,7 +50,7 @@ export class GridBeam extends BasePartCreator<'gridbeam'> {
     const { id, x, y, z, variantId = getDefaultVariantId() } = options
 
     const gridUnit = getGridLengthInMeters(variantId)
-    const halfGridUnit = 0.5 * gridUnit
+    const pivot: [number, number, number] = [0.5 * gridUnit, 0.5 * gridUnit, 0.5 * gridUnit]
 
     return new GridBeam({
       id,
@@ -60,7 +60,7 @@ export class GridBeam extends BasePartCreator<'gridbeam'> {
         {
           type: 'rotation',
           angle: x[0] <= x[1] ? 0 : 180,
-          origin: [halfGridUnit, halfGridUnit, halfGridUnit],
+          origin: pivot,
           direction: Y_AXIS,
         },
         {
@@ -75,7 +75,7 @@ export class GridBeam extends BasePartCreator<'gridbeam'> {
     const { id, x, y, z, variantId = getDefaultVariantId() } = options
 
     const gridUnit = getGridLengthInMeters(variantId)
-    const halfGridUnit = 0.5 * gridUnit
+    const pivot: [number, number, number] = [0.5 * gridUnit, 0.5 * gridUnit, 0.5 * gridUnit]
 
     return new GridBeam({
       id,
@@ -85,7 +85,7 @@ export class GridBeam extends BasePartCreator<'gridbeam'> {
         {
           type: 'rotation',
           angle: y[0] <= y[1] ? 90 : -90,
-          origin: [halfGridUnit, halfGridUnit, halfGridUnit],
+          origin: pivot,
           direction: Z_AXIS,
         },
         {
@@ -100,7 +100,7 @@ export class GridBeam extends BasePartCreator<'gridbeam'> {
     const { id, x, y, z, variantId = getDefaultVariantId() } = options
 
     const gridUnit = getGridLengthInMeters(variantId)
-    const halfGridUnit = 0.5 * gridUnit
+    const pivot: [number, number, number] = [0.5 * gridUnit, 0.5 * gridUnit, 0.5 * gridUnit]
 
     return new GridBeam({
       id,
@@ -110,7 +110,7 @@ export class GridBeam extends BasePartCreator<'gridbeam'> {
         {
           type: 'rotation',
           angle: z[0] <= z[1] ? -90 : 90,
-          origin: [halfGridUnit, halfGridUnit, halfGridUnit],
+          origin: pivot,
           direction: Y_AXIS,
         },
         {

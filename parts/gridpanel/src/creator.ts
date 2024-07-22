@@ -59,8 +59,10 @@ export class GridPanel extends BasePartCreator<'gridpanel'> {
   static XY(options: GridPanelXYOptions) {
     const { id, x, y, z, variantId = getDefaultVariantId() } = options
 
-    const gridUnit = getGridLengthInMeters(variantId)
-    const halfGridUnit = 0.5 * gridUnit
+    const variant = getVariant(variantId)
+    const gridUnit = getGridLength(variant)
+    const thickness = getThickness(variant)
+    const pivot: [number, number, number] = [0.5 * gridUnit, 0.5 * gridUnit, 0.5 * thickness]
 
     return new GridPanel({
       id,
@@ -70,13 +72,13 @@ export class GridPanel extends BasePartCreator<'gridpanel'> {
         {
           type: 'rotation',
           angle: x[0] <= x[1] ? 0 : 180,
-          origin: [halfGridUnit, halfGridUnit, halfGridUnit],
+          origin: pivot,
           direction: Y_AXIS,
         },
         {
           type: 'rotation',
           angle: y[0] <= y[1] ? 0 : 180,
-          origin: [halfGridUnit, halfGridUnit, halfGridUnit],
+          origin: pivot,
           direction: X_AXIS,
         },
         {
@@ -90,8 +92,10 @@ export class GridPanel extends BasePartCreator<'gridpanel'> {
   static YZ(options: GridPanelYZOptions) {
     const { id, x, y, z, variantId = getDefaultVariantId() } = options
 
-    const gridUnit = getGridLengthInMeters(variantId)
-    const halfGridUnit = 0.5 * gridUnit
+    const variant = getVariant(variantId)
+    const gridUnit = getGridLength(variant)
+    const thickness = getThickness(variant)
+    const pivot: [number, number, number] = [0.5 * gridUnit, 0.5 * gridUnit, 0.5 * thickness]
 
     return new GridPanel({
       id,
@@ -101,19 +105,19 @@ export class GridPanel extends BasePartCreator<'gridpanel'> {
         {
           type: 'rotation',
           angle: 90,
-          origin: [halfGridUnit, halfGridUnit, halfGridUnit],
+          origin: pivot,
           direction: Z_AXIS,
         },
         {
           type: 'rotation',
           angle: z[0] <= z[1] ? 90 : -90,
-          origin: [halfGridUnit, halfGridUnit, halfGridUnit],
+          origin: pivot,
           direction: Y_AXIS,
         },
         {
           type: 'rotation',
           angle: y[0] <= y[1] ? 0 : 180,
-          origin: [halfGridUnit, halfGridUnit, halfGridUnit],
+          origin: pivot,
           direction: Z_AXIS,
         },
         {
@@ -127,8 +131,10 @@ export class GridPanel extends BasePartCreator<'gridpanel'> {
   static XZ(options: GridPanelXZOptions) {
     const { id, x, y, z, variantId = getDefaultVariantId() } = options
 
-    const gridUnit = getGridLengthInMeters(variantId)
-    const halfGridUnit = 0.5 * gridUnit
+    const variant = getVariant(variantId)
+    const gridUnit = getGridLength(variant)
+    const thickness = getThickness(variant)
+    const pivot: [number, number, number] = [0.5 * gridUnit, 0.5 * gridUnit, 0.5 * thickness]
 
     return new GridPanel({
       id,
@@ -138,13 +144,13 @@ export class GridPanel extends BasePartCreator<'gridpanel'> {
         {
           type: 'rotation',
           angle: z[0] <= z[1] ? 90 : -90,
-          origin: [halfGridUnit, halfGridUnit, halfGridUnit],
+          origin: pivot,
           direction: X_AXIS,
         },
         {
           type: 'rotation',
           angle: x[0] <= x[1] ? 0 : 180,
-          origin: [halfGridUnit, halfGridUnit, halfGridUnit],
+          origin: pivot,
           direction: Z_AXIS,
         },
         {
@@ -189,11 +195,20 @@ interface GridPanelXZOptions extends BaseOptions {
   z: [number, number]
 }
 
-function getGridLengthInMeters(variantId: string): number {
+function getVariant(variantId: string): GridPanelVariant {
   const variant = gridPanelVariants[variantId]
   if (variant == null) {
     throw new Error(`Unknown gridpanel variant: ${variantId}`)
   }
+  return variant
+}
+
+function getGridLength(variant: GridPanelVariant): number {
   const { gridLength } = variant
   return convert(gridLength, meter).value
+}
+
+function getThickness(variant: GridPanelVariant): number {
+  const { thickness } = variant
+  return convert(thickness, meter).value
 }

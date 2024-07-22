@@ -2,11 +2,12 @@ import { AnyMap, type TraceMap, originalPositionFor } from '@jridgewell/trace-ma
 import * as Comlink from 'comlink'
 import { parseStackTrace } from 'errorstacks'
 import { fromCallback } from 'xstate'
-import { comlinkDataUrl } from '../comlink'
 import type { Params, ParamsValues, PartVariantsByType, Parts, Presets } from '../types'
 import type { RenderEvent, RendererMachineEvent } from './'
 
 import partCreatorRaw from '../../../../core/part/dist/creator.js?raw'
+import comlinkRaw from '../../../../node_modules/comlink/dist/esm/comlink.js?raw'
+import threeRaw from '../../../../node_modules/three/build/three.module.js?raw'
 import gridbeamCreatorRaw from '../../../../parts/gridbeam/dist/creator.js?raw'
 import gridpanelCreatorRaw from '../../../../parts/gridpanel/dist/creator.js?raw'
 import mathRaw from '../../../../util/math/dist/index.js?raw'
@@ -62,8 +63,6 @@ export const javascriptRenderer = fromCallback<RenderEvent, RendererMachineEvent
       if (jsModule == null) return
 
       const { parameters, presets, parts, plugins } = jsModule
-
-      console.log('js module', jsModule)
 
       const event: RendererMachineEvent =
         parameters == null || presets == null
@@ -130,8 +129,8 @@ const createEvaluatorIframeSrc = () =>
 <script type="importmap">
 {
   "imports": {
-    "comlink": "${comlinkDataUrl}",
-    "three": "https://cdn.jsdelivr.net/npm/three@165.0/build/three.module.js",
+    "comlink": "data:application/javascript;base64,${encodeURI(encodeBase64(comlinkRaw))}",
+    "three": "data:application/javascript;base64,${encodeURI(encodeBase64(threeRaw))}",
     "@villagekit/math": "data:application/javascript;base64,${encodeURI(encodeBase64(mathRaw))}",
     "@villagekit/units": "data:application/javascript;base64,${encodeURI(encodeBase64(unitsRaw))}",
     "@villagekit/part/creator": "data:application/javascript;base64,${encodeURI(encodeBase64(partCreatorRaw))}",
