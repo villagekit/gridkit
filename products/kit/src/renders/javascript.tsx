@@ -8,6 +8,7 @@ import type { RenderEvent, RendererMachineEvent } from './'
 
 import partCreatorRaw from '../../../../core/part/dist/creator.js?raw'
 import gridbeamCreatorRaw from '../../../../parts/gridbeam/dist/creator.js?raw'
+import gridpanelCreatorRaw from '../../../../parts/gridpanel/dist/creator.js?raw'
 import mathRaw from '../../../../util/math/dist/index.js?raw'
 import unitsRaw from '../../../../util/units/dist/index.js?raw'
 
@@ -135,6 +136,7 @@ const createEvaluatorIframeSrc = () =>
     "@villagekit/units": "data:application/javascript;base64,${encodeURI(encodeBase64(unitsRaw))}",
     "@villagekit/part/creator": "data:application/javascript;base64,${encodeURI(encodeBase64(partCreatorRaw))}",
     "@villagekit/part-gridbeam/creator": "data:application/javascript;base64,${encodeURI(encodeBase64(gridbeamCreatorRaw))}",
+    "@villagekit/part-gridpanel/creator": "data:application/javascript;base64,${encodeURI(encodeBase64(gridpanelCreatorRaw))}",
     "@villagekit/design/kit": "data:,${encodeURI('')}"
   }
 }

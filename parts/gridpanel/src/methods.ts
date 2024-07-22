@@ -10,6 +10,7 @@ import {
 } from '@villagekit/math'
 import type { FasteningPoint, WithRequiredId } from '@villagekit/part'
 import { convert, meter } from '@villagekit/units'
+import generateKey, { sorted as generateKeySorted } from 'deadbeef'
 import { Box3, Matrix4, Quaternion, Vector3 } from 'three'
 import { degToRad } from 'three/src/math/MathUtils.js'
 import { type GridPanel, gridPanelVariants } from './creator'
@@ -167,6 +168,25 @@ export function calculateBoundingBox(value: GridPanelGlValue): Box3 {
     new Vector3(...locationInMeters),
     new Vector3(...locationInMeters).add(new Vector3(...sizeInMeters)),
   ])
+}
+
+export function calculateSummaryKey(part: GridPanel): string {
+  const { type, sizeInGrids, variantId } = part
+  let { holes } = part
+
+  if (typeof holes === 'boolean') {
+    return generateKey(type, variantId, ...sizeInGrids, holes)
+  }
+
+  if (sizeInGrids[1] > sizeInGrids[0]) {
+    // need to "rotate" panel so main length is larger side
+    holes = holes.map((hole) => [hole[1], hole[0]])
+  }
+
+  return (
+    generateKey(type, variantId, ...sizeInGrids) +
+    generateKeySorted(...holes.map(([a, b]) => `${a},${b}`))
+  )
 }
 
 export function calculateFasteningPoints(state: GridPanelState): Array<FasteningPoint> {
