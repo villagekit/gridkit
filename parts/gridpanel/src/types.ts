@@ -1,6 +1,4 @@
 import type { AxisId, Location } from '@villagekit/math'
-import type { BasePartSummaryValue } from '@villagekit/part/base'
-import type { BaseGridPartState } from '@villagekit/part/base/grid'
 import type { Length } from '@villagekit/units'
 
 export type GridPanelType = 'gridpanel'
@@ -20,7 +18,8 @@ export interface GridPanelVariant {
 export type GridPanelFit = 'top' | 'bottom'
 export type GridPanelHoles = boolean | Array<[number, number]>
 
-export interface GridPanelState extends BaseGridPartState {
+export type GridPanelState = {
+  id: string
   type: GridPanelType
   variant: GridPanelVariant
   mainAxis: AxisId
@@ -35,18 +34,11 @@ export interface GridPanelState extends BaseGridPartState {
   holes?: GridPanelHoles
 }
 
-export interface GridPanelGlValue extends GridPanelState {
+export type GridPanelGlValue = GridPanelState & {
   gridLengthInMeters: number
   holeDiameterInMeters: number
   thicknessInMeters: number
   locationInGrids: Location
   locationInMeters: Location
   sizeInMeters: [number, number, number]
-}
-
-export interface GridPanelSummaryValue extends BasePartSummaryValue {
-  type: GridPanelType
-  variant: GridPanelVariant
-  sizeInGrids: [number, number]
-  holes?: GridPanelHoles
 }

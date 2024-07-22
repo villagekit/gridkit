@@ -11,6 +11,8 @@ import generateKey, { sorted as generateKeySorted } from 'deadbeef'
 import { Box3, Vector3 } from 'three'
 import type { GridPanelGlValue, GridPanelState, GridPanelSummaryValue } from './types'
 
+export function calculateState(creator: WithRequiredId<GridPanel>): GridPanelState {}
+
 export function calculateGlValue(state: GridPanelState): GridPanelGlValue {
   const {
     variant: { gridLength, holeDiameter, thickness },

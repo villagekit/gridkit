@@ -41,9 +41,3 @@ export type GridBeamGlValue = GridBeamState & {
   sizeInGrids: [number, number, number]
   sizeInMeters: [number, number, number]
 }
-
-export type GridBeamSummaryValue = {
-  type: GridBeamType
-  variant: GridBeamVariant
-  lengthInGrids: ScaleX
-}
