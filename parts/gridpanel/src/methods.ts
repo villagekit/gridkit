@@ -7,6 +7,7 @@ import {
   directionToAxisId,
   flipAxisId,
   mapRange,
+  vectorFloatsEquals,
 } from '@villagekit/math'
 import type { FasteningPoint, WithRequiredId } from '@villagekit/part'
 import { convert, meter } from '@villagekit/units'
@@ -14,26 +15,43 @@ import generateKey, { sorted as generateKeySorted } from 'deadbeef'
 import { Box3, Matrix4, Quaternion, Vector3 } from 'three'
 import { degToRad } from 'three/src/math/MathUtils.js'
 import { type GridPanel, gridPanelVariants } from './creator'
-import type { GridPanelGlValue, GridPanelState, GridPanelVariant } from './types'
+import type { GridPanelFit, GridPanelGlValue, GridPanelState } from './types'
 
 const X_AXIS = axisIdToDirectionVector(AxisId.X)
 const Y_AXIS = axisIdToDirectionVector(AxisId.Y)
 const Z_AXIS = axisIdToDirectionVector(AxisId.Z)
 
 export function calculateState(creator: WithRequiredId<GridPanel>): GridPanelState {
-  const { type, id, variantId, sizeInGrids, fit, holes, transforms } = creator
+  const { type, id, variantId, sizeInGrids, holes, transforms } = creator
 
   const variant = gridPanelVariants[variantId]
   if (variant == null) {
     throw new Error(`Unknown gridbeam variant: ${variantId}`)
   }
 
+  const gridLengthInMeters = convert(variant.gridLength, meter).value
+  const thicknessInMeters = convert(variant.thickness, meter).value
+
+  let fit: GridPanelFit = 'bottom'
+
   const matrix = new Matrix4()
   for (const transform of transforms) {
+    if (transform == null) continue
     switch (transform.type) {
-      case 'translation':
-        matrix.premultiply(new Matrix4().makeTranslation(...transform.vector))
+      case 'translation': {
+        const { vector } = transform
+        const fitAdjustment = gridLengthInMeters - thicknessInMeters
+        if (
+          vectorFloatsEquals(vector, [fitAdjustment, 0, 0]) ||
+          vectorFloatsEquals(vector, [0, fitAdjustment, 0]) ||
+          vectorFloatsEquals(vector, [0, 0, fitAdjustment])
+        ) {
+          fit = 'top'
+          continue
+        }
+        matrix.premultiply(new Matrix4().makeTranslation(...vector))
         break
+      }
       case 'rotation': {
         // https://stackoverflow.com/a/55138754
         /*
@@ -56,7 +74,6 @@ export function calculateState(creator: WithRequiredId<GridPanel>): GridPanelSta
   const scale = new Vector3()
   matrix.decompose(position, quaternion, scale)
 
-  const gridLengthInMeters = getGridLengthInMeters(variant)
   const startInGrids = roundTo(position.divideScalar(gridLengthInMeters), 10).toArray()
 
   const mainDirection = X_AXIS.clone().applyQuaternion(quaternion).toArray()
@@ -299,12 +316,6 @@ function getHolesMap(holes: Array<[number, number]>): Record<number, Record<numb
 
 export function calculateNumFastenersToFasten(_state: GridPanelState): number {
   return 2
-}
-
-function getGridLengthInMeters(variant: GridPanelVariant): number {
-  const { gridLength } = variant
-
-  return convert(gridLength, meter).value
 }
 
 function getAxisStart(axisId: AxisId, startInGrids: [number, number, number]) {

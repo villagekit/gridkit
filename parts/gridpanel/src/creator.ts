@@ -2,7 +2,7 @@ import { BasePartCreator, type PartTransform } from '@villagekit/part/creator'
 import { convert, meter } from '@villagekit/units'
 
 import { millimeter } from '@villagekit/units'
-import type { GridPanelState, GridPanelVariant } from './types'
+import type { GridPanelFit, GridPanelHoles, GridPanelState, GridPanelVariant } from './types'
 
 export const gridPanelVariants: Record<string, GridPanelVariant> = {
   '40mm:8mm:12mm:douglas-fir': {
@@ -40,15 +40,13 @@ const Z_AXIS: [number, number, number] = [0, 0, 1]
 export class GridPanel extends BasePartCreator<'gridpanel'> {
   variantId: keyof typeof gridPanelVariants
   sizeInGrids: [number, number]
-  fit: GridPanelState['fit']
-  holes: GridPanelState['holes']
+  holes: GridPanelHoles
 
   constructor(options: GridPanelOptions) {
-    const { id, variantId, sizeInGrids, fit, holes, transforms } = options
+    const { id, variantId, sizeInGrids, holes, transforms } = options
     super('gridpanel', id, transforms)
     this.variantId = variantId ?? getDefaultVariantId()
     this.sizeInGrids = sizeInGrids
-    this.fit = fit ?? 'bottom'
     this.holes = holes ?? true
   }
 
@@ -68,7 +66,6 @@ export class GridPanel extends BasePartCreator<'gridpanel'> {
       id,
       variantId,
       sizeInGrids: [Math.abs(x[0] - x[1]), Math.abs(y[0] - y[1])],
-      fit,
       holes,
       transforms: [
         {
@@ -87,6 +84,12 @@ export class GridPanel extends BasePartCreator<'gridpanel'> {
           type: 'translation',
           vector: [x[0] * gridUnit, y[0] * gridUnit, z * gridUnit],
         },
+        fit === 'top'
+          ? {
+              type: 'translation',
+              vector: [0, 0, gridUnit - thickness],
+            }
+          : null,
       ],
     })
   }
@@ -103,7 +106,6 @@ export class GridPanel extends BasePartCreator<'gridpanel'> {
       id,
       variantId,
       sizeInGrids: [Math.abs(y[0] - y[1]), Math.abs(z[0] - z[1])],
-      fit,
       holes,
       transforms: [
         {
@@ -128,6 +130,12 @@ export class GridPanel extends BasePartCreator<'gridpanel'> {
           type: 'translation',
           vector: [x * gridUnit, y[0] * gridUnit, z[0] * gridUnit],
         },
+        fit === 'top'
+          ? {
+              type: 'translation',
+              vector: [gridUnit - thickness, 0, 0],
+            }
+          : null,
       ],
     })
   }
@@ -144,7 +152,6 @@ export class GridPanel extends BasePartCreator<'gridpanel'> {
       id,
       variantId,
       sizeInGrids: [Math.abs(x[0] - x[1]), Math.abs(z[0] - z[1])],
-      fit,
       holes,
       transforms: [
         {
@@ -163,6 +170,12 @@ export class GridPanel extends BasePartCreator<'gridpanel'> {
           type: 'translation',
           vector: [x[0] * gridUnit, y * gridUnit, z[0] * gridUnit],
         },
+        fit === 'top'
+          ? {
+              type: 'translation',
+              vector: [0, gridUnit - thickness, 0],
+            }
+          : null,
       ],
     })
   }
@@ -170,7 +183,6 @@ export class GridPanel extends BasePartCreator<'gridpanel'> {
 
 interface BaseOptions {
   id?: string
-  fit?: GridPanelState['fit']
   holes?: GridPanelState['holes']
 }
 
@@ -185,6 +197,7 @@ interface GridPanelXYOptions extends BaseOptions {
   x: [number, number]
   y: [number, number]
   z: number
+  fit?: GridPanelFit
 }
 
 interface GridPanelYZOptions extends BaseOptions {
@@ -192,6 +205,7 @@ interface GridPanelYZOptions extends BaseOptions {
   x: number
   y: [number, number]
   z: [number, number]
+  fit?: GridPanelFit
 }
 
 interface GridPanelXZOptions extends BaseOptions {
@@ -199,6 +213,7 @@ interface GridPanelXZOptions extends BaseOptions {
   x: [number, number]
   y: number
   z: [number, number]
+  fit?: GridPanelFit
 }
 
 function getVariant(variantId: string): GridPanelVariant {

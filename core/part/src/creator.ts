@@ -1,4 +1,5 @@
 export type PartTransform =
+  | null
   | {
       type: 'translation'
       vector: [number, number, number]
