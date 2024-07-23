@@ -17,8 +17,7 @@
   ],
   "sideEffects": false,
   "scripts": {
-    "build:comlink": "node ./scripts/generate-comlink-dataurl.cjs",
-    "build:pkg": "npm run build:comlink && tsup src",
+    "build:pkg": "tsup src",
     "lint": "biome check .",
     "publint": "publint"
   },

@@ -57,7 +57,7 @@ export class GridPanel extends BasePartCreator<'gridpanel'> {
   }
 
   static XY(options: GridPanelXYOptions) {
-    const { id, x, y, z, variantId = getDefaultVariantId() } = options
+    const { id, variantId = getDefaultVariantId(), x, y, z, fit, holes } = options
 
     const variant = getVariant(variantId)
     const gridUnit = getGridLength(variant)
@@ -68,6 +68,8 @@ export class GridPanel extends BasePartCreator<'gridpanel'> {
       id,
       variantId,
       sizeInGrids: [Math.abs(x[0] - x[1]), Math.abs(y[0] - y[1])],
+      fit,
+      holes,
       transforms: [
         {
           type: 'rotation',
@@ -90,7 +92,7 @@ export class GridPanel extends BasePartCreator<'gridpanel'> {
   }
 
   static YZ(options: GridPanelYZOptions) {
-    const { id, x, y, z, variantId = getDefaultVariantId() } = options
+    const { id, variantId = getDefaultVariantId(), x, y, z, fit, holes } = options
 
     const variant = getVariant(variantId)
     const gridUnit = getGridLength(variant)
@@ -101,6 +103,8 @@ export class GridPanel extends BasePartCreator<'gridpanel'> {
       id,
       variantId,
       sizeInGrids: [Math.abs(y[0] - y[1]), Math.abs(z[0] - z[1])],
+      fit,
+      holes,
       transforms: [
         {
           type: 'rotation',
@@ -129,7 +133,7 @@ export class GridPanel extends BasePartCreator<'gridpanel'> {
   }
 
   static XZ(options: GridPanelXZOptions) {
-    const { id, x, y, z, variantId = getDefaultVariantId() } = options
+    const { id, variantId = getDefaultVariantId(), x, y, z, fit, holes } = options
 
     const variant = getVariant(variantId)
     const gridUnit = getGridLength(variant)
@@ -140,6 +144,8 @@ export class GridPanel extends BasePartCreator<'gridpanel'> {
       id,
       variantId,
       sizeInGrids: [Math.abs(x[0] - x[1]), Math.abs(z[0] - z[1])],
+      fit,
+      holes,
       transforms: [
         {
           type: 'rotation',

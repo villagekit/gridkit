@@ -57,7 +57,7 @@ export function calculateState(creator: WithRequiredId<GridPanel>): GridPanelSta
   matrix.decompose(position, quaternion, scale)
 
   const gridLengthInMeters = getGridLengthInMeters(variant)
-  const startInGrids = position.divideScalar(gridLengthInMeters).round().toArray()
+  const startInGrids = roundTo(position.divideScalar(gridLengthInMeters), 10).toArray()
 
   const mainDirection = X_AXIS.clone().applyQuaternion(quaternion).toArray()
   let mainAxis = directionToAxisId(mainDirection)
@@ -92,7 +92,6 @@ export function calculateState(creator: WithRequiredId<GridPanel>): GridPanelSta
       `gridpanel thickness direction axis is not standard: [${thicknessDirection.join(', ')}]`,
     )
   }
-  console.log('thickness axis', thicknessAxis)
   const thicknessStart = getAxisStart(thicknessAxis, startInGrids)
   if (isNegativeAxis(thicknessAxis)) {
     thicknessAxis = flipAxisId(thicknessAxis)
@@ -333,4 +332,8 @@ function isNegativeAxis(axisId: AxisId) {
     case AxisId['-Z']:
       return true
   }
+}
+
+function roundTo(vector: Vector3, divisions: number) {
+  return vector.multiplyScalar(divisions).round().divideScalar(divisions)
 }
