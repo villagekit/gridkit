@@ -1,19 +1,77 @@
 import weakMemoize from '@emotion/weak-memoize'
-import type { FasteningPoint } from '@villagekit/part'
+import type { FasteningPoint, WithRequiredId } from '@villagekit/part'
 import { convert, meter } from '@villagekit/units'
-import { Box3, Quaternion, Vector3 } from 'three'
+import { Box3, Matrix4, Quaternion, Vector3 } from 'three'
 
-import type { FastenerGlValue, FastenerState, FastenerSummaryValue } from './types'
+import { degToRad } from 'three/src/math/MathUtils.js'
+import type { Fastener } from './creator'
+import type { FastenerGlValue, FastenerState, FastenerVariant } from './types'
+import { fastenerVariants } from './variants'
 
 const X_AXIS = new Vector3(1, 0, 0)
 
-const getGridLengthInMeters = weakMemoize((state: FastenerState): number => {
-  const {
-    variant: { gridLength },
-  } = state
+const getGridLengthInMeters = weakMemoize((variant: FastenerVariant): number => {
+  const { gridLength } = variant
 
   return convert(gridLength, meter).value
 })
+
+export function calculateState(creator: WithRequiredId<Fastener>): FastenerState {
+  const { type, id, variantId, transforms } = creator
+
+  const variant = fastenerVariants[variantId]
+  if (variant == null) {
+    throw new Error(`Unknown gridbeam variant: ${variantId}`)
+  }
+
+  const matrix = new Matrix4()
+  for (const transform of transforms) {
+    if (transform == null) continue
+    switch (transform.type) {
+      case 'translation':
+        matrix.premultiply(new Matrix4().makeTranslation(...transform.vector))
+        break
+      case 'rotation': {
+        // https://stackoverflow.com/a/55138754
+        /*
+        const pivotMatrix = new Matrix4().makeTranslation(...transform.origin)
+        const pivotInverseMatrix = pivotMatrix.clone().invert()
+        matrix.premultiply(pivotInverseMatrix)
+        */
+        const rotationMatrix = new Matrix4().makeRotationAxis(
+          new Vector3(...transform.direction),
+          degToRad(transform.angle),
+        )
+        matrix.premultiply(rotationMatrix)
+        // matrix.premultiply(pivotMatrix)
+        break
+      }
+    }
+  }
+  const position = new Vector3()
+  const quaternion = new Quaternion()
+  const scale = new Vector3()
+  matrix.decompose(position, quaternion, scale)
+
+  const gridLengthInMeters = getGridLengthInMeters(variant)
+  const startVector = position.divideScalar(gridLengthInMeters).round()
+  const start = startVector.toArray()
+
+  const direction = X_AXIS.clone().applyQuaternion(quaternion).toArray()
+  const endVector = startVector.add(
+    new Vector3(...direction).multiplyScalar(convert(variant.fastenedLength, meter).value),
+  )
+  const end = endVector.toArray()
+
+  return {
+    id,
+    type,
+    variant,
+    start,
+    direction,
+    end,
+  }
+}
 
 export function calculateGlValue(state: FastenerState): FastenerGlValue {
   const {
@@ -25,7 +83,7 @@ export function calculateGlValue(state: FastenerState): FastenerGlValue {
 
   const extrusionLengthInMeters = convert(extrusionLength, meter).value
   const fastenedLengthInMeters = convert(fastenedLength, meter).value
-  const gridLengthInMeters = getGridLengthInMeters(state)
+  const gridLengthInMeters = getGridLengthInMeters(state.variant)
 
   const position: FastenerGlValue['position'] = [
     ((start[0] + end[0]) * 0.5 + 0.5) * gridLengthInMeters,
@@ -51,16 +109,10 @@ export function calculateBoundingBox(_value: FastenerGlValue): Box3 {
   return new Box3() // Does not apply to fastener part
 }
 
-export function calculateSummaryValue(state: FastenerState): FastenerSummaryValue {
-  const { type, variant } = state
+export function calculateSummaryKey(summary: Fastener): string {
+  const { type, variantId } = summary
 
-  return { type, variant }
-}
-
-export function calculateSummaryKey(summary: FastenerSummaryValue): string {
-  const { type, variant } = summary
-
-  return `${type}::${variant.id}`
+  return `${type}::${variantId}`
 }
 
 export function calculateEstimatedPrice(_state: FastenerState): number {

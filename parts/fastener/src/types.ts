@@ -1,5 +1,4 @@
 import type { Direction, Location, ScaleX } from '@villagekit/math'
-import type { BasePartState, BasePartSummaryValue } from '@villagekit/part/base'
 import type { Length } from '@villagekit/units'
 import type { Quaternion } from 'three'
 
@@ -28,7 +27,8 @@ export interface FastenerVariant {
   nutLength: Length
 }
 
-export interface FastenerState extends BasePartState {
+export type FastenerState = {
+  id: string
   type: FastenerType
   variant: FastenerVariant
   start: Location
@@ -36,14 +36,9 @@ export interface FastenerState extends BasePartState {
   direction: Direction
 }
 
-export interface FastenerGlValue extends FastenerState {
+export type FastenerGlValue = FastenerState & {
   extrusionLengthInMeters: number
   fastenedLengthInMeters: ScaleX
   position: [number, number, number]
   quarternion: Quaternion
-}
-
-export interface FastenerSummaryValue extends BasePartSummaryValue {
-  type: FastenerType
-  variant: FastenerVariant
 }

@@ -1,21 +1,20 @@
 import { registerPartModule } from '@villagekit/part'
-import { type FastenerCreator, calculateState } from './creators'
+import type { Fastener } from './creator'
 import { PartsGl } from './gl'
 import {
   calculateBoundingBox,
   calculateFasteningPoints,
   calculateGlValue,
   calculateNumFastenersToFasten,
-  calculateSummaryKey,
-  calculateSummaryValue,
+  calculateState,
 } from './methods'
 import { fastenerSchemas } from './schemas'
 import { PartsSummary } from './summary'
-import type { FastenerGlValue, FastenerState, FastenerSummaryValue, FastenerType } from './types'
+import type { FastenerGlValue, FastenerState, FastenerType } from './types'
 import { fastenerVariants } from './variants'
 
 export * from './types'
-export * from './variants'
+export { fastenerVariants }
 
 declare global {
   namespace VK {
@@ -23,7 +22,7 @@ declare global {
       gridbeam: FastenerType
     }
     interface EveryPartCreator {
-      fastener: FastenerCreator
+      fastener: Fastener
     }
     interface EveryPartState {
       fastener: FastenerState
@@ -33,9 +32,6 @@ declare global {
     }
     interface EveryPartGlValue {
       fastener: FastenerGlValue
-    }
-    interface EveryPartSummaryValue {
-      fastener: FastenerSummaryValue
     }
   }
 }
@@ -52,8 +48,6 @@ registerPartModule({
     calculateGlValue,
     calculateNumFastenersToFasten,
     calculateState,
-    calculateSummaryKey,
-    calculateSummaryValue,
   },
   schemas: fastenerSchemas,
   variants: fastenerVariants,

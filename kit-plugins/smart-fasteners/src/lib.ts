@@ -7,6 +7,7 @@ import {
   calculateNumFastenersToFasten,
 } from '@villagekit/part'
 import { fastenerVariants } from '@villagekit/part-fastener'
+import { Fastener } from '@villagekit/part-fastener/creator'
 import {
   forEach,
   groupBy,
@@ -416,12 +417,13 @@ function buildFastenerParts(chosenFasteners: Array<PossibleFastener>): Array<Par
 
     for (let fastenerIndex = 0; fastenerIndex < fasteners.length; fastenerIndex++) {
       const fastener = fasteners[fastenerIndex]!
-      fastenerParts.push({
-        ...fastener,
-        id: `fasteners-${fastenedLengthInMillimeters}-${fastenerIndex}`,
-        type: 'fastener',
-        variant,
-      })
+      fastenerParts.push(
+        Fastener.create({
+          ...fastener,
+          id: `fasteners-${fastenedLengthInMillimeters}-${fastenerIndex}`,
+          variantId: variant.id,
+        }),
+      )
     }
   })
 
