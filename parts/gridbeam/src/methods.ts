@@ -26,6 +26,7 @@ export function calculateState(creator: WithRequiredId<GridBeam>): GridBeamState
 
   const matrix = new Matrix4()
   for (const transform of transforms) {
+    if (transform == null) continue
     switch (transform.type) {
       case 'translation':
         matrix.premultiply(new Matrix4().makeTranslation(...transform.vector))

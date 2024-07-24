@@ -1,5 +1,4 @@
 import { registerPartModule } from '@villagekit/part'
-import { gridPanelVariants } from './creator'
 import type { GridPanel } from './creator'
 import { PartsGl } from './gl'
 import {
@@ -12,6 +11,7 @@ import {
 import { gridPanelSchemas } from './schemas'
 import { PartsSummary } from './summary'
 import type { GridPanelGlValue, GridPanelState, GridPanelType } from './types'
+import { gridPanelVariants } from './variants'
 
 export * from './svg/index'
 export * from './types'

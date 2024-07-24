@@ -14,8 +14,9 @@ import { convert, meter } from '@villagekit/units'
 import generateKey, { sorted as generateKeySorted } from 'deadbeef'
 import { Box3, Matrix4, Quaternion, Vector3 } from 'three'
 import { degToRad } from 'three/src/math/MathUtils.js'
-import { type GridPanel, gridPanelVariants } from './creator'
+import type { GridPanel } from './creator'
 import type { GridPanelFit, GridPanelGlValue, GridPanelState } from './types'
+import { gridPanelVariants } from './variants'
 
 const X_AXIS = axisIdToDirectionVector(AxisId.X)
 const Y_AXIS = axisIdToDirectionVector(AxisId.Y)

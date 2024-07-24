@@ -5,12 +5,19 @@ import { fromCallback } from 'xstate'
 import type { Params, ParamsValues, PartVariantsByType, Parts, Presets } from '../types'
 import type { RenderEvent, RendererMachineEvent } from './'
 
+// @ts-ignore
 import partCreatorRaw from '../../../../core/part/dist/creator.js?raw'
+// @ts-ignore
 import comlinkRaw from '../../../../node_modules/comlink/dist/esm/comlink.js?raw'
+// @ts-ignore
 import threeRaw from '../../../../node_modules/three/build/three.module.js?raw'
-import gridbeamCreatorRaw from '../../../../parts/gridbeam/dist/creator.js?raw'
-import gridpanelCreatorRaw from '../../../../parts/gridpanel/dist/creator.js?raw'
+// @ts-ignore
+import gridbeamCreatorRaw from '../../../../parts/gridbeam/dist-bundles/creator.js?raw'
+// @ts-ignore
+import gridpanelCreatorRaw from '../../../../parts/gridpanel/dist-bundles/creator.js?raw'
+// @ts-ignore
 import mathRaw from '../../../../util/math/dist/index.js?raw'
+// @ts-ignore
 import unitsRaw from '../../../../util/units/dist/index.js?raw'
 
 type Evaluator = {
