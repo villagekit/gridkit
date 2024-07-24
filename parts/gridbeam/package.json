@@ -12,14 +12,14 @@
     "./creator": {
       "types": "./dist/creator.d.ts",
       "source": "./src/creator.ts",
-      "import": "./bundles/creator.js",
-      "default": "./bundles/creator.js"
+      "import": "./dist/creator.js",
+      "default": "./dist/creator.js"
     },
     "./bundles/creator": "./dist-bundles/creator.js",
     "./type-bundles/creator.d.ts": "./dist-type-bundles/creator.d.ts",
     "./package.json": "./package.json"
   },
-  "files": ["./src", "./dist"],
+  "files": ["./src", "./dist", "./dist-bundles", "./dist-type-bundles"],
   "sideEffects": ["./src/index.ts", "./dist/index.js"],
   "scripts": {
     "build:dist": "tsup src",
