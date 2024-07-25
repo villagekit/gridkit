@@ -1,5 +1,5 @@
 import { type TransformMatrix, degToRad } from '@villagekit/math'
-import { Matrix4, Quaternion, Vector3 } from 'three'
+import { Matrix4, Vector3 } from 'three'
 
 export type RotateOptions = {
   angle: number
@@ -27,41 +27,33 @@ export class BasePartCreator<PartType extends string> {
     return Object.assign(Object.create(Object.getPrototypeOf(this)), this)
   }
 
-  translate(_vector: [number, number, number]) {
+  translate(vector: [number, number, number]) {
     const next = this.clone()
     const matrix = new Matrix4().fromArray(this.transform)
-    // matrix.premultiply(new Matrix4().makeTranslation(...vector))
+    matrix.premultiply(new Matrix4().makeTranslation(...vector))
     next.transform = matrix.toArray()
     return next
   }
 
   applyRotation(options: ApplyRotationOptions) {
-    const { origin = [0, 0, 0], rotation } = options
+    const { origin, rotation } = options
 
     const next = this.clone()
-
-    function log(prefix: string, matrix: Matrix4) {
-      const pos = new Vector3()
-      const quat = new Quaternion()
-      const sca = new Vector3()
-      matrix.decompose(pos, quat, sca)
-      console.log(prefix, pos.toArray())
-    }
-
-    // https://stackoverflow.com/a/55138754
-    const pivotMatrix = new Matrix4().makeTranslation(new Vector3(...origin))
-    const pivotInverseMatrix = pivotMatrix.clone().invert()
+    const matrix = new Matrix4().fromArray(this.transform)
     const rotationMatrix = new Matrix4().fromArray(rotation)
 
-    const matrix = new Matrix4()
-    matrix.multiply(pivotInverseMatrix)
-    matrix.multiply(rotationMatrix)
-    matrix.multiply(pivotMatrix)
+    if (origin != null) {
+      // https://stackoverflow.com/a/55138754
+      const pivotMatrix = new Matrix4().makeTranslation(new Vector3(...origin))
+      const pivotInverseMatrix = pivotMatrix.clone().invert()
+      matrix.premultiply(pivotInverseMatrix)
+      matrix.premultiply(rotationMatrix)
+      matrix.premultiply(pivotMatrix)
+    } else {
+      matrix.premultiply(rotationMatrix)
+    }
 
-    log('matrix', matrix)
-
-    const nextTransform = new Matrix4().fromArray(this.transform).premultiply(matrix)
-    next.transform = nextTransform.toArray()
+    next.transform = matrix.toArray()
 
     return next
   }

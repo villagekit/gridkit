@@ -40,7 +40,6 @@ export class GridPanel extends BasePartCreator<'gridpanel'> {
     const variant = getVariant(variantId)
     const gridUnit = getGridLength(variant)
     const thickness = getThickness(variant)
-    const pivot: [number, number, number] = [0.5 * gridUnit, 0.5 * gridUnit, 0.5 * thickness]
 
     let panel = new GridPanel({
       id,
@@ -51,12 +50,10 @@ export class GridPanel extends BasePartCreator<'gridpanel'> {
     })
       .rotate({
         angle: x[0] <= x[1] ? 0 : 180,
-        origin: pivot,
         direction: Y_AXIS,
       })
       .rotate({
         angle: y[0] <= y[1] ? 0 : 180,
-        origin: pivot,
         direction: X_AXIS,
       })
       .translate([x[0] * gridUnit, y[0] * gridUnit, z * gridUnit])
@@ -74,7 +71,6 @@ export class GridPanel extends BasePartCreator<'gridpanel'> {
     const variant = getVariant(variantId)
     const gridUnit = getGridLength(variant)
     const thickness = getThickness(variant)
-    const pivot: [number, number, number] = [0.5 * gridUnit, 0.5 * gridUnit, 0.5 * thickness]
 
     let panel = new GridPanel({
       id,
@@ -85,17 +81,14 @@ export class GridPanel extends BasePartCreator<'gridpanel'> {
     })
       .rotate({
         angle: 90,
-        origin: pivot,
         direction: Z_AXIS,
       })
       .rotate({
         angle: z[0] <= z[1] ? 90 : -90,
-        origin: pivot,
         direction: Y_AXIS,
       })
       .rotate({
         angle: y[0] <= y[1] ? 0 : 180,
-        origin: pivot,
         direction: Z_AXIS,
       })
       .translate([x * gridUnit, y[0] * gridUnit, z[0] * gridUnit])
@@ -113,7 +106,6 @@ export class GridPanel extends BasePartCreator<'gridpanel'> {
     const variant = getVariant(variantId)
     const gridUnit = getGridLength(variant)
     const thickness = getThickness(variant)
-    const pivot: [number, number, number] = [0.5 * gridUnit, 0.5 * gridUnit, 0.5 * thickness]
 
     let panel = new GridPanel({
       id,
@@ -124,12 +116,10 @@ export class GridPanel extends BasePartCreator<'gridpanel'> {
     })
       .rotate({
         angle: z[0] <= z[1] ? 90 : -90,
-        origin: pivot,
         direction: X_AXIS,
       })
       .rotate({
         angle: x[0] <= x[1] ? 0 : 180,
-        origin: pivot,
         direction: Z_AXIS,
       })
       .translate([x[0] * gridUnit, y * gridUnit, z[0] * gridUnit])

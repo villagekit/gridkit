@@ -26,7 +26,6 @@ export class GridBeam extends BasePartCreator<'gridbeam'> {
     const { id, x, y, z, variantId = getDefaultVariantId() } = options
 
     const gridUnit = getGridLengthInMeters(variantId)
-    const pivot: [number, number, number] = [0.5 * gridUnit, 0.5 * gridUnit, 0.5 * gridUnit]
 
     return new GridBeam({
       id,
@@ -35,7 +34,6 @@ export class GridBeam extends BasePartCreator<'gridbeam'> {
     })
       .rotate({
         angle: x[0] <= x[1] ? 0 : 180,
-        origin: pivot,
         direction: Y_AXIS,
       })
       .translate([x[0] * gridUnit, y * gridUnit, z * gridUnit])
@@ -45,7 +43,6 @@ export class GridBeam extends BasePartCreator<'gridbeam'> {
     const { id, x, y, z, variantId = getDefaultVariantId() } = options
 
     const gridUnit = getGridLengthInMeters(variantId)
-    const pivot: [number, number, number] = [0.5 * gridUnit, 0.5 * gridUnit, 0.5 * gridUnit]
 
     return new GridBeam({
       id,
@@ -54,7 +51,6 @@ export class GridBeam extends BasePartCreator<'gridbeam'> {
     })
       .rotate({
         angle: y[0] <= y[1] ? 90 : -90,
-        origin: pivot,
         direction: Z_AXIS,
       })
       .translate([x * gridUnit, y[0] * gridUnit, z * gridUnit])
@@ -64,7 +60,6 @@ export class GridBeam extends BasePartCreator<'gridbeam'> {
     const { id, x, y, z, variantId = getDefaultVariantId() } = options
 
     const gridUnit = getGridLengthInMeters(variantId)
-    const pivot: [number, number, number] = [0.5 * gridUnit, 0.5 * gridUnit, 0.5 * gridUnit]
 
     return new GridBeam({
       id,
@@ -73,7 +68,6 @@ export class GridBeam extends BasePartCreator<'gridbeam'> {
     })
       .rotate({
         angle: z[0] <= z[1] ? -90 : 90,
-        origin: pivot,
         direction: Y_AXIS,
       })
       .translate([x * gridUnit, y * gridUnit, z[0] * gridUnit])
