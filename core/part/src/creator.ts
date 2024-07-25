@@ -31,20 +31,18 @@ export class BasePartCreator<PartType extends string> {
     const matrix = new Matrix4().fromArray(this.transform)
     matrix.premultiply(new Matrix4().makeTranslation(...vector))
     next.transform = matrix.toArray()
-    console.log('next', next)
     return next
   }
 
   rotate(options: RotateOptions) {
     const next = this.clone()
     const { angle, /*origin = [0, 0, 0],*/ direction = [0, 0, 1] } = options
+
     // https://stackoverflow.com/a/55138754
-    /*
-    const pivotMatrix = new Matrix4().makeTranslation(...transform.origin)
-    const pivotInverseMatrix = pivotMatrix.clone().invert()
-    matrix.premultiply(pivotInverseMatrix)
-    */
     const matrix = new Matrix4().fromArray(this.transform)
+    // const pivotMatrix = new Matrix4().makeTranslation(...origin)
+    // const pivotInverseMatrix = pivotMatrix.clone().invert()
+    // matrix.premultiply(pivotInverseMatrix)
     const rotationMatrix = new Matrix4().makeRotationAxis(
       new Vector3(...direction),
       degToRad(angle),
@@ -52,7 +50,6 @@ export class BasePartCreator<PartType extends string> {
     matrix.premultiply(rotationMatrix)
     // matrix.premultiply(pivotMatrix)
     next.transform = matrix.toArray()
-    console.log('next', next)
     return next
   }
 
@@ -62,7 +59,6 @@ export class BasePartCreator<PartType extends string> {
     const matrixToApply = new Matrix4().fromArray(transform)
     matrixAppliedTo.premultiply(matrixToApply)
     next.transform = matrixAppliedTo.toArray()
-    console.log('next', next)
     return next
   }
 }
