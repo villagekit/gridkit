@@ -30,7 +30,7 @@ export function calculateState(creator: WithRequiredId<GridBeam>): GridBeamState
   matrix.decompose(position, quaternion, scale)
 
   const gridLengthInMeters = getGridLengthInMeters(variant)
-  const locationInGrids = position.divideScalar(gridLengthInMeters).round().toArray()
+  const locationInGrids = position.clone().divideScalar(gridLengthInMeters).round().toArray()
 
   const direction = X_AXIS.clone().applyQuaternion(quaternion).toArray()
   const axis = directionToAxisId(direction)
@@ -38,6 +38,9 @@ export function calculateState(creator: WithRequiredId<GridBeam>): GridBeamState
   if (axis == null) {
     throw new Error(`gridbeam direction axis is not standard: [${direction.join(', ')}]`)
   }
+
+  const locationInGridsRaw = position.clone().divideScalar(gridLengthInMeters).toArray()
+  console.log('beam', axis, lengthInGrids, locationInGridsRaw)
 
   return {
     id,
