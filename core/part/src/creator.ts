@@ -7,6 +7,11 @@ export type RotateOptions = {
   direction?: [number, number, number]
 }
 
+export type ApplyRotationOptions = {
+  origin?: [number, number, number]
+  rotation: TransformMatrix
+}
+
 export class BasePartCreator<PartType extends string> {
   type: PartType
   id?: string
@@ -34,23 +39,31 @@ export class BasePartCreator<PartType extends string> {
     return next
   }
 
-  rotate(options: RotateOptions) {
+  applyRotation(options: ApplyRotationOptions) {
+    const { origin = [0, 0, 0], rotation } = options
+
     const next = this.clone()
-    const { angle, /*origin = [0, 0, 0],*/ direction = [0, 0, 1] } = options
 
     // https://stackoverflow.com/a/55138754
     const matrix = new Matrix4().fromArray(this.transform)
-    // const pivotMatrix = new Matrix4().makeTranslation(...origin)
-    // const pivotInverseMatrix = pivotMatrix.clone().invert()
-    // matrix.premultiply(pivotInverseMatrix)
-    const rotationMatrix = new Matrix4().makeRotationAxis(
-      new Vector3(...direction),
-      degToRad(angle),
-    )
+    const pivotMatrix = new Matrix4().makeTranslation(new Vector3(...origin))
+    const pivotInverseMatrix = pivotMatrix.clone().invert()
+    matrix.premultiply(pivotInverseMatrix)
+    const rotationMatrix = new Matrix4().fromArray(rotation)
     matrix.premultiply(rotationMatrix)
-    // matrix.premultiply(pivotMatrix)
+    matrix.premultiply(pivotMatrix)
+
     next.transform = matrix.toArray()
+
     return next
+  }
+
+  rotate(options: RotateOptions) {
+    const { angle, origin, direction = [0, 0, 1] } = options
+    const rotation = new Matrix4()
+      .makeRotationAxis(new Vector3(...direction), degToRad(angle))
+      .toArray()
+    return this.applyRotation({ origin, rotation })
   }
 
   applyTransform(transform: TransformMatrix) {

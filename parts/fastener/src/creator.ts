@@ -1,4 +1,4 @@
-import { AxisId, type Point3, axisIdToDirectionVector, degToRad } from '@villagekit/math'
+import { AxisId, type Point3, axisIdToDirectionVector } from '@villagekit/math'
 import { BasePartCreator } from '@villagekit/part/creator'
 import { convert, meter } from '@villagekit/units'
 import { Matrix4, Quaternion, Vector3 } from 'three'
@@ -24,29 +24,21 @@ export class Fastener extends BasePartCreator<'fastener'> {
     const gridUnit = convert(variant.gridLength, meter).value
     const halfGridUnit = 0.5 * gridUnit
 
-    const rotationMatrix = new Matrix4().makeRotationFromQuaternion(
-      new Quaternion().setFromUnitVectors(
-        axisIdToDirectionVector(AxisId.X),
-        new Vector3(...direction),
-      ),
-    )
-
-    const left = new Vector3(...direction)
-      .applyAxisAngle(axisIdToDirectionVector(AxisId.Z), degToRad(90))
-      .multiplyScalar(halfGridUnit)
-      .toArray()
-    const up = new Vector3(...direction)
-      .applyAxisAngle(axisIdToDirectionVector(AxisId.Y), degToRad(-90))
-      .multiplyScalar(halfGridUnit)
+    const rotation = new Matrix4()
+      .makeRotationFromQuaternion(
+        new Quaternion().setFromUnitVectors(
+          axisIdToDirectionVector(AxisId.X),
+          new Vector3(...direction),
+        ),
+      )
       .toArray()
 
     return new Fastener({
       id,
       variantId,
     })
-      .applyTransform(rotationMatrix.toArray())
-      .translate(left)
-      .translate(up)
+      .translate([0, halfGridUnit, halfGridUnit])
+      .applyRotation({ origin: [halfGridUnit, halfGridUnit, halfGridUnit], rotation })
       .translate([start[0] * gridUnit, start[1] * gridUnit, start[2] * gridUnit])
   }
 }
