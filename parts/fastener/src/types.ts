@@ -1,6 +1,8 @@
-import type { Direction, Location, ScaleX } from '@villagekit/math'
+import type { ScaleX } from '@villagekit/math'
+import type { WithRequiredId } from '@villagekit/part'
 import type { Length } from '@villagekit/units'
-import type { Quaternion } from 'three'
+import type { Quaternion, Vector3 } from 'three'
+import type { Fastener } from './creator'
 
 export type FastenerType = 'fastener'
 
@@ -27,18 +29,14 @@ export interface FastenerVariant {
   nutLength: Length
 }
 
-export type FastenerState = {
+export type FastenerState = Pick<Fastener, 'type' | 'transforms'> & {
   id: string
-  type: FastenerType
   variant: FastenerVariant
-  start: Location
-  end: Location
-  direction: Direction
 }
 
-export type FastenerGlValue = FastenerState & {
+export type FastenerGlValue = Omit<FastenerState, 'transforms'> & {
   extrusionLengthInMeters: number
   fastenedLengthInMeters: ScaleX
-  position: [number, number, number]
-  quarternion: Quaternion
+  position: Vector3
+  quaternion: Quaternion
 }
