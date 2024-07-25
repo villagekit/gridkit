@@ -16,9 +16,6 @@ declare global {
     export interface EveryPartVariants {
       noop: { noop: null }
     }
-    export interface EveryPartState {
-      noop: { type: 'noop'; id: string }
-    }
     export interface EveryPartGlValue {
       noop: { type: 'noop' }
     }
@@ -30,7 +27,6 @@ type $Values<T extends object> = T[keyof T]
 
 export type PartTypeId = $Values<VK.EveryPartTypeId>
 export type PartCreator = $Values<VK.EveryPartCreator>
-export type PartState = $Values<VK.EveryPartState>
 export type PartGlValue = $Values<VK.EveryPartGlValue>
 export type PartGlValuesByType = {
   [Key in keyof VK.EveryPartGlValue]: Array<VK.EveryPartGlValue[Key]>
@@ -40,17 +36,16 @@ export type FasteningPoint = {
   cellPosition: Point3
   facePosition: Point3
   axis: AxisId
-  part: PartState
+  part: WithRequiredId<PartCreator>
   gradient: number
 }
 
-export type CalculatePartState<Creator extends { id?: string }, State> = (
+export type CalculatePartGlValue<Creator extends { id?: string }, GlValue> = (
   creator: WithRequiredId<Creator>,
-) => State
-export type CalculatePartGlValue<State, GlValue> = (state: State) => GlValue
-export type CalculatePartBoundingBox<Value> = (value: Value) => Box3
-export type CalculatePartFasteningPoints<State> = (state: State) => Array<FasteningPoint>
-export type CalculateNumFastenersToFasten<State> = (state: State) => number
+) => GlValue
+export type CalculatePartBoundingBox<Creator> = (creator: Creator) => Box3
+export type CalculatePartFasteningPoints<Creator> = (creator: Creator) => Array<FasteningPoint>
+export type CalculateNumFastenersToFasten<Creator> = (creator: Creator) => number
 
 export type WithRequiredId<T extends { id?: string }> = { id: string } & {
   [Key in keyof T as Exclude<Key, 'id'>]: T[Key]
@@ -59,13 +54,7 @@ export type WithRequiredId<T extends { id?: string }> = { id: string } & {
 export type PartsGl<GlValue> = (props: PartsGlProps<GlValue>) => ReactElement | null
 export type PartsSummary<Creator> = (props: PartsSummaryProps<Creator>) => ReactElement | null
 
-export interface PartModule<
-  Id extends PartTypeId,
-  Creator extends PartCreator,
-  State extends PartState,
-  GlValue,
-  Variants,
-> {
+export interface PartModule<Id extends PartTypeId, Creator extends PartCreator, GlValue, Variants> {
   id: Id
   variants: Variants
   components: {
@@ -73,11 +62,10 @@ export interface PartModule<
     PartsGl: PartsGl<GlValue>
   }
   methods: {
-    calculateState: CalculatePartState<Creator, State>
-    calculateGlValue: CalculatePartGlValue<State, GlValue>
+    calculateGlValue: CalculatePartGlValue<Creator, GlValue>
     calculateBoundingBox: CalculatePartBoundingBox<GlValue>
-    calculateFasteningPoints: CalculatePartFasteningPoints<State>
-    calculateNumFastenersToFasten: CalculateNumFastenersToFasten<State>
+    calculateFasteningPoints: CalculatePartFasteningPoints<Creator>
+    calculateNumFastenersToFasten: CalculateNumFastenersToFasten<Creator>
   }
   schemas: Array<ZodDiscriminatedUnionOption<'type'>>
 }
@@ -86,7 +74,6 @@ export type PartModulesByType = {
   [PT in PartTypeId]: PartModule<
     PT,
     VK.EveryPartCreator[PT],
-    VK.EveryPartState[PT],
     VK.EveryPartGlValue[PT],
     VK.EveryPartVariants[PT]
   >

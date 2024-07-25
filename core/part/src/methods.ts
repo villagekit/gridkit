@@ -1,32 +1,25 @@
 import { Box3 } from 'three'
 import { getPartModule } from './modules'
-import type { FasteningPoint, PartCreator, PartGlValue, PartState, WithRequiredId } from './types'
+import type { FasteningPoint, PartCreator, PartGlValue, WithRequiredId } from './types'
 
-export function calculateState(partCreator: WithRequiredId<PartCreator>): PartState {
+export function calculateGlValue(partCreator: WithRequiredId<PartCreator>): PartGlValue {
   const partModule = getPartModule(partCreator.type)
   // @ts-ignore
-  return partModule.methods.calculateState(partCreator)
+  return partModule.methods.calculateGlValue(partCreator)
 }
-export function calculateStateForAll(partCreators: Array<PartCreator>) {
-  return partCreators.map(calculateState)
-}
-
-export function calculateGlValue(partState: PartState): PartGlValue {
-  const partModule = getPartModule(partState.type)
-  // @ts-ignore
-  return partModule.methods.calculateGlValue(partState)
-}
-export function calculateGlValueForAll(partStates: Array<PartState>): Array<PartGlValue> {
-  return partStates.map(calculateGlValue)
+export function calculateGlValueForAll(
+  partCreators: Array<WithRequiredId<PartCreator>>,
+): Array<PartGlValue> {
+  return partCreators.map(calculateGlValue)
 }
 
-export function calculateBoundingBox(partGlValue: PartGlValue): Box3 {
-  const partModule = getPartModule(partGlValue.type)
+export function calculateBoundingBox(partCreator: PartCreator): Box3 {
+  const partModule = getPartModule(partCreator.type)
   // @ts-ignore
   return partModule.methods.calculateBoundingBox(partGlValue)
 }
-export function calculateBoundingBoxForAll(partGlValues: Array<PartGlValue>) {
-  const boundingBoxes = partGlValues.map(calculateBoundingBox)
+export function calculateBoundingBoxForAll(partCreators: Array<PartCreator>): Box3 {
+  const boundingBoxes = partCreators.map(calculateBoundingBox)
   const boundingBox = boundingBoxes.reduce(
     (sofar: Box3, box: Box3) => sofar.clone().union(box),
     new Box3(),
@@ -34,20 +27,20 @@ export function calculateBoundingBoxForAll(partGlValues: Array<PartGlValue>) {
   return boundingBox
 }
 
-export function calculateFasteningPoints(partState: PartState): Array<FasteningPoint> {
-  const partModule = getPartModule(partState.type)
+export function calculateFasteningPoints(partCreator: PartCreator): Array<FasteningPoint> {
+  const partModule = getPartModule(partCreator.type)
   // @ts-ignore
-  return partModule.methods.calculateFasteningPoints(partState)
+  return partModule.methods.calculateFasteningPoints(partCreator)
 }
 
 export function calculateFasteningPointsForAll(
-  partStates: Array<PartState>,
+  partCreators: Array<PartCreator>,
 ): Array<FasteningPoint> {
-  return partStates.flatMap(calculateFasteningPoints)
+  return partCreators.flatMap(calculateFasteningPoints)
 }
 
-export function calculateNumFastenersToFasten(partState: PartState): number {
-  const partModule = getPartModule(partState.type)
+export function calculateNumFastenersToFasten(partCreator: PartCreator): number {
+  const partModule = getPartModule(partCreator.type)
   // @ts-ignore
-  return partModule.methods.calculateNumFastenersToFasten(partState)
+  return partModule.methods.calculateNumFastenersToFasten(partCreator)
 }

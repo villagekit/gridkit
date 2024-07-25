@@ -2,7 +2,6 @@ import type {
   PartCreator,
   PartModule,
   PartModulesByType,
-  PartState,
   PartTypeId,
   PartVariantsByType,
 } from './types'
@@ -13,10 +12,9 @@ export const partModules: PartModulesByType = {}
 export function registerPartModule<
   Id extends PartTypeId,
   Creator extends PartCreator,
-  State extends PartState,
   GlValue,
   Variants,
->(partModule: PartModule<Id, Creator, State, GlValue, Variants>) {
+>(partModule: PartModule<Id, Creator, GlValue, Variants>) {
   // @ts-ignore
   partModules[partModule.id] = partModule
 }

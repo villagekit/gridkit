@@ -1,7 +1,7 @@
 import { groupBy, map } from 'lodash-es'
 import type React from 'react'
 import { useMemo } from 'react'
-import { type PartCreator, type PartGlValue, type PartState, getPartModule } from './index'
+import { type PartCreator, type PartGlValue, type PartTypeId, getPartModule } from './index'
 
 export interface PartsGlForAllProps {
   partGlValues: Array<PartGlValue>
@@ -29,7 +29,7 @@ export function PartsGlForAll(props: PartsGlForAllProps): React.ReactElement {
 }
 
 export interface PartsGlForTypeProps {
-  partType: PartState['type']
+  partType: PartTypeId
   partGlValues: Array<PartGlValue>
 }
 
@@ -64,7 +64,7 @@ export function PartsSummaryForAll(props: PartsSummaryForAllProps): React.ReactE
 }
 
 export interface PartsSummaryForTypeProps {
-  partType: PartState['type']
+  partType: PartTypeId
   parts: Array<PartCreator>
 }
 

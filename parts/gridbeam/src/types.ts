@@ -14,19 +14,17 @@ export type GridBeamVariant = {
   }
 }
 
-export type GridBeamState = {
+export type GridBeamGlValue = {
   id: string
   type: GridBeamType
   variant: GridBeamVariant
-  lengthInGrids: number
-  position: Vector3
-  quaternion: Quaternion
-}
-
-export type GridBeamGlValue = GridBeamState & {
   // variant
   gridLengthInMeters: number
   holeDiameterInMeters: number
   // length
+  lengthInGrids: number
   lengthInMeters: number
+  // transform
+  position: Vector3
+  quaternion: Quaternion
 }

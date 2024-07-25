@@ -2,7 +2,6 @@ import { type AxisId, type Point3, axisIdToDirection, flipAxisId } from '@villag
 import {
   type FasteningPoint,
   type PartCreator,
-  type PartState,
   calculateFasteningPointsForAll,
   calculateNumFastenersToFasten,
 } from '@villagekit/part'
@@ -30,8 +29,8 @@ export type PossibleFastener = {
   endPoint: FasteningPoint
 }
 
-export function generateFastenerParts(partStates: Array<PartState>): Array<PartCreator> {
-  const fasteningPoints = calculateFasteningPointsForAll(partStates)
+export function generateFastenerParts(partCreators: Array<PartCreator>): Array<PartCreator> {
+  const fasteningPoints = calculateFasteningPointsForAll(partCreators)
   const fasteningMap = buildFasteningMap(fasteningPoints)
   const possibleFasteners = generatePossibleFasteners(fasteningMap)
   const chosenFasteners = generateFastenersByWeighting(possibleFasteners)
@@ -162,7 +161,7 @@ interface PartAdjacencyMap {
 }
 type PartPairPriorityOrder = Array<string>
 interface PartPairById {
-  [partPairId: string]: [PartState, PartState]
+  [partPairId: string]: [PartCreator, PartCreator]
 }
 
 function derivePartAdjacencies(possibleFasteners: Array<PossibleFastener>): {
@@ -201,13 +200,13 @@ function derivePartAdjacencies(possibleFasteners: Array<PossibleFastener>): {
   return { partAdjacencyMap, partPairPriorityOrder, partPairsById }
 }
 
-function getPartPairId(partA: PartState, partB: PartState): string {
+function getPartPairId(partA: PartCreator, partB: PartCreator): string {
   return `${partA.id}__${partB.id}`
 }
 
 function getPartPairsFromFastener(
   possibleFastener: PossibleFastener,
-): Array<[PartState, PartState]> {
+): Array<[PartCreator, PartCreator]> {
   const parts = uniq(map(possibleFastener.fasteningPoints, 'part'))
   return pairwise(parts)
 }
@@ -220,7 +219,7 @@ function pairwise<T>(array: Array<T>): Array<[T, T]> {
   return result
 }
 
-function sortPartPairs(partA: PartState, partB: PartState): [PartState, PartState] {
+function sortPartPairs(partA: PartCreator, partB: PartCreator): [PartCreator, PartCreator] {
   if (partA.id.localeCompare(partB.id) <= 0) {
     return [partA, partB]
   }

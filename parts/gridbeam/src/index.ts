@@ -6,11 +6,10 @@ import {
   calculateFasteningPoints,
   calculateGlValue,
   calculateNumFastenersToFasten,
-  calculateState,
 } from './methods'
 import { gridBeamSchemas } from './schemas'
 import { PartsSummary } from './summary'
-import type { GridBeamGlValue, GridBeamState, GridBeamType } from './types'
+import type { GridBeamGlValue, GridBeamType } from './types'
 import { gridBeamVariants } from './variants'
 
 export * from './svg/index'
@@ -25,9 +24,6 @@ declare global {
     }
     interface EveryPartCreator {
       gridbeam: GridBeam
-    }
-    interface EveryPartState {
-      gridbeam: GridBeamState
     }
     interface EveryPartVariants {
       gridbeam: typeof gridBeamVariants
@@ -49,7 +45,6 @@ registerPartModule({
     calculateFasteningPoints,
     calculateGlValue,
     calculateNumFastenersToFasten,
-    calculateState,
   },
   variants: gridBeamVariants,
   schemas: gridBeamSchemas,

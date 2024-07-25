@@ -10,13 +10,13 @@ import type { FasteningPoint, WithRequiredId } from '@villagekit/part'
 import { convert, meter } from '@villagekit/units'
 import { Box3, Matrix4, Quaternion, Vector3 } from 'three'
 import type { GridBeam } from './creator'
-import type { GridBeamGlValue, GridBeamState, GridBeamVariant } from './types'
+import type { GridBeamGlValue } from './types'
 import { gridBeamVariants } from './variants'
 
 const X_AXIS = axisIdToDirectionVector(AxisId.X)
 
-export function calculateState(creator: WithRequiredId<GridBeam>): GridBeamState {
-  const { type, id, variantId, lengthInGrids, transform } = creator
+export function calculateGlValue(creator: WithRequiredId<GridBeam>): GridBeamGlValue {
+  const { id, type, variantId, lengthInGrids, transform } = creator
 
   const variant = gridBeamVariants[variantId]
   if (variant == null) {
@@ -29,23 +29,8 @@ export function calculateState(creator: WithRequiredId<GridBeam>): GridBeamState
   const scale = new Vector3()
   matrix.decompose(position, quaternion, scale)
 
-  return {
-    id,
-    type,
-    variant,
-    lengthInGrids,
-    position,
-    quaternion,
-  }
-}
-
-export function calculateGlValue(state: GridBeamState): GridBeamGlValue {
-  const { id, type, variant, lengthInGrids, position, quaternion } = state
-
-  const { holeDiameter } = variant
-
-  const gridLengthInMeters = getGridLengthInMeters(state.variant)
-  const holeDiameterInMeters = convert(holeDiameter, meter).value
+  const gridLengthInMeters = convert(variant.gridLength, meter).value
+  const holeDiameterInMeters = convert(variant.holeDiameter, meter).value
   const lengthInMeters = lengthInGrids * gridLengthInMeters
 
   return {
@@ -61,18 +46,22 @@ export function calculateGlValue(state: GridBeamState): GridBeamGlValue {
   }
 }
 
-export function calculateBoundingBox(value: GridBeamGlValue): Box3 {
-  const { gridLengthInMeters, lengthInGrids, quaternion } = value
+export function calculateBoundingBox(creator: GridBeam): Box3 {
+  const { variantId, lengthInGrids, transform } = creator
 
-  const gridUnit = gridLengthInMeters
-  const halfGridUnit = 0.5 * gridLengthInMeters
+  const variant = gridBeamVariants[variantId]
+  if (variant == null) {
+    throw new Error(`Unknown gridbeam variant: ${variantId}`)
+  }
+  const gridUnit = convert(variant.gridLength, meter).value
+  const halfGridUnit = 0.5 * gridUnit
 
   const box = new Box3(
     new Vector3(-halfGridUnit, -halfGridUnit, -halfGridUnit),
     new Vector3(lengthInGrids * gridUnit - halfGridUnit, halfGridUnit, halfGridUnit),
   )
 
-  box.applyMatrix4(new Matrix4().makeRotationFromQuaternion(quaternion))
+  box.applyMatrix4(transform)
 
   return box
 }
@@ -92,10 +81,21 @@ const fasteningAxesByAxisId: Record<AxisId, Array<AxisId>> = {
   [AxisId['-Z']]: [AxisId.X, AxisId['-X'], AxisId.Y, AxisId['-Y']],
 }
 
-export function calculateFasteningPoints(state: GridBeamState): Array<FasteningPoint> {
-  const { variant, lengthInGrids, position, quaternion } = state
+export function calculateFasteningPoints(creator: GridBeam): Array<FasteningPoint> {
+  const { variantId, lengthInGrids, transform } = creator
 
-  const gridLengthInMeters = getGridLengthInMeters(variant)
+  const variant = gridBeamVariants[variantId]
+  if (variant == null) {
+    throw new Error(`Unknown gridbeam variant: ${variantId}`)
+  }
+
+  const matrix = new Matrix4().fromArray(transform)
+  const position = new Vector3()
+  const quaternion = new Quaternion()
+  const scale = new Vector3()
+  matrix.decompose(position, quaternion, scale)
+
+  const gridLengthInMeters = convert(variant.gridLength, meter).value
   const locationInGrids = position.clone().divideScalar(gridLengthInMeters).round().toArray()
 
   const direction = X_AXIS.clone().applyQuaternion(quaternion).toArray()
@@ -144,19 +144,13 @@ export function calculateFasteningPoints(state: GridBeamState): Array<FasteningP
         cellPosition: point,
         facePosition,
         gradient,
-        part: state,
+        part: creator,
       }
     }
   }
   return fasteningPoints
 }
 
-export function calculateNumFastenersToFasten(_state: GridBeamState): number {
+export function calculateNumFastenersToFasten(_creator: WithRequiredId<GridBeam>): number {
   return 2
-}
-
-function getGridLengthInMeters(variant: GridBeamVariant): number {
-  const { gridLength } = variant
-
-  return convert(gridLength, meter).value
 }

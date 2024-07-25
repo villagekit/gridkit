@@ -1,4 +1,4 @@
-import type { PartCreator, PartState } from '@villagekit/part'
+import type { PartCreator } from '@villagekit/part'
 
 declare global {
   namespace VK {
@@ -14,6 +14,6 @@ export type PluginId = $Values<VK.EveryPluginId>
 export interface Plugin<PluginState = unknown> {
   id: PluginId
   init?: () => void
-  generateParts: (parts: Array<PartState>) => Promise<Array<PartCreator>>
+  generateParts: (parts: Array<PartCreator>) => Promise<Array<PartCreator>>
   state: PluginState
 }

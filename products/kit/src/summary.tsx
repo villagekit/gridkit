@@ -1,4 +1,4 @@
-import { type PartState, PartsSummaryForAll } from '@villagekit/part'
+import { type PartCreator, PartsSummaryForAll } from '@villagekit/part'
 import { SummaryContextProvider } from '@villagekit/part/base'
 import type { ProductSummaryProps } from '@villagekit/product'
 import { debounce } from 'lodash-es'
@@ -14,7 +14,7 @@ export function ProductKitSummary(props: ProductSummaryProps) {
 
   const setPartsDebounced = useMemo(
     () =>
-      debounce((latestParts: Array<PartState>) => setLocalParts(latestParts), 500, {
+      debounce((latestParts: Array<PartCreator>) => setLocalParts(latestParts), 500, {
         leading: false,
       }),
     [],
