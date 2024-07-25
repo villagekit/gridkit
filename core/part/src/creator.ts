@@ -52,10 +52,11 @@ export class BasePartCreator<PartType extends string> {
     const pivotMatrix = new Matrix4().makeTranslation(new Vector3(...origin))
     const pivotInverseMatrix = pivotMatrix.clone().invert()
     const rotationMatrix = new Matrix4().fromArray(rotation)
-    const matrix = new Matrix4().multiplyMatrices(
-      new Matrix4().multiplyMatrices(pivotInverseMatrix, rotationMatrix),
-      pivotMatrix,
-    )
+
+    const matrix = new Matrix4()
+    matrix.multiply(pivotInverseMatrix)
+    matrix.multiply(rotationMatrix)
+    matrix.multiply(pivotMatrix)
 
     log('matrix', matrix)
 
