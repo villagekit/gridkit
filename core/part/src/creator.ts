@@ -49,17 +49,18 @@ export class BasePartCreator<PartType extends string> {
     }
 
     // https://stackoverflow.com/a/55138754
-    const matrix = new Matrix4().fromArray(this.transform)
     const pivotMatrix = new Matrix4().makeTranslation(new Vector3(...origin))
-    log('pivot', pivotMatrix)
     const pivotInverseMatrix = pivotMatrix.clone().invert()
-    log('pivotInverse', pivotInverseMatrix)
-    matrix.premultiply(pivotInverseMatrix)
     const rotationMatrix = new Matrix4().fromArray(rotation)
-    matrix.premultiply(rotationMatrix)
-    matrix.premultiply(pivotMatrix)
+    const matrix = new Matrix4().multiplyMatrices(
+      new Matrix4().multiplyMatrices(pivotInverseMatrix, rotationMatrix),
+      pivotMatrix,
+    )
 
-    next.transform = matrix.toArray()
+    log('matrix', matrix)
+
+    const nextTransform = new Matrix4().fromArray(this.transform).premultiply(matrix)
+    next.transform = nextTransform.toArray()
 
     return next
   }
