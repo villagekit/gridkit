@@ -15,15 +15,6 @@ import { gridBeamVariants } from './variants'
 
 const X_AXIS = axisIdToDirectionVector(AxisId.X)
 
-// NOTES:
-//   - it's true if you rotate [0, 0, 0] around a point, it will change
-//   - so how to fix that?
-//     - do we translate to the origin first?
-//     - do we translate back later?
-//       - use the same panel axis to generate a back translation:
-//          - length (X), widthA (Y), widthB (Z)
-//          - rotate axis with the direction quaternion, get new axis
-
 export function calculateState(creator: WithRequiredId<GridBeam>): GridBeamState {
   const { type, id, variantId, lengthInGrids, transform } = creator
 
@@ -38,86 +29,52 @@ export function calculateState(creator: WithRequiredId<GridBeam>): GridBeamState
   const scale = new Vector3()
   matrix.decompose(position, quaternion, scale)
 
-  const gridLengthInMeters = getGridLengthInMeters(variant)
-  const locationInGrids = position.clone().divideScalar(gridLengthInMeters).round().toArray()
-
-  const direction = X_AXIS.clone().applyQuaternion(quaternion).toArray()
-  const axis = directionToAxisId(direction)
-
-  if (axis == null) {
-    throw new Error(`gridbeam direction axis is not standard: [${direction.join(', ')}]`)
+  return {
+    id,
+    type,
+    variant,
+    lengthInGrids,
+    position,
+    quaternion,
   }
+}
 
-  const locationInGridsRaw = position.clone().divideScalar(gridLengthInMeters).toArray()
-  console.log('beam', axis, lengthInGrids, locationInGridsRaw)
+export function calculateGlValue(state: GridBeamState): GridBeamGlValue {
+  const { id, type, variant, lengthInGrids, position, quaternion } = state
+
+  const { holeDiameter } = variant
+
+  const gridLengthInMeters = getGridLengthInMeters(state.variant)
+  const holeDiameterInMeters = convert(holeDiameter, meter).value
+  const lengthInMeters = lengthInGrids * gridLengthInMeters
 
   return {
     id,
     type,
     variant,
-    axis,
-    locationInGrids,
-    lengthInGrids,
-  }
-}
-
-export function calculateGlValue(state: GridBeamState): GridBeamGlValue {
-  const {
-    axis,
-    locationInGrids,
-    lengthInGrids,
-    variant: { holeDiameter },
-  } = state
-
-  const gridLengthInMeters = getGridLengthInMeters(state.variant)
-  const holeDiameterInMeters = convert(holeDiameter, meter).value
-
-  const direction = axisIdToDirection(axis)
-  const directionVector = axisIdToDirectionVector(axis)
-  const quaternion = new Quaternion().setFromUnitVectors(X_AXIS, directionVector)
-
-  const locationInMeters = [
-    locationInGrids[0] * gridLengthInMeters,
-    locationInGrids[1] * gridLengthInMeters,
-    locationInGrids[2] * gridLengthInMeters,
-  ] as [number, number, number]
-  const position: GridBeamGlValue['position'] = [
-    (locationInGrids[0] + 0.5) * gridLengthInMeters,
-    (locationInGrids[1] + 0.5) * gridLengthInMeters,
-    (locationInGrids[2] + 0.5) * gridLengthInMeters,
-  ]
-
-  const lengthInMeters = lengthInGrids * gridLengthInMeters
-
-  const sizeInGrids = getSizeInGrids(state)
-  const sizeInMeters = [
-    sizeInGrids[0] * gridLengthInMeters,
-    sizeInGrids[1] * gridLengthInMeters,
-    sizeInGrids[2] * gridLengthInMeters,
-  ] as [number, number, number]
-
-  return {
-    ...state,
-    direction,
     gridLengthInMeters,
     holeDiameterInMeters,
     lengthInGrids,
     lengthInMeters,
-    locationInMeters,
     position,
     quaternion,
-    sizeInGrids,
-    sizeInMeters,
   }
 }
 
 export function calculateBoundingBox(value: GridBeamGlValue): Box3 {
-  const { sizeInMeters, locationInMeters } = value
+  const { gridLengthInMeters, lengthInGrids, quaternion } = value
 
-  return new Box3().setFromPoints([
-    new Vector3(...locationInMeters),
-    new Vector3(...locationInMeters).add(new Vector3(...sizeInMeters)),
-  ])
+  const gridUnit = gridLengthInMeters
+  const halfGridUnit = 0.5 * gridLengthInMeters
+
+  const box = new Box3(
+    new Vector3(-halfGridUnit, -halfGridUnit, -halfGridUnit),
+    new Vector3(lengthInGrids * gridUnit - halfGridUnit, halfGridUnit, halfGridUnit),
+  )
+
+  box.applyMatrix4(new Matrix4().makeRotationFromQuaternion(quaternion))
+
+  return box
 }
 
 export function calculateSummaryKey(creator: GridBeam): string {
@@ -136,9 +93,17 @@ const fasteningAxesByAxisId: Record<AxisId, Array<AxisId>> = {
 }
 
 export function calculateFasteningPoints(state: GridBeamState): Array<FasteningPoint> {
-  const { locationInGrids, lengthInGrids, axis } = state
+  const { variant, lengthInGrids, position, quaternion } = state
 
-  const direction = axisIdToDirection(axis)
+  const gridLengthInMeters = getGridLengthInMeters(variant)
+  const locationInGrids = position.clone().divideScalar(gridLengthInMeters).round().toArray()
+
+  const direction = X_AXIS.clone().applyQuaternion(quaternion).toArray()
+  const axis = directionToAxisId(direction)
+
+  if (axis == null) {
+    throw new Error(`gridbeam direction axis is not standard: [${direction.join(', ')}]`)
+  }
 
   const points: Array<Point3> = new Array(lengthInGrids)
   for (let index = 0; index < lengthInGrids; index++) {
@@ -194,19 +159,4 @@ function getGridLengthInMeters(variant: GridBeamVariant): number {
   const { gridLength } = variant
 
   return convert(gridLength, meter).value
-}
-
-function getSizeInGrids(state: GridBeamState): [number, number, number] {
-  const { axis, lengthInGrids } = state
-  switch (axis) {
-    case AxisId.X:
-    case AxisId['-X']:
-      return [lengthInGrids, 1, 1]
-    case AxisId.Y:
-    case AxisId['-Y']:
-      return [1, lengthInGrids, 1]
-    case AxisId.Z:
-    case AxisId['-Z']:
-      return [1, 1, lengthInGrids]
-  }
 }

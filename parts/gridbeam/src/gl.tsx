@@ -167,11 +167,9 @@ function Beam(props: BeamProps) {
 
   return (
     <group name={`gridbeam-beam-${id}`}>
-      <group name="gridbeam-beam-material">
-        <mesh name="gridbeam-beam-texture" geometry={geometry} castShadow receiveShadow>
-          <meshLambertMaterial map={texture} />
-        </mesh>
-      </group>
+      <mesh name="gridbeam-beam-texture" geometry={geometry} castShadow receiveShadow>
+        <meshLambertMaterial map={texture} />
+      </mesh>
       {children}
     </group>
   )

@@ -24,14 +24,12 @@ export class Fastener extends BasePartCreator<'fastener'> {
     const gridUnit = convert(variant.gridLength, meter).value
     const halfGridUnit = 0.5 * gridUnit
 
-    const rotation = new Matrix4()
-      .makeRotationFromQuaternion(
-        new Quaternion().setFromUnitVectors(
-          axisIdToDirectionVector(AxisId.X),
-          new Vector3(...direction),
-        ),
-      )
-      .toArray()
+    const rotation = new Matrix4().makeRotationFromQuaternion(
+      new Quaternion().setFromUnitVectors(
+        axisIdToDirectionVector(AxisId.X),
+        new Vector3(...direction),
+      ),
+    ).toArray()
 
     return new Fastener({
       id,
