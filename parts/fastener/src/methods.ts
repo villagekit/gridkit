@@ -54,13 +54,16 @@ export function calculateState(creator: WithRequiredId<Fastener>): FastenerState
   matrix.decompose(position, quaternion, scale)
 
   const gridLengthInMeters = getGridLengthInMeters(variant)
-  const startVector = position.divideScalar(gridLengthInMeters).round()
+  const startVector = position.clone().divideScalar(gridLengthInMeters).round()
   const start = startVector.toArray()
 
-  const direction = X_AXIS.clone().applyQuaternion(quaternion).toArray()
-  const endVector = startVector.add(
-    new Vector3(...direction).multiplyScalar(convert(variant.fastenedLength, meter).value),
-  )
+  const direction = X_AXIS.clone().applyQuaternion(quaternion).round().toArray()
+  const fastenedLength = convert(variant.fastenedLength, meter).value
+  const endVector = position
+    .clone()
+    .add(new Vector3(...direction).multiplyScalar(fastenedLength))
+    .divideScalar(gridLengthInMeters)
+    .round()
   const end = endVector.toArray()
 
   return {
@@ -76,7 +79,6 @@ export function calculateState(creator: WithRequiredId<Fastener>): FastenerState
 export function calculateGlValue(state: FastenerState): FastenerGlValue {
   const {
     start,
-    end,
     direction,
     variant: { extrusionLength, fastenedLength },
   } = state
@@ -86,9 +88,9 @@ export function calculateGlValue(state: FastenerState): FastenerGlValue {
   const gridLengthInMeters = getGridLengthInMeters(state.variant)
 
   const position: FastenerGlValue['position'] = [
-    ((start[0] + end[0]) * 0.5 + 0.5) * gridLengthInMeters,
-    ((start[1] + end[1]) * 0.5 + 0.5) * gridLengthInMeters,
-    ((start[2] + end[2]) * 0.5 + 0.5) * gridLengthInMeters,
+    (start[0] * 0.5 + 0.5) * gridLengthInMeters,
+    (start[1] * 0.5 + 0.5) * gridLengthInMeters,
+    (start[2] * 0.5 + 0.5) * gridLengthInMeters,
   ]
 
   const quarternion: FastenerGlValue['quarternion'] = new Quaternion().setFromUnitVectors(

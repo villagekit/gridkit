@@ -12,6 +12,8 @@ import comlinkRaw from '../../../../node_modules/comlink/dist/esm/comlink.js?raw
 // @ts-ignore
 import threeRaw from '../../../../node_modules/three/build/three.module.js?raw'
 // @ts-ignore
+import fastenerCreatorRaw from '../../../../parts/fastener/dist-bundles/creator.js?raw'
+// @ts-ignore
 import gridbeamCreatorRaw from '../../../../parts/gridbeam/dist-bundles/creator.js?raw'
 // @ts-ignore
 import gridpanelCreatorRaw from '../../../../parts/gridpanel/dist-bundles/creator.js?raw'
@@ -143,6 +145,7 @@ const createEvaluatorIframeSrc = () =>
     "@villagekit/part/creator": "data:application/javascript;base64,${encodeURI(encodeBase64(partCreatorRaw))}",
     "@villagekit/part-gridbeam/creator": "data:application/javascript;base64,${encodeURI(encodeBase64(gridbeamCreatorRaw))}",
     "@villagekit/part-gridpanel/creator": "data:application/javascript;base64,${encodeURI(encodeBase64(gridpanelCreatorRaw))}",
+    "@villagekit/part-fastener/creator": "data:application/javascript;base64,${encodeURI(encodeBase64(fastenerCreatorRaw))}",
     "@villagekit/design/kit": "data:,${encodeURI('')}"
   }
 }

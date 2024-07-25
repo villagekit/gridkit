@@ -399,9 +399,9 @@ function buildFastenerParts(chosenFasteners: Array<PossibleFastener>): Array<Par
   const fastenerParts: Array<PartCreator> = []
 
   forEach(groupedFasteners, (chosenFastenersForLength, fastenedLengthInMillimeters) => {
-    const fasteners = map(chosenFastenersForLength, ({ axis, endPoint, startPoint }) => ({
+    const fasteners = map(chosenFastenersForLength, ({ axis, startPoint }) => ({
       direction: axisIdToDirection(axis),
-      end: endPoint.facePosition,
+      // end: endPoint.facePosition,
       start: startPoint.facePosition,
     }))
 
@@ -418,7 +418,7 @@ function buildFastenerParts(chosenFasteners: Array<PossibleFastener>): Array<Par
     for (let fastenerIndex = 0; fastenerIndex < fasteners.length; fastenerIndex++) {
       const fastener = fasteners[fastenerIndex]!
       fastenerParts.push(
-        Fastener.create({
+        Fastener.Line({
           ...fastener,
           id: `fasteners-${fastenedLengthInMillimeters}-${fastenerIndex}`,
           variantId: variant.id,

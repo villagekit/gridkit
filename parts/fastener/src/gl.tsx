@@ -13,6 +13,7 @@ import {
 } from 'three'
 import { mergeBufferGeometries } from 'three-stdlib'
 
+import { convert, meter } from '@villagekit/units'
 import type { FastenerGlValue, FastenerState } from './types'
 
 export function PartsGl(props: PartsGlProps<FastenerGlValue>) {
@@ -105,9 +106,10 @@ function FastenersWithGeometry(props: FastenersWithGeometryProps) {
     fastenedLengthInMeters,
     positions,
     quarternions,
-    variant: { materials },
+    variant,
     fastenerGeometry,
   } = props
+  const { materials } = variant
 
   // TODO (mw): use mesh uvs instead of texture.repeat
   // https://discourse.threejs.org/t/use-the-same-texture-with-different-offsets-on-different-materials/19270/11
@@ -118,6 +120,10 @@ function FastenersWithGeometry(props: FastenersWithGeometryProps) {
   }, [texture])
   material.needsUpdate = true
 
+  const gridLength = useMemo(() => {
+    return convert(variant.gridLength, meter).value
+  }, [variant])
+
   const geometry = useMemo(() => {
     const fullLengthInMeters = fastenedLengthInMeters + extrusionLengthInMeters
 
@@ -125,11 +131,11 @@ function FastenersWithGeometry(props: FastenersWithGeometryProps) {
     const sideB = fastenerGeometry.clone()
 
     sideA.rotateZ(Math.PI)
-    sideA.translate(fullLengthInMeters * 0.5, 0, 0)
-    sideB.translate(-fullLengthInMeters * 0.5, 0, 0)
+    sideA.translate(0, 0, 0)
+    sideB.translate(-fullLengthInMeters, 0, 0)
 
     return mergeBufferGeometries([sideA, sideB])
-  }, [fastenedLengthInMeters, extrusionLengthInMeters, fastenerGeometry])
+  }, [fastenedLengthInMeters, extrusionLengthInMeters, fastenerGeometry, gridLength])
 
   const mesh = useMemo(() => {
     if (geometry == null) return null

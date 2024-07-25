@@ -32,6 +32,12 @@ Comlink.expose(
       // NOTE (mw): why?
       (await import('../../../../../parts/gridpanel/dist-type-bundles/creator.d.ts?raw')).default,
     )
+    fsMap.set(
+      '/node_modules/@villagekit/part-fastener/creator.d.ts',
+      // @ts-ignore
+      // NOTE (mw): why?
+      (await import('../../../../../parts/fastener/dist-type-bundles/creator.d.ts?raw')).default,
+    )
     const system = createSystem(fsMap)
     const compilerOpts = {}
     return createVirtualTypeScriptEnvironment(system, [], ts, compilerOpts)

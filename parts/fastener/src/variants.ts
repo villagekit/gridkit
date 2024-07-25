@@ -1,4 +1,4 @@
-import { useGLTF } from '@react-three/drei'
+// import { useGLTF } from '@react-three/drei'
 import { millimeter } from '@villagekit/units'
 
 import type { FastenerVariant } from './types'
@@ -206,6 +206,7 @@ export const fastenerVariants: Record<string, FastenerVariant> = {
 }
 /* eslint-enable sort-keys-fix/sort-keys-fix */
 
+/*
 export function preload() {
   // preload gltf models
   for (const variantId in fastenerVariants) {
@@ -214,3 +215,4 @@ export function preload() {
     useGLTF.preload(fastenerModel.modelUrl)
   }
 }
+*/
