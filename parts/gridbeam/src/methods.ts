@@ -15,6 +15,15 @@ import { gridBeamVariants } from './variants'
 
 const X_AXIS = axisIdToDirectionVector(AxisId.X)
 
+// NOTES:
+//   - it's true if you rotate [0, 0, 0] around a point, it will change
+//   - so how to fix that?
+//     - do we translate to the origin first?
+//     - do we translate back later?
+//       - use the same panel axis to generate a back translation:
+//          - length (X), widthA (Y), widthB (Z)
+//          - rotate axis with the direction quaternion, get new axis
+
 export function calculateState(creator: WithRequiredId<GridBeam>): GridBeamState {
   const { type, id, variantId, lengthInGrids, transform } = creator
 
