@@ -13,7 +13,6 @@ import {
 } from 'three'
 import { mergeBufferGeometries } from 'three-stdlib'
 
-import { convert, meter } from '@villagekit/units'
 import type { FastenerGlValue, FastenerState } from './types'
 
 export function PartsGl(props: PartsGlProps<FastenerGlValue>) {

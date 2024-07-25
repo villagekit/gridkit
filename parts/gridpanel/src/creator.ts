@@ -1,4 +1,4 @@
-import { BasePartCreator, type PartTransform } from '@villagekit/part/creator'
+import { BasePartCreator } from '@villagekit/part/creator'
 import { convert, meter } from '@villagekit/units'
 import type { GridPanelFit, GridPanelHoles, GridPanelState, GridPanelVariant } from './types'
 import { gridPanelVariants } from './variants'
@@ -12,14 +12,22 @@ const Z_AXIS: [number, number, number] = [0, 0, 1]
 export class GridPanel extends BasePartCreator<'gridpanel'> {
   variantId: keyof typeof gridPanelVariants
   sizeInGrids: [number, number]
+  fit: GridPanelFit
   holes: GridPanelHoles
 
   constructor(options: GridPanelOptions) {
-    const { id, variantId, sizeInGrids, holes, transforms } = options
-    super('gridpanel', id, transforms)
-    this.variantId = variantId ?? getDefaultVariantId()
+    const {
+      id,
+      variantId = getDefaultVariantId(),
+      sizeInGrids,
+      fit = 'bottom',
+      holes = true,
+    } = options
+    super('gridpanel', id)
+    this.variantId = variantId
     this.sizeInGrids = sizeInGrids
-    this.holes = holes ?? true
+    this.fit = fit
+    this.holes = holes
   }
 
   static create(options: GridPanelOptions) {
@@ -34,36 +42,30 @@ export class GridPanel extends BasePartCreator<'gridpanel'> {
     const thickness = getThickness(variant)
     const pivot: [number, number, number] = [0.5 * gridUnit, 0.5 * gridUnit, 0.5 * thickness]
 
-    return new GridPanel({
+    let panel = new GridPanel({
       id,
       variantId,
       sizeInGrids: [Math.abs(x[0] - x[1]), Math.abs(y[0] - y[1])],
+      fit,
       holes,
-      transforms: [
-        {
-          type: 'rotation',
-          angle: x[0] <= x[1] ? 0 : 180,
-          origin: pivot,
-          direction: Y_AXIS,
-        },
-        {
-          type: 'rotation',
-          angle: y[0] <= y[1] ? 0 : 180,
-          origin: pivot,
-          direction: X_AXIS,
-        },
-        {
-          type: 'translation',
-          vector: [x[0] * gridUnit, y[0] * gridUnit, z * gridUnit],
-        },
-        fit === 'top'
-          ? {
-              type: 'translation',
-              vector: [0, 0, gridUnit - thickness],
-            }
-          : null,
-      ],
     })
+      .rotate({
+        angle: x[0] <= x[1] ? 0 : 180,
+        origin: pivot,
+        direction: Y_AXIS,
+      })
+      .rotate({
+        angle: y[0] <= y[1] ? 0 : 180,
+        origin: pivot,
+        direction: X_AXIS,
+      })
+      .translate([x[0] * gridUnit, y[0] * gridUnit, z * gridUnit])
+
+    if (fit === 'top') {
+      panel = panel.translate([0, 0, gridUnit - thickness])
+    }
+
+    return panel
   }
 
   static YZ(options: GridPanelYZOptions) {
@@ -74,42 +76,35 @@ export class GridPanel extends BasePartCreator<'gridpanel'> {
     const thickness = getThickness(variant)
     const pivot: [number, number, number] = [0.5 * gridUnit, 0.5 * gridUnit, 0.5 * thickness]
 
-    return new GridPanel({
+    let panel = new GridPanel({
       id,
       variantId,
       sizeInGrids: [Math.abs(y[0] - y[1]), Math.abs(z[0] - z[1])],
+      fit,
       holes,
-      transforms: [
-        {
-          type: 'rotation',
-          angle: 90,
-          origin: pivot,
-          direction: Z_AXIS,
-        },
-        {
-          type: 'rotation',
-          angle: z[0] <= z[1] ? 90 : -90,
-          origin: pivot,
-          direction: Y_AXIS,
-        },
-        {
-          type: 'rotation',
-          angle: y[0] <= y[1] ? 0 : 180,
-          origin: pivot,
-          direction: Z_AXIS,
-        },
-        {
-          type: 'translation',
-          vector: [x * gridUnit, y[0] * gridUnit, z[0] * gridUnit],
-        },
-        fit === 'top'
-          ? {
-              type: 'translation',
-              vector: [gridUnit - thickness, 0, 0],
-            }
-          : null,
-      ],
     })
+      .rotate({
+        angle: 90,
+        origin: pivot,
+        direction: Z_AXIS,
+      })
+      .rotate({
+        angle: z[0] <= z[1] ? 90 : -90,
+        origin: pivot,
+        direction: Y_AXIS,
+      })
+      .rotate({
+        angle: y[0] <= y[1] ? 0 : 180,
+        origin: pivot,
+        direction: Z_AXIS,
+      })
+      .translate([x * gridUnit, y[0] * gridUnit, z[0] * gridUnit])
+
+    if (fit === 'top') {
+      panel = panel.translate([gridUnit - thickness, 0, 0])
+    }
+
+    return panel
   }
 
   static XZ(options: GridPanelXZOptions) {
@@ -120,48 +115,42 @@ export class GridPanel extends BasePartCreator<'gridpanel'> {
     const thickness = getThickness(variant)
     const pivot: [number, number, number] = [0.5 * gridUnit, 0.5 * gridUnit, 0.5 * thickness]
 
-    return new GridPanel({
+    let panel = new GridPanel({
       id,
       variantId,
       sizeInGrids: [Math.abs(x[0] - x[1]), Math.abs(z[0] - z[1])],
+      fit,
       holes,
-      transforms: [
-        {
-          type: 'rotation',
-          angle: z[0] <= z[1] ? 90 : -90,
-          origin: pivot,
-          direction: X_AXIS,
-        },
-        {
-          type: 'rotation',
-          angle: x[0] <= x[1] ? 0 : 180,
-          origin: pivot,
-          direction: Z_AXIS,
-        },
-        {
-          type: 'translation',
-          vector: [x[0] * gridUnit, y * gridUnit, z[0] * gridUnit],
-        },
-        fit === 'top'
-          ? {
-              type: 'translation',
-              vector: [0, gridUnit - thickness, 0],
-            }
-          : null,
-      ],
     })
+      .rotate({
+        angle: z[0] <= z[1] ? 90 : -90,
+        origin: pivot,
+        direction: X_AXIS,
+      })
+      .rotate({
+        angle: x[0] <= x[1] ? 0 : 180,
+        origin: pivot,
+        direction: Z_AXIS,
+      })
+      .translate([x[0] * gridUnit, y * gridUnit, z[0] * gridUnit])
+
+    if (fit === 'top') {
+      panel = panel.translate([0, gridUnit - thickness, 0])
+    }
+
+    return panel
   }
 }
 
 interface BaseOptions {
   id?: string
+  fit?: GridPanelFit
   holes?: GridPanelState['holes']
 }
 
 interface GridPanelOptions extends BaseOptions {
   variantId: keyof typeof gridPanelVariants
   sizeInGrids: [number, number]
-  transforms?: Array<PartTransform>
 }
 
 interface GridPanelXYOptions extends BaseOptions {
@@ -169,7 +158,6 @@ interface GridPanelXYOptions extends BaseOptions {
   x: [number, number]
   y: [number, number]
   z: number
-  fit?: GridPanelFit
 }
 
 interface GridPanelYZOptions extends BaseOptions {
@@ -177,7 +165,6 @@ interface GridPanelYZOptions extends BaseOptions {
   x: number
   y: [number, number]
   z: [number, number]
-  fit?: GridPanelFit
 }
 
 interface GridPanelXZOptions extends BaseOptions {
@@ -185,7 +172,6 @@ interface GridPanelXZOptions extends BaseOptions {
   x: [number, number]
   y: number
   z: [number, number]
-  fit?: GridPanelFit
 }
 
 function getVariant(variantId: string): GridPanelVariant {

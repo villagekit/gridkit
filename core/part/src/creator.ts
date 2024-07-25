@@ -1,44 +1,68 @@
-export type PartTransform =
-  | null
-  | {
-      type: 'translation'
-      vector: [number, number, number]
-    }
-  | {
-      type: 'rotation'
-      angle: number
-      origin: [number, number, number]
-      direction: [number, number, number]
-    }
+import { type TransformMatrix, degToRad } from '@villagekit/math'
+import { Matrix4, Vector3 } from 'three'
+
+export type RotateOptions = {
+  angle: number
+  origin?: [number, number, number]
+  direction?: [number, number, number]
+}
 
 export class BasePartCreator<PartType extends string> {
   type: PartType
   id?: string
-  transforms: Array<PartTransform>
+  transform: TransformMatrix
 
-  constructor(type: PartType, id?: string, transforms: Array<PartTransform> = []) {
+  constructor(
+    type: PartType,
+    id?: string,
+    transform: TransformMatrix = new Matrix4().identity().toArray(),
+  ) {
     this.type = type
     this.id = id
-    this.transforms = transforms
+    this.transform = transform
+  }
+
+  clone() {
+    return Object.assign(Object.create(Object.getPrototypeOf(this)), this)
   }
 
   translate(vector: [number, number, number]) {
-    this.transforms.push({
-      type: 'translation',
-      vector,
-    })
+    const next = this.clone()
+    const matrix = new Matrix4().fromArray(this.transform)
+    matrix.premultiply(new Matrix4().makeTranslation(...vector))
+    next.transform = matrix.toArray()
+    console.log('next', next)
+    return next
   }
 
-  rotate(
-    angle: number,
-    origin: [number, number, number] = [0, 0, 0],
-    direction: [number, number, number] = [0, 0, 1],
-  ) {
-    this.transforms.push({
-      type: 'rotation',
-      angle,
-      origin,
-      direction,
-    })
+  rotate(options: RotateOptions) {
+    const next = this.clone()
+    const { angle, /*origin = [0, 0, 0],*/ direction = [0, 0, 1] } = options
+    // https://stackoverflow.com/a/55138754
+    /*
+    const pivotMatrix = new Matrix4().makeTranslation(...transform.origin)
+    const pivotInverseMatrix = pivotMatrix.clone().invert()
+    matrix.premultiply(pivotInverseMatrix)
+    */
+    const matrix = new Matrix4().fromArray(this.transform)
+    const rotationMatrix = new Matrix4().makeRotationAxis(
+      new Vector3(...direction),
+      degToRad(angle),
+    )
+    matrix.premultiply(rotationMatrix)
+    // matrix.premultiply(pivotMatrix)
+    next.transform = matrix.toArray()
+    console.log('next', next)
+    return next
+  }
+
+  applyTransform(transform: TransformMatrix) {
+    const next = this.clone()
+    const matrixAppliedTo = new Matrix4().fromArray(this.transform)
+    const matrixToApply = new Matrix4().fromArray(transform)
+    matrixAppliedTo.premultiply(matrixToApply)
+    next.transform = matrixAppliedTo.toArray()
+    console.log('next', next)
+    return next
   }
 }

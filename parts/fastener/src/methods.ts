@@ -3,13 +3,12 @@ import { convert, meter } from '@villagekit/units'
 import { Box3, Matrix4, Quaternion, Vector3 } from 'three'
 
 import weakMemoize from '@emotion/weak-memoize'
-import { degToRad } from 'three/src/math/MathUtils.js'
 import type { Fastener } from './creator'
 import type { FastenerGlValue, FastenerState, FastenerVariant } from './types'
 import { fastenerVariants } from './variants'
 
 export function calculateState(creator: WithRequiredId<Fastener>): FastenerState {
-  const { type, id, variantId, transforms } = creator
+  const { type, id, variantId, transform } = creator
 
   const variant = fastenerVariants[variantId]
   if (variant == null) {
@@ -20,7 +19,7 @@ export function calculateState(creator: WithRequiredId<Fastener>): FastenerState
     type,
     id,
     variant,
-    transforms,
+    transform,
   }
 }
 
@@ -33,35 +32,12 @@ const getFastenedLength = weakMemoize(
 )
 
 export function calculateGlValue(state: FastenerState): FastenerGlValue {
-  const { type, id, variant, transforms } = state
+  const { type, id, variant, transform } = state
 
   const extrusionLengthInMeters = getExtrusionLength(variant)
   const fastenedLengthInMeters = getFastenedLength(variant)
 
-  const matrix = new Matrix4()
-  for (const transform of transforms) {
-    if (transform == null) continue
-    switch (transform.type) {
-      case 'translation':
-        matrix.premultiply(new Matrix4().makeTranslation(...transform.vector))
-        break
-      case 'rotation': {
-        // https://stackoverflow.com/a/55138754
-        /*
-        const pivotMatrix = new Matrix4().makeTranslation(...transform.origin)
-        const pivotInverseMatrix = pivotMatrix.clone().invert()
-        matrix.premultiply(pivotInverseMatrix)
-        */
-        const rotationMatrix = new Matrix4().makeRotationAxis(
-          new Vector3(...transform.direction),
-          degToRad(transform.angle),
-        )
-        matrix.premultiply(rotationMatrix)
-        // matrix.premultiply(pivotMatrix)
-        break
-      }
-    }
-  }
+  const matrix = new Matrix4().fromArray(transform)
   const position = new Vector3()
   const quaternion = new Quaternion()
   const scale = new Vector3()

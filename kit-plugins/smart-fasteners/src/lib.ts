@@ -1,4 +1,4 @@
-import { type AxisId, type Location, axisIdToDirection, flipAxisId } from '@villagekit/math'
+import { type AxisId, type Point3, axisIdToDirection, flipAxisId } from '@villagekit/math'
 import {
   type FasteningPoint,
   type PartCreator,
@@ -42,7 +42,7 @@ export function generateFastenerParts(partStates: Array<PartState>): Array<PartC
 
 type FasteningMap = Record<string, FasteningCell>
 type FasteningCell = {
-  cellPosition: Location
+  cellPosition: Point3
   fasteningPoints: FasteningPointByAxis
 }
 type FasteningPointByAxis = { [key in AxisId]?: FasteningPoint }

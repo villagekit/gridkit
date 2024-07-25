@@ -1,6 +1,6 @@
 import {
   AxisId,
-  type Location,
+  type Point3,
   axisIdToDirection,
   axisIdToDirectionVector,
   directionToAxisId,
@@ -9,7 +9,6 @@ import {
 import type { FasteningPoint, WithRequiredId } from '@villagekit/part'
 import { convert, meter } from '@villagekit/units'
 import { Box3, Matrix4, Quaternion, Vector3 } from 'three'
-import { degToRad } from 'three/src/math/MathUtils.js'
 import type { GridBeam } from './creator'
 import type { GridBeamGlValue, GridBeamState, GridBeamVariant } from './types'
 import { gridBeamVariants } from './variants'
@@ -17,37 +16,14 @@ import { gridBeamVariants } from './variants'
 const X_AXIS = axisIdToDirectionVector(AxisId.X)
 
 export function calculateState(creator: WithRequiredId<GridBeam>): GridBeamState {
-  const { type, id, variantId, lengthInGrids, transforms } = creator
+  const { type, id, variantId, lengthInGrids, transform } = creator
 
   const variant = gridBeamVariants[variantId]
   if (variant == null) {
     throw new Error(`Unknown gridbeam variant: ${variantId}`)
   }
 
-  const matrix = new Matrix4()
-  for (const transform of transforms) {
-    if (transform == null) continue
-    switch (transform.type) {
-      case 'translation':
-        matrix.premultiply(new Matrix4().makeTranslation(...transform.vector))
-        break
-      case 'rotation': {
-        // https://stackoverflow.com/a/55138754
-        /*
-        const pivotMatrix = new Matrix4().makeTranslation(...transform.origin)
-        const pivotInverseMatrix = pivotMatrix.clone().invert()
-        matrix.premultiply(pivotInverseMatrix)
-        */
-        const rotationMatrix = new Matrix4().makeRotationAxis(
-          new Vector3(...transform.direction),
-          degToRad(transform.angle),
-        )
-        matrix.premultiply(rotationMatrix)
-        // matrix.premultiply(pivotMatrix)
-        break
-      }
-    }
-  }
+  const matrix = new Matrix4().fromArray(transform)
   const position = new Vector3()
   const quaternion = new Quaternion()
   const scale = new Vector3()
@@ -152,7 +128,7 @@ export function calculateFasteningPoints(state: GridBeamState): Array<FasteningP
 
   const direction = axisIdToDirection(axis)
 
-  const points: Array<Location> = new Array(lengthInGrids)
+  const points: Array<Point3> = new Array(lengthInGrids)
   for (let index = 0; index < lengthInGrids; index++) {
     points[index] = [
       locationInGrids[0] + direction[0] * index,

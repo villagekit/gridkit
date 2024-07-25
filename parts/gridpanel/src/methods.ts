@@ -7,15 +7,13 @@ import {
   directionToAxisId,
   flipAxisId,
   mapRange,
-  vectorFloatsEquals,
 } from '@villagekit/math'
 import type { FasteningPoint, WithRequiredId } from '@villagekit/part'
 import { convert, meter } from '@villagekit/units'
 import generateKey, { sorted as generateKeySorted } from 'deadbeef'
 import { Box3, Matrix4, Quaternion, Vector3 } from 'three'
-import { degToRad } from 'three/src/math/MathUtils.js'
 import type { GridPanel } from './creator'
-import type { GridPanelFit, GridPanelGlValue, GridPanelState } from './types'
+import type { GridPanelGlValue, GridPanelState } from './types'
 import { gridPanelVariants } from './variants'
 
 const X_AXIS = axisIdToDirectionVector(AxisId.X)
@@ -23,7 +21,7 @@ const Y_AXIS = axisIdToDirectionVector(AxisId.Y)
 const Z_AXIS = axisIdToDirectionVector(AxisId.Z)
 
 export function calculateState(creator: WithRequiredId<GridPanel>): GridPanelState {
-  const { type, id, variantId, sizeInGrids, holes, transforms } = creator
+  const { type, id, variantId, sizeInGrids, fit, holes, transform } = creator
 
   const variant = gridPanelVariants[variantId]
   if (variant == null) {
@@ -33,62 +31,17 @@ export function calculateState(creator: WithRequiredId<GridPanel>): GridPanelSta
   const gridLengthInMeters = convert(variant.gridLength, meter).value
   const thicknessInMeters = convert(variant.thickness, meter).value
 
-  let fit: GridPanelFit = 'bottom'
-
-  const matrix = new Matrix4()
-  for (const transform of transforms) {
-    if (transform == null) continue
-    switch (transform.type) {
-      case 'translation': {
-        const { vector } = transform
-        const fitAdjustment = gridLengthInMeters - thicknessInMeters
-        if (
-          vectorFloatsEquals(vector, [fitAdjustment, 0, 0]) ||
-          vectorFloatsEquals(vector, [0, fitAdjustment, 0]) ||
-          vectorFloatsEquals(vector, [0, 0, fitAdjustment])
-        ) {
-          fit = 'top'
-          continue
-        }
-        matrix.premultiply(new Matrix4().makeTranslation(...vector))
-        break
-      }
-      case 'rotation': {
-        // https://stackoverflow.com/a/55138754
-        /*
-        const pivotMatrix = new Matrix4().makeTranslation(...transform.origin)
-        const pivotInverseMatrix = pivotMatrix.clone().invert()
-        matrix.premultiply(pivotInverseMatrix)
-        */
-        const rotationMatrix = new Matrix4().makeRotationAxis(
-          new Vector3(...transform.direction),
-          degToRad(transform.angle),
-        )
-        matrix.premultiply(rotationMatrix)
-        // matrix.premultiply(pivotMatrix)
-        break
-      }
-    }
-  }
+  const matrix = new Matrix4().fromArray(transform)
   const position = new Vector3()
   const quaternion = new Quaternion()
   const scale = new Vector3()
   matrix.decompose(position, quaternion, scale)
-
-  const startInGrids = roundTo(position.divideScalar(gridLengthInMeters), 10).toArray()
 
   const mainDirection = X_AXIS.clone().applyQuaternion(quaternion).toArray()
   let mainAxis = directionToAxisId(mainDirection)
   if (mainAxis == null) {
     throw new Error(`gridpanel main direction axis is not standard: [${mainDirection.join(', ')}]`)
   }
-  let mainStart = getAxisStart(mainAxis, startInGrids)
-  const mainLength = sizeInGrids[0]
-  if (isNegativeAxis(mainAxis)) {
-    mainAxis = flipAxisId(mainAxis)
-    mainStart = mainStart - mainLength + 1
-  }
-
   const crossDirection = Y_AXIS.clone().applyQuaternion(quaternion).toArray()
   let crossAxis = directionToAxisId(crossDirection)
   if (crossAxis == null) {
@@ -96,13 +49,6 @@ export function calculateState(creator: WithRequiredId<GridPanel>): GridPanelSta
       `gridpanel cross direction axis is not standard: [${crossDirection.join(', ')}]`,
     )
   }
-  let crossStart = getAxisStart(crossAxis, startInGrids)
-  const crossLength = sizeInGrids[1]
-  if (isNegativeAxis(crossAxis)) {
-    crossAxis = flipAxisId(crossAxis)
-    crossStart = crossStart - crossLength + 1
-  }
-
   const thicknessDirection = Z_AXIS.clone().applyQuaternion(quaternion).toArray()
   let thicknessAxis = directionToAxisId(thicknessDirection)
   if (thicknessAxis == null) {
@@ -110,6 +56,33 @@ export function calculateState(creator: WithRequiredId<GridPanel>): GridPanelSta
       `gridpanel thickness direction axis is not standard: [${thicknessDirection.join(', ')}]`,
     )
   }
+
+  // reverse the fit adjustment
+  if (fit === 'top') {
+    const fitAdjustment = axisValuesToVector({
+      [crossAxis]: 0,
+      [mainAxis]: 0,
+      [thicknessAxis]: fit === 'top' ? gridLengthInMeters - thicknessInMeters : 0,
+    } as AxisValues)
+    position.add(new Vector3(...fitAdjustment))
+  }
+
+  const startInGrids = roundTo(position.divideScalar(gridLengthInMeters), 10).toArray()
+
+  let mainStart = getAxisStart(mainAxis, startInGrids)
+  const mainLength = sizeInGrids[0]
+  if (isNegativeAxis(mainAxis)) {
+    mainAxis = flipAxisId(mainAxis)
+    mainStart = mainStart - mainLength + 1
+  }
+
+  let crossStart = getAxisStart(crossAxis, startInGrids)
+  const crossLength = sizeInGrids[1]
+  if (isNegativeAxis(crossAxis)) {
+    crossAxis = flipAxisId(crossAxis)
+    crossStart = crossStart - crossLength + 1
+  }
+
   const thicknessStart = getAxisStart(thicknessAxis, startInGrids)
   if (isNegativeAxis(thicknessAxis)) {
     thicknessAxis = flipAxisId(thicknessAxis)

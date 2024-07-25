@@ -1,4 +1,4 @@
-import { BasePartCreator, type PartTransform } from '@villagekit/part/creator'
+import { BasePartCreator } from '@villagekit/part/creator'
 import { convert, meter } from '@villagekit/units'
 import { gridBeamVariants } from './variants'
 
@@ -12,8 +12,8 @@ export class GridBeam extends BasePartCreator<'gridbeam'> {
   lengthInGrids: number
 
   constructor(options: GridBeamOptions) {
-    const { id, variantId, lengthInGrids, transforms } = options
-    super('gridbeam', id, transforms)
+    const { id, variantId, lengthInGrids } = options
+    super('gridbeam', id)
     this.variantId = variantId ?? getDefaultVariantId()
     this.lengthInGrids = lengthInGrids
   }
@@ -32,19 +32,13 @@ export class GridBeam extends BasePartCreator<'gridbeam'> {
       id,
       variantId,
       lengthInGrids: Math.abs(x[0] - x[1]),
-      transforms: [
-        {
-          type: 'rotation',
-          angle: x[0] <= x[1] ? 0 : 180,
-          origin: pivot,
-          direction: Y_AXIS,
-        },
-        {
-          type: 'translation',
-          vector: [x[0] * gridUnit, y * gridUnit, z * gridUnit],
-        },
-      ],
     })
+      .rotate({
+        angle: x[0] <= x[1] ? 0 : 180,
+        origin: pivot,
+        direction: Y_AXIS,
+      })
+      .translate([x[0] * gridUnit, y * gridUnit, z * gridUnit])
   }
 
   static Y(options: GridBeamYOptions) {
@@ -57,19 +51,13 @@ export class GridBeam extends BasePartCreator<'gridbeam'> {
       id,
       variantId,
       lengthInGrids: Math.abs(y[0] - y[1]),
-      transforms: [
-        {
-          type: 'rotation',
-          angle: y[0] <= y[1] ? 90 : -90,
-          origin: pivot,
-          direction: Z_AXIS,
-        },
-        {
-          type: 'translation',
-          vector: [x * gridUnit, y[0] * gridUnit, z * gridUnit],
-        },
-      ],
     })
+      .rotate({
+        angle: y[0] <= y[1] ? 90 : -90,
+        origin: pivot,
+        direction: Z_AXIS,
+      })
+      .translate([x * gridUnit, y[0] * gridUnit, z * gridUnit])
   }
 
   static Z(options: GridBeamZOptions) {
@@ -82,19 +70,13 @@ export class GridBeam extends BasePartCreator<'gridbeam'> {
       id,
       variantId,
       lengthInGrids: Math.abs(z[0] - z[1]),
-      transforms: [
-        {
-          type: 'rotation',
-          angle: z[0] <= z[1] ? -90 : 90,
-          origin: pivot,
-          direction: Y_AXIS,
-        },
-        {
-          type: 'translation',
-          vector: [x * gridUnit, y * gridUnit, z[0] * gridUnit],
-        },
-      ],
     })
+      .rotate({
+        angle: z[0] <= z[1] ? -90 : 90,
+        origin: pivot,
+        direction: Y_AXIS,
+      })
+      .translate([x * gridUnit, y * gridUnit, z[0] * gridUnit])
   }
 }
 
@@ -105,7 +87,6 @@ interface BaseOptions {
 interface GridBeamOptions extends BaseOptions {
   variantId: keyof typeof gridBeamVariants
   lengthInGrids: number
-  transforms?: Array<PartTransform>
 }
 
 interface GridBeamXOptions extends BaseOptions {

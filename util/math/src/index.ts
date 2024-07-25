@@ -1,13 +1,27 @@
 import { Vector3 as ThreeVector3 } from 'three'
 
-export type Vector2<_Number = number> = Readonly<[number, number]>
-export type Vector3<_Number = number> = Readonly<[number, number, number]>
+export type Point2 = readonly [number, number]
+export type Point3 = readonly [number, number, number]
 
-export type Location = Vector3
-export type Direction = Vector3
-export type ScaleX = number
-export type ScaleXY = Vector2
-export type ScaleXYZ = Vector3
+// column-major 4x4 transformation matrix
+export type TransformMatrix = readonly [
+  number,
+  number,
+  number,
+  number,
+  number,
+  number,
+  number,
+  number,
+  number,
+  number,
+  number,
+  number,
+  number,
+  number,
+  number,
+  number,
+]
 
 export enum AxisId {
   X = 'X',
@@ -18,7 +32,7 @@ export enum AxisId {
   '-Z' = '-Z',
 }
 
-const directionByAxisId: Record<AxisId, Direction> = {
+const directionByAxisId: Record<AxisId, Point3> = {
   [AxisId.X]: [1, 0, 0],
   [AxisId['-X']]: [-1, 0, 0],
   [AxisId.Y]: [0, 1, 0],
@@ -59,7 +73,7 @@ export function flipAxisId(axisId: AxisId) {
   return flippedAxisIdByAxisId[axisId]
 }
 
-export function directionToAxisId(direction: Direction): AxisId | undefined {
+export function directionToAxisId(direction: Point3): AxisId | undefined {
   return axisIds.find((axisId) => {
     const axisDirection = directionByAxisId[axisId]
     return vectorFloatsEquals(direction, axisDirection)
@@ -70,11 +84,7 @@ export function floatEquals(a: number, b: number, epsilon = Number.EPSILON * 100
   return Math.abs(a - b) < epsilon
 }
 
-export function vectorFloatsEquals(
-  a: Vector3,
-  b: Vector3,
-  epsilon = Number.EPSILON * 100,
-): boolean {
+export function vectorFloatsEquals(a: Point3, b: Point3, epsilon = Number.EPSILON * 100): boolean {
   return (
     floatEquals(a[0], b[0], epsilon) &&
     floatEquals(a[1], b[1], epsilon) &&
@@ -82,7 +92,7 @@ export function vectorFloatsEquals(
   )
 }
 
-export function isStandardDirection(direction: Direction): boolean {
+export function isStandardDirection(direction: Point3): boolean {
   return isStandardAxisVector(new ThreeVector3(...direction))
 }
 
@@ -102,4 +112,15 @@ export function axisValuesToVector(axisValues: AxisValues): [number, number, num
 
 export function mapRange(value: number, x1: number, y1: number, x2: number, y2: number): number {
   return ((value - x1) * (y2 - x2)) / (y1 - x1) + x2
+}
+
+const DEG2RAD = Math.PI / 180
+const RAD2DEG = 180 / Math.PI
+
+export function degToRad(degrees: number) {
+  return degrees * DEG2RAD
+}
+
+export function radToDeg(radians: number) {
+  return radians * RAD2DEG
 }

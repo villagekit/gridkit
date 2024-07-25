@@ -1,4 +1,4 @@
-import type { AxisId, Location } from '@villagekit/math'
+import type { AxisId, Point3 } from '@villagekit/math'
 import type { Length } from '@villagekit/units'
 
 export type GridPanelType = 'gridpanel'
@@ -38,7 +38,7 @@ export type GridPanelGlValue = GridPanelState & {
   gridLengthInMeters: number
   holeDiameterInMeters: number
   thicknessInMeters: number
-  locationInGrids: Location
-  locationInMeters: Location
+  locationInGrids: Point3
+  locationInMeters: Point3
   sizeInMeters: [number, number, number]
 }

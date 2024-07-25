@@ -1,4 +1,4 @@
-import type { AxisId, Location } from '@villagekit/math'
+import type { AxisId, Point3 } from '@villagekit/math'
 import type { ReactElement } from 'react'
 import type { Box3 } from 'three'
 import type { ZodDiscriminatedUnionOption } from 'zod'
@@ -37,8 +37,8 @@ export type PartGlValuesByType = {
 }
 
 export type FasteningPoint = {
-  cellPosition: Location
-  facePosition: Location
+  cellPosition: Point3
+  facePosition: Point3
   axis: AxisId
   part: PartState
   gradient: number
