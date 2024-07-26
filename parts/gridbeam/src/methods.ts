@@ -96,9 +96,9 @@ export function calculateFasteningPoints(creator: WithRequiredId<GridBeam>): Arr
   matrix.decompose(position, quaternion, scale)
 
   const gridLengthInMeters = convert(variant.gridLength, meter).value
-  const locationInGrids = position.clone().divideScalar(gridLengthInMeters).round().toArray()
+  const locationInGrids = position.clone().divideScalar(gridLengthInMeters).toArray()
 
-  const direction = X_AXIS.clone().applyQuaternion(quaternion).round().toArray()
+  const direction = X_AXIS.clone().applyQuaternion(quaternion).toArray()
   const axis = directionToAxisId(direction)
 
   if (axis == null) {

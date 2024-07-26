@@ -1,4 +1,10 @@
-import { type AxisId, type Point3, axisIdToDirection, flipAxisId } from '@villagekit/math'
+import {
+  type AxisId,
+  type Point3,
+  axisIdToDirection,
+  flipAxisId,
+  pointEquals,
+} from '@villagekit/math'
 import {
   type FasteningPoint,
   type PartCreator,
@@ -11,15 +17,16 @@ import { Fastener } from '@villagekit/part-fastener/creator'
 import {
   forEach,
   groupBy,
-  intersection,
+  intersectionWith,
   map,
   mapValues,
   maxBy,
   reduce,
+  round,
   sortBy,
   sumBy,
   uniq,
-  uniqBy,
+  uniqWith,
 } from 'lodash-es'
 import { Line3, Vector3 } from 'three'
 
@@ -53,7 +60,7 @@ function buildFasteningMap(fasteningPoints: Array<FasteningPoint>) {
   return reduce<FasteningPoint, FasteningMap>(
     fasteningPoints,
     (sofar, fasteningPoint) => {
-      const cellKey = fasteningPoint.cellPosition.join(',')
+      const cellKey = fasteningPoint.cellPosition.map(Math.round).join(',')
 
       if (!(cellKey in sofar)) {
         sofar[cellKey] = {
@@ -93,7 +100,7 @@ function generatePossibleFasteners(fasteningMap: FasteningMap): Array<PossibleFa
           ...expandedPointsFromEnd,
         ]
 
-        if (JSON.stringify(startPoint.cellPosition) !== JSON.stringify(endPoint.cellPosition)) {
+        if (!pointEquals(startPoint.cellPosition, endPoint.cellPosition)) {
           sofar.push({
             axis,
             endPoint,
@@ -108,7 +115,34 @@ function generatePossibleFasteners(fasteningMap: FasteningMap): Array<PossibleFa
     [],
   )
 
-  return uniqBy(possibleFasteners, JSON.stringify)
+  return uniqWith(possibleFasteners, possibleFastenerEquals)
+}
+
+function possibleFastenerEquals(a: PossibleFastener, b: PossibleFastener) {
+  return (
+    arrayEqualsWith(a.fasteningPoints, b.fasteningPoints, fasteningPointEquals) &&
+    a.axis === b.axis &&
+    fasteningPointEquals(a.startPoint, b.startPoint) &&
+    fasteningPointEquals(a.endPoint, b.endPoint)
+  )
+}
+
+function arrayEqualsWith<T>(a: Array<T>, b: Array<T>, comparator: (a: T, b: T) => boolean) {
+  if (a.length !== b.length) return false
+  for (let i = 0; i < a.length; i++) {
+    if (!comparator(a[i]!, b[i]!)) return false
+  }
+  return true
+}
+
+function fasteningPointEquals(a: FasteningPoint, b: FasteningPoint) {
+  return (
+    pointEquals(a.cellPosition, b.cellPosition) &&
+    pointEquals(a.facePosition, b.facePosition) &&
+    a.axis === b.axis &&
+    a.part === b.part &&
+    a.gradient === b.gradient
+  )
 }
 
 function expandCells(
@@ -130,7 +164,7 @@ function expandCells(
       currentPoint.cellPosition[1] + neighbourOffset[1],
       currentPoint.cellPosition[2] + neighbourOffset[2],
     ] as [number, number, number]
-    const neighbourKey = neighbourCellPosition.join(',')
+    const neighbourKey = neighbourCellPosition.map(Math.round).join(',')
 
     if (Object.prototype.hasOwnProperty.call(fasteningMap, neighbourKey)) {
       const neighbourCell = fasteningMap[neighbourKey]!
@@ -332,9 +366,10 @@ function generateFastenersByWeighting(
           return // Possible fastener has already been collided with
         }
 
-        const sharedFasteningPoints = intersection(
+        const sharedFasteningPoints = intersectionWith(
           map(possibleFastener.fasteningPoints, 'cellPosition'),
           map(chosenFastener.fasteningPoints, 'cellPosition'),
+          pointEquals,
         )
 
         if (sharedFasteningPoints.length > 0) {
@@ -395,13 +430,13 @@ function buildFastenerParts(
   chosenFasteners: Array<PossibleFastener>,
 ): Array<WithRequiredId<PartCreator>> {
   const groupedFasteners = groupBy(chosenFasteners, ({ startPoint, endPoint }) => {
-    const fastenedLengthInGrids =
-      Math.round(
-        new Line3(
-          new Vector3(...startPoint.facePosition),
-          new Vector3(...endPoint.facePosition),
-        ).distance() * 10,
-      ) / 10
+    const fastenedLengthInGrids = round(
+      new Line3(
+        new Vector3(...startPoint.facePosition),
+        new Vector3(...endPoint.facePosition),
+      ).distance(),
+      1,
+    )
 
     return fastenedLengthInGrids * 40
   })

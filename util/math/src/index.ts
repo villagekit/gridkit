@@ -76,7 +76,7 @@ export function flipAxisId(axisId: AxisId) {
 export function directionToAxisId(direction: Point3): AxisId | undefined {
   return axisIds.find((axisId) => {
     const axisDirection = directionByAxisId[axisId]
-    return vectorFloatsEquals(direction, axisDirection)
+    return pointEquals(direction, axisDirection)
   })
 }
 
@@ -84,7 +84,7 @@ export function floatEquals(a: number, b: number, epsilon = Number.EPSILON * 100
   return Math.abs(a - b) < epsilon
 }
 
-export function vectorFloatsEquals(a: Point3, b: Point3, epsilon = Number.EPSILON * 100): boolean {
+export function pointEquals(a: Point3, b: Point3, epsilon = Number.EPSILON * 100): boolean {
   return (
     floatEquals(a[0], b[0], epsilon) &&
     floatEquals(a[1], b[1], epsilon) &&

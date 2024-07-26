@@ -116,19 +116,19 @@ export function calculateFasteningPoints(
   const scale = new Vector3()
   matrix.decompose(position, quaternion, scale)
 
-  const mainDirection = X_AXIS.clone().applyQuaternion(quaternion).round().toArray()
+  const mainDirection = X_AXIS.clone().applyQuaternion(quaternion).toArray()
   const mainAxis = directionToAxisId(mainDirection)
   if (mainAxis == null) {
     throw new Error(`gridpanel main direction axis is not standard: [${mainDirection.join(', ')}]`)
   }
-  const crossDirection = Y_AXIS.clone().applyQuaternion(quaternion).round().toArray()
+  const crossDirection = Y_AXIS.clone().applyQuaternion(quaternion).toArray()
   const crossAxis = directionToAxisId(crossDirection)
   if (crossAxis == null) {
     throw new Error(
       `gridpanel cross direction axis is not standard: [${crossDirection.join(', ')}]`,
     )
   }
-  const thicknessDirection = Z_AXIS.clone().applyQuaternion(quaternion).round().toArray()
+  const thicknessDirection = Z_AXIS.clone().applyQuaternion(quaternion).toArray()
   const thicknessAxis = directionToAxisId(thicknessDirection)
   if (thicknessAxis == null) {
     throw new Error(
@@ -144,7 +144,7 @@ export function calculateFasteningPoints(
   } as AxisValues)
   position.sub(new Vector3(...fitAdjustment))
 
-  const startInGrids = roundTo(position.divideScalar(gridLengthInMeters), 10).toArray()
+  const startInGrids = position.divideScalar(gridLengthInMeters).toArray()
 
   const mainStart = getAxisStart(mainAxis, startInGrids)
   const mainLength = sizeInGrids[0]
@@ -249,8 +249,4 @@ function getAxisStart(axisId: AxisId, startInGrids: [number, number, number]) {
     case AxisId['-Z']:
       return startInGrids[2]
   }
-}
-
-function roundTo(vector: Vector3, divisions: number) {
-  return vector.multiplyScalar(divisions).round().divideScalar(divisions)
 }
