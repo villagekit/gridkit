@@ -1,9 +1,7 @@
 import {
   AxisId,
-  type AxisValues,
   axisIdToDirection,
   axisIdToDirectionVector,
-  axisValuesToVector,
   directionToAxisId,
   flipAxisId,
   mapRange,
@@ -109,6 +107,7 @@ export function calculateFasteningPoints(
 
   const gridLengthInMeters = convert(variant.gridLength, meter).value
   const thicknessInMeters = convert(variant.thickness, meter).value
+  const thicknessRatio = thicknessInMeters / gridLengthInMeters
 
   const matrix = new Matrix4().fromArray(transform)
   const position = new Vector3()
@@ -117,51 +116,27 @@ export function calculateFasteningPoints(
   matrix.decompose(position, quaternion, scale)
 
   const mainDirection = X_AXIS.clone().applyQuaternion(quaternion).toArray()
-  const mainAxis = directionToAxisId(mainDirection)
-  if (mainAxis == null) {
-    throw new Error(`gridpanel main direction axis is not standard: [${mainDirection.join(', ')}]`)
-  }
   const crossDirection = Y_AXIS.clone().applyQuaternion(quaternion).toArray()
-  const crossAxis = directionToAxisId(crossDirection)
-  if (crossAxis == null) {
-    throw new Error(
-      `gridpanel cross direction axis is not standard: [${crossDirection.join(', ')}]`,
-    )
-  }
   const thicknessDirection = Z_AXIS.clone().applyQuaternion(quaternion).toArray()
+
   const thicknessAxis = directionToAxisId(thicknessDirection)
   if (thicknessAxis == null) {
     throw new Error(
       `gridpanel thickness direction axis is not standard: [${thicknessDirection.join(', ')}]`,
     )
   }
-
-  // reverse the fit adjustment
-  const fitAdjustment = axisValuesToVector({
-    [crossAxis]: 0,
-    [mainAxis]: 0,
-    [thicknessAxis]: (fit === 'top' ? 1 : -1) * 0.5 * (gridLengthInMeters - thicknessInMeters),
-  } as AxisValues)
-  position.sub(new Vector3(...fitAdjustment))
-
-  const startInGrids = position.divideScalar(gridLengthInMeters).toArray()
-
-  const mainStart = getAxisStart(mainAxis, startInGrids)
-  const mainLength = sizeInGrids[0]
-  const crossStart = getAxisStart(crossAxis, startInGrids)
-  const crossLength = sizeInGrids[1]
-  const thicknessStart = getAxisStart(thicknessAxis, startInGrids)
-
-  const start = axisValuesToVector({
-    [crossAxis]: crossStart,
-    [mainAxis]: mainStart,
-    [thicknessAxis]: thicknessStart,
-  } as AxisValues)
-
   const fastenAxis = fit !== 'top' ? flipAxisId(thicknessAxis) : thicknessAxis
   const fastenDirection = axisIdToDirection(fastenAxis)
 
-  const thicknessRatio = variant.thickness.value / variant.gridLength.value
+  // reverse the fit adjustment
+  position.sub(
+    new Vector3(...thicknessDirection).multiplyScalar(
+      (fit === 'top' ? 1 : -1) * 0.5 * (gridLengthInMeters - thicknessInMeters),
+    ),
+  )
+
+  const [mainLength, crossLength] = sizeInGrids
+  const start = position.clone().divideScalar(gridLengthInMeters).toArray()
 
   const holesMap = holes === true ? true : getHolesMap(holes)
 
@@ -183,23 +158,17 @@ export function calculateFasteningPoints(
         continue
       }
 
-      console.log('pre', start, crossDirection, mainDirection)
-
       const point = [
         start[0] + crossDirection[0] * crossIndex + mainDirection[0] * mainIndex,
         start[1] + crossDirection[1] * crossIndex + mainDirection[1] * mainIndex,
         start[2] + crossDirection[2] * crossIndex + mainDirection[2] * mainIndex,
       ] as const
 
-      console.log('point', point)
-
       const facePosition = [
         point[0] + fastenDirection[0] * 0.5 - fastenDirection[0] * thicknessRatio,
         point[1] + fastenDirection[1] * 0.5 - fastenDirection[1] * thicknessRatio,
         point[2] + fastenDirection[2] * 0.5 - fastenDirection[2] * thicknessRatio,
       ] as const
-
-      console.log('facePosition', facePosition)
 
       const mainIndexHalved =
         mainIndex >= mainLength / 2 ? Math.abs(mainIndex - mainLength + 1) : mainIndex
@@ -235,18 +204,4 @@ function getHolesMap(holes: Array<[number, number]>): Record<number, Record<numb
 
 export function calculateNumFastenersToFasten(_creator: GridPanel): number {
   return 2
-}
-
-function getAxisStart(axisId: AxisId, startInGrids: [number, number, number]) {
-  switch (axisId) {
-    case AxisId.X:
-    case AxisId['-X']:
-      return startInGrids[0]
-    case AxisId.Y:
-    case AxisId['-Y']:
-      return startInGrids[1]
-    case AxisId.Z:
-    case AxisId['-Z']:
-      return startInGrids[2]
-  }
 }
