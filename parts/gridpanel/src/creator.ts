@@ -16,13 +16,7 @@ export class GridPanel extends BasePartCreator<'gridpanel'> {
   holes: GridPanelHoles
 
   constructor(options: GridPanelOptions) {
-    const {
-      id,
-      variantId = getDefaultVariantId(),
-      sizeInGrids,
-      fit = 'bottom',
-      holes = true,
-    } = options
+    const { id, variantId = getDefaultVariantId(), sizeInGrids, fit, holes = true } = options
     super('gridpanel', id)
     this.variantId = variantId
     this.sizeInGrids = sizeInGrids
@@ -35,7 +29,7 @@ export class GridPanel extends BasePartCreator<'gridpanel'> {
   }
 
   static XY(options: GridPanelXYOptions) {
-    const { id, variantId = getDefaultVariantId(), x, y, z, fit, holes } = options
+    const { id, variantId = getDefaultVariantId(), x, y, z, fit = 'bottom', holes } = options
 
     const variant = getVariant(variantId)
     const gridUnit = getGridLength(variant)
@@ -58,15 +52,17 @@ export class GridPanel extends BasePartCreator<'gridpanel'> {
       })
       .translate([x[0] * gridUnit, y[0] * gridUnit, z * gridUnit])
 
-    if (fit === 'top') {
-      panel = panel.translate([0, 0, gridUnit - thickness])
+    if (fit === 'bottom') {
+      panel = panel.translate([0, 0, -0.5 * (gridUnit - thickness)])
+    } else if (fit === 'top') {
+      panel = panel.translate([0, 0, 0.5 * (gridUnit - thickness)])
     }
 
     return panel
   }
 
   static YZ(options: GridPanelYZOptions) {
-    const { id, variantId = getDefaultVariantId(), x, y, z, fit, holes } = options
+    const { id, variantId = getDefaultVariantId(), x, y, z, fit = 'bottom', holes } = options
 
     const variant = getVariant(variantId)
     const gridUnit = getGridLength(variant)
@@ -93,15 +89,17 @@ export class GridPanel extends BasePartCreator<'gridpanel'> {
       })
       .translate([x * gridUnit, y[0] * gridUnit, z[0] * gridUnit])
 
-    if (fit === 'top') {
-      panel = panel.translate([gridUnit - thickness, 0, 0])
+    if (fit === 'bottom') {
+      panel = panel.translate([-0.5 * (gridUnit - thickness), 0, 0])
+    } else if (fit === 'top') {
+      panel = panel.translate([0.5 * (gridUnit - thickness), 0, 0])
     }
 
     return panel
   }
 
   static XZ(options: GridPanelXZOptions) {
-    const { id, variantId = getDefaultVariantId(), x, y, z, fit, holes } = options
+    const { id, variantId = getDefaultVariantId(), x, y, z, fit = 'bottom', holes } = options
 
     const variant = getVariant(variantId)
     const gridUnit = getGridLength(variant)
@@ -124,8 +122,10 @@ export class GridPanel extends BasePartCreator<'gridpanel'> {
       })
       .translate([x[0] * gridUnit, y * gridUnit, z[0] * gridUnit])
 
-    if (fit === 'top') {
-      panel = panel.translate([0, gridUnit - thickness, 0])
+    if (fit === 'bottom') {
+      panel = panel.translate([0, -0.5 * (gridUnit - thickness), 0])
+    } else if (fit === 'top') {
+      panel = panel.translate([0, 0.5 * (gridUnit - thickness), 0])
     }
 
     return panel
@@ -134,13 +134,13 @@ export class GridPanel extends BasePartCreator<'gridpanel'> {
 
 interface BaseOptions {
   id?: string
-  fit?: GridPanelFit
   holes?: GridPanelHoles
 }
 
 interface GridPanelOptions extends BaseOptions {
   variantId: keyof typeof gridPanelVariants
   sizeInGrids: [number, number]
+  fit: GridPanelFit
 }
 
 interface GridPanelXYOptions extends BaseOptions {
@@ -148,6 +148,7 @@ interface GridPanelXYOptions extends BaseOptions {
   x: [number, number]
   y: [number, number]
   z: number
+  fit?: GridPanelFit
 }
 
 interface GridPanelYZOptions extends BaseOptions {
@@ -155,6 +156,7 @@ interface GridPanelYZOptions extends BaseOptions {
   x: number
   y: [number, number]
   z: [number, number]
+  fit?: GridPanelFit
 }
 
 interface GridPanelXZOptions extends BaseOptions {
@@ -162,6 +164,7 @@ interface GridPanelXZOptions extends BaseOptions {
   x: [number, number]
   y: number
   z: [number, number]
+  fit?: GridPanelFit
 }
 
 function getVariant(variantId: string): GridPanelVariant {

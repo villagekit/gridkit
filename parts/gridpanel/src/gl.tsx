@@ -106,7 +106,7 @@ function Panel(props: PanelProps) {
     return [...id].reduce((sofar, _, i) => sofar + id.charCodeAt(i), 0)
   }, [id])
 
-  const geometry: BoxGeometry = useMemo(() => {
+  const geometry = useMemo(() => {
     const boxSize: [number, number, number] = [
       sizeInGrids[0] * gridLengthInMeters,
       sizeInGrids[1] * gridLengthInMeters,
@@ -119,8 +119,8 @@ function Panel(props: PanelProps) {
 
     // translate beam so first hole is at (0, 0, 0).
     boxGeometry.translate(
-      (gridLengthInMeters * (sizeInGrids[0] - 1)) / 2,
-      gridLengthInMeters * (sizeInGrids[1] - 1),
+      0.5 * (gridLengthInMeters * (sizeInGrids[0] - 1)),
+      0.5 * (gridLengthInMeters * (sizeInGrids[1] - 1)),
       0,
     )
 
@@ -130,9 +130,9 @@ function Panel(props: PanelProps) {
     const s2 = boxSize[1] / TEXTURE_SIZE
     const s3 = boxSize[2] / TEXTURE_SIZE
 
-    const index = geometry.getIndex()
+    const index = boxGeometry.getIndex()
     if (index == null) throw new Error('unexpected')
-    const uvs = geometry.getAttribute('uv') as BufferAttribute
+    const uvs = boxGeometry.getAttribute('uv') as BufferAttribute
 
     const uvOffsetX = Math.sin(uniqueNumericId) * 10
     const uvOffsetY = Math.cos(uniqueNumericId) * 10
@@ -185,7 +185,7 @@ function Panel(props: PanelProps) {
     uvs.setXY(index.getX(34), s1 + uvOffsetX, uvOffsetY)
     uvs.setXY(index.getX(35), s1 + uvOffsetX, s2 + uvOffsetY)
 
-    return geometry
+    return boxGeometry
   }, [sizeInGrids, gridLengthInMeters, thicknessInMeters, uniqueNumericId])
 
   const texture = useTexture(material)
@@ -243,9 +243,9 @@ function Holes(props: HolesProps) {
       // up
       dummy.setRotationFromQuaternion(IDENTITY_QUATERNION)
       dummy.position.set(
-        (1 / 2 + mainIndex) * gridLengthInMeters,
-        (1 / 2 + crossIndex) * gridLengthInMeters,
-        1e-4 + thicknessInMeters,
+        mainIndex * gridLengthInMeters,
+        crossIndex * gridLengthInMeters,
+        1e-4 + 0.5 * thicknessInMeters,
       )
       dummy.updateMatrix()
       m.setMatrixAt(mIndex, dummy.matrix)
@@ -253,9 +253,9 @@ function Holes(props: HolesProps) {
       // down
       dummy.setRotationFromQuaternion(FLIP_Z_QUATERNION)
       dummy.position.set(
-        (1 / 2 + mainIndex) * gridLengthInMeters,
-        (1 / 2 + crossIndex) * gridLengthInMeters,
-        -1e-4,
+        mainIndex * gridLengthInMeters,
+        crossIndex * gridLengthInMeters,
+        -1e-4 - 0.5 * thicknessInMeters,
       )
       dummy.updateMatrix()
       m.setMatrixAt(mIndex + 1, dummy.matrix)
