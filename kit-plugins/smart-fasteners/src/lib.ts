@@ -409,11 +409,22 @@ function buildFastenerParts(
   const fastenerParts: Array<WithRequiredId<PartCreator>> = []
 
   forEach(groupedFasteners, (chosenFastenersForLength, fastenedLengthInMillimeters) => {
-    const fasteners = map(chosenFastenersForLength, ({ axis, startPoint }) => ({
-      direction: axisIdToDirection(axis),
-      // end: endPoint.facePosition,
-      start: startPoint.facePosition,
-    }))
+    const fasteners = map(chosenFastenersForLength, ({ axis, startPoint, endPoint }) => {
+      // NOTE (mw): I'm not sure why fasteners are offset by 0.5 in the direction.
+      const direction = axisIdToDirection(axis)
+      const offset = [0.5 * direction[0], 0.5 * direction[1], 0.5 * direction[2]] as const
+      const start: [number, number, number] = [
+        offset[0] + startPoint.facePosition[0],
+        offset[1] + startPoint.facePosition[1],
+        offset[2] + startPoint.facePosition[2],
+      ]
+      const end: [number, number, number] = [
+        offset[0] + endPoint.facePosition[0],
+        offset[1] + endPoint.facePosition[1],
+        offset[2] + endPoint.facePosition[2],
+      ]
+      return { start, end }
+    })
 
     const variant = Object.values(fastenerVariants).find(
       (variant) => variant.fastenedLength.value === Number.parseFloat(fastenedLengthInMillimeters),
@@ -427,9 +438,8 @@ function buildFastenerParts(
 
     for (let fastenerIndex = 0; fastenerIndex < fasteners.length; fastenerIndex++) {
       const fastener = fasteners[fastenerIndex]!
-      console.log('fastener', fastener)
       fastenerParts.push(
-        Fastener.Line({
+        Fastener.Grid({
           ...fastener,
           id: `fasteners-${fastenedLengthInMillimeters}-${fastenerIndex}`,
           variantId: variant.id,

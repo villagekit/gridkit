@@ -17,28 +17,30 @@ export class Fastener extends BasePartCreator<'fastener'> {
     return new Fastener(options)
   }
 
-  static Line(options: FastenerLineOptions) {
-    const { id, variantId, start, direction } = options
+  static Grid(options: FastenerLineOptions) {
+    const { id, variantId, start, end } = options
 
     const variant = fastenerVariants[variantId]!
     const gridUnit = convert(variant.gridLength, meter).value
-    const halfGridUnit = 0.5 * gridUnit
+
+    const direction = new Vector3(...end).sub(new Vector3(...start)).normalize()
 
     const rotation = new Matrix4()
       .makeRotationFromQuaternion(
-        new Quaternion().setFromUnitVectors(
-          axisIdToDirectionVector(AxisId.X),
-          new Vector3(...direction),
-        ),
+        new Quaternion().setFromUnitVectors(axisIdToDirectionVector(AxisId.X), direction),
       )
+      .toArray()
+    const offset = direction
+      .clone()
+      .multiplyScalar(0.5 * gridUnit)
       .toArray()
 
     return new Fastener({
       id,
       variantId,
     })
-      .translate([-halfGridUnit, 0, 0])
       .applyRotation({ rotation })
+      .translate(offset)
       .translate([start[0] * gridUnit, start[1] * gridUnit, start[2] * gridUnit])
   }
 }
@@ -52,5 +54,5 @@ interface FastenerOptions extends BaseOptions {}
 
 interface FastenerLineOptions extends BaseOptions {
   start: Point3
-  direction: Point3
+  end: Point3
 }
