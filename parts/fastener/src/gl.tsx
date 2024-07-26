@@ -120,14 +120,12 @@ function FastenersWithGeometry(props: FastenersWithGeometryProps) {
   material.needsUpdate = true
 
   const geometry = useMemo(() => {
-    const fullLengthInMeters = fastenedLengthInMeters + extrusionLengthInMeters
-
     const sideA = fastenerGeometry.clone()
     const sideB = fastenerGeometry.clone()
 
     sideA.rotateZ(Math.PI)
-    sideA.translate(fullLengthInMeters, 0, 0)
-    sideB.translate(0, 0, 0)
+    sideA.translate(fastenedLengthInMeters + 0.5 * extrusionLengthInMeters, 0, 0)
+    sideB.translate(-0.5 * extrusionLengthInMeters, 0, 0)
 
     return mergeBufferGeometries([sideA, sideB])
   }, [fastenedLengthInMeters, extrusionLengthInMeters, fastenerGeometry])
