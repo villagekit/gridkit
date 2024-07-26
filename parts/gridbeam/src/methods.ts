@@ -98,7 +98,7 @@ export function calculateFasteningPoints(creator: WithRequiredId<GridBeam>): Arr
   const gridLengthInMeters = convert(variant.gridLength, meter).value
   const locationInGrids = position.clone().divideScalar(gridLengthInMeters).round().toArray()
 
-  const direction = X_AXIS.clone().applyQuaternion(quaternion).toArray()
+  const direction = X_AXIS.clone().applyQuaternion(quaternion).round().toArray()
   const axis = directionToAxisId(direction)
 
   if (axis == null) {
@@ -148,8 +148,6 @@ export function calculateFasteningPoints(creator: WithRequiredId<GridBeam>): Arr
       }
     }
   }
-
-  console.log('fasteningPoints', creator, axis, fasteningPoints)
 
   return fasteningPoints
 }

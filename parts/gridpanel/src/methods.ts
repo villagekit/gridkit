@@ -116,19 +116,19 @@ export function calculateFasteningPoints(
   const scale = new Vector3()
   matrix.decompose(position, quaternion, scale)
 
-  const mainDirection = X_AXIS.clone().applyQuaternion(quaternion).toArray()
+  const mainDirection = X_AXIS.clone().applyQuaternion(quaternion).round().toArray()
   const mainAxis = directionToAxisId(mainDirection)
   if (mainAxis == null) {
     throw new Error(`gridpanel main direction axis is not standard: [${mainDirection.join(', ')}]`)
   }
-  const crossDirection = Y_AXIS.clone().applyQuaternion(quaternion).toArray()
+  const crossDirection = Y_AXIS.clone().applyQuaternion(quaternion).round().toArray()
   const crossAxis = directionToAxisId(crossDirection)
   if (crossAxis == null) {
     throw new Error(
       `gridpanel cross direction axis is not standard: [${crossDirection.join(', ')}]`,
     )
   }
-  const thicknessDirection = Z_AXIS.clone().applyQuaternion(quaternion).toArray()
+  const thicknessDirection = Z_AXIS.clone().applyQuaternion(quaternion).round().toArray()
   const thicknessAxis = directionToAxisId(thicknessDirection)
   if (thicknessAxis == null) {
     throw new Error(
@@ -152,18 +152,15 @@ export function calculateFasteningPoints(
   const crossLength = sizeInGrids[1]
   const thicknessStart = getAxisStart(thicknessAxis, startInGrids)
 
-  const mainAxisDirection = axisIdToDirection(mainAxis)
-  const crossAxisDirection = axisIdToDirection(crossAxis)
-
   const start = axisValuesToVector({
     [crossAxis]: crossStart,
     [mainAxis]: mainStart,
     [thicknessAxis]: thicknessStart,
   } as AxisValues)
 
-  const axis = fit !== 'top' ? flipAxisId(thicknessAxis) : thicknessAxis
+  const fastenAxis = fit !== 'top' ? flipAxisId(thicknessAxis) : thicknessAxis
+  const fastenDirection = axisIdToDirection(fastenAxis)
 
-  const direction = axisIdToDirection(axis)
   const thicknessRatio = variant.thickness.value / variant.gridLength.value
 
   const holesMap = holes === true ? true : getHolesMap(holes)
@@ -186,17 +183,23 @@ export function calculateFasteningPoints(
         continue
       }
 
+      console.log('pre', start, crossDirection, mainDirection)
+
       const point = [
-        start[0] + crossAxisDirection[0] * crossIndex + mainAxisDirection[0] * mainIndex,
-        start[1] + crossAxisDirection[1] * crossIndex + mainAxisDirection[1] * mainIndex,
-        start[2] + crossAxisDirection[2] * crossIndex + mainAxisDirection[2] * mainIndex,
+        start[0] + crossDirection[0] * crossIndex + mainDirection[0] * mainIndex,
+        start[1] + crossDirection[1] * crossIndex + mainDirection[1] * mainIndex,
+        start[2] + crossDirection[2] * crossIndex + mainDirection[2] * mainIndex,
       ] as const
 
+      console.log('point', point)
+
       const facePosition = [
-        point[0] + direction[0] * 0.5 - direction[0] * thicknessRatio,
-        point[1] + direction[1] * 0.5 - direction[1] * thicknessRatio,
-        point[2] + direction[2] * 0.5 - direction[2] * thicknessRatio,
+        point[0] + fastenDirection[0] * 0.5 - fastenDirection[0] * thicknessRatio,
+        point[1] + fastenDirection[1] * 0.5 - fastenDirection[1] * thicknessRatio,
+        point[2] + fastenDirection[2] * 0.5 - fastenDirection[2] * thicknessRatio,
       ] as const
+
+      console.log('facePosition', facePosition)
 
       const mainIndexHalved =
         mainIndex >= mainLength / 2 ? Math.abs(mainIndex - mainLength + 1) : mainIndex
@@ -205,7 +208,7 @@ export function calculateFasteningPoints(
       const gradient = mapRange(crossIndexGradient * mainIndexGradient, 0.25, 1, 0, 1)
 
       fasteningPoints[holeIndex++] = {
-        axis,
+        axis: fastenAxis,
         cellPosition: point,
         facePosition,
         gradient: gradient,
