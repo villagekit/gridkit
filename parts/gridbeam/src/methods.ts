@@ -148,6 +148,9 @@ export function calculateFasteningPoints(creator: WithRequiredId<GridBeam>): Arr
       }
     }
   }
+
+  console.log('fasteningPoints', creator, axis, fasteningPoints)
+
   return fasteningPoints
 }
 

@@ -117,19 +117,19 @@ export function calculateFasteningPoints(
   matrix.decompose(position, quaternion, scale)
 
   const mainDirection = X_AXIS.clone().applyQuaternion(quaternion).toArray()
-  let mainAxis = directionToAxisId(mainDirection)
+  const mainAxis = directionToAxisId(mainDirection)
   if (mainAxis == null) {
     throw new Error(`gridpanel main direction axis is not standard: [${mainDirection.join(', ')}]`)
   }
   const crossDirection = Y_AXIS.clone().applyQuaternion(quaternion).toArray()
-  let crossAxis = directionToAxisId(crossDirection)
+  const crossAxis = directionToAxisId(crossDirection)
   if (crossAxis == null) {
     throw new Error(
       `gridpanel cross direction axis is not standard: [${crossDirection.join(', ')}]`,
     )
   }
   const thicknessDirection = Z_AXIS.clone().applyQuaternion(quaternion).toArray()
-  let thicknessAxis = directionToAxisId(thicknessDirection)
+  const thicknessAxis = directionToAxisId(thicknessDirection)
   if (thicknessAxis == null) {
     throw new Error(
       `gridpanel thickness direction axis is not standard: [${thicknessDirection.join(', ')}]`,
@@ -146,24 +146,11 @@ export function calculateFasteningPoints(
 
   const startInGrids = roundTo(position.divideScalar(gridLengthInMeters), 10).toArray()
 
-  let mainStart = getAxisStart(mainAxis, startInGrids)
+  const mainStart = getAxisStart(mainAxis, startInGrids)
   const mainLength = sizeInGrids[0]
-  if (isNegativeAxis(mainAxis)) {
-    mainAxis = flipAxisId(mainAxis)
-    mainStart = mainStart - mainLength + 1
-  }
-
-  let crossStart = getAxisStart(crossAxis, startInGrids)
+  const crossStart = getAxisStart(crossAxis, startInGrids)
   const crossLength = sizeInGrids[1]
-  if (isNegativeAxis(crossAxis)) {
-    crossAxis = flipAxisId(crossAxis)
-    crossStart = crossStart - crossLength + 1
-  }
-
   const thicknessStart = getAxisStart(thicknessAxis, startInGrids)
-  if (isNegativeAxis(thicknessAxis)) {
-    thicknessAxis = flipAxisId(thicknessAxis)
-  }
 
   const mainAxisDirection = axisIdToDirection(mainAxis)
   const crossAxisDirection = axisIdToDirection(crossAxis)
@@ -175,8 +162,6 @@ export function calculateFasteningPoints(
   } as AxisValues)
 
   const axis = fit !== 'top' ? flipAxisId(thicknessAxis) : thicknessAxis
-
-  const offset = axisIdToDirection(axis)
 
   const direction = axisIdToDirection(axis)
   const thicknessRatio = variant.thickness.value / variant.gridLength.value
@@ -208,9 +193,9 @@ export function calculateFasteningPoints(
       ] as const
 
       const facePosition = [
-        point[0] + offset[0] * 0.5 - direction[0] * thicknessRatio,
-        point[1] + offset[1] * 0.5 - direction[1] * thicknessRatio,
-        point[2] + offset[2] * 0.5 - direction[2] * thicknessRatio,
+        point[0] + direction[0] * 0.5 - direction[0] * thicknessRatio,
+        point[1] + direction[1] * 0.5 - direction[1] * thicknessRatio,
+        point[2] + direction[2] * 0.5 - direction[2] * thicknessRatio,
       ] as const
 
       const mainIndexHalved =
@@ -260,19 +245,6 @@ function getAxisStart(axisId: AxisId, startInGrids: [number, number, number]) {
     case AxisId.Z:
     case AxisId['-Z']:
       return startInGrids[2]
-  }
-}
-
-function isNegativeAxis(axisId: AxisId) {
-  switch (axisId) {
-    case AxisId.X:
-    case AxisId.Y:
-    case AxisId.Z:
-      return false
-    case AxisId['-X']:
-    case AxisId['-Y']:
-    case AxisId['-Z']:
-      return true
   }
 }
 
