@@ -137,14 +137,12 @@ export function calculateFasteningPoints(
   }
 
   // reverse the fit adjustment
-  if (fit === 'top') {
-    const fitAdjustment = axisValuesToVector({
-      [crossAxis]: 0,
-      [mainAxis]: 0,
-      [thicknessAxis]: fit === 'top' ? gridLengthInMeters - thicknessInMeters : 0,
-    } as AxisValues)
-    position.add(new Vector3(...fitAdjustment))
-  }
+  const fitAdjustment = axisValuesToVector({
+    [crossAxis]: 0,
+    [mainAxis]: 0,
+    [thicknessAxis]: (fit === 'top' ? 1 : -1) * 0.5 * (gridLengthInMeters - thicknessInMeters),
+  } as AxisValues)
+  position.sub(new Vector3(...fitAdjustment))
 
   const startInGrids = roundTo(position.divideScalar(gridLengthInMeters), 10).toArray()
 
