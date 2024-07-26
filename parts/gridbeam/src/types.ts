@@ -15,8 +15,8 @@ export type GridBeamVariant = {
 }
 
 export type GridBeamGlValue = {
-  id: string
   type: GridBeamType
+  id: string
   variant: GridBeamVariant
   // variant
   gridLengthInMeters: number

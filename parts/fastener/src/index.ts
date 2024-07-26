@@ -6,11 +6,10 @@ import {
   calculateFasteningPoints,
   calculateGlValue,
   calculateNumFastenersToFasten,
-  calculateState,
 } from './methods'
 import { fastenerSchemas } from './schemas'
 import { PartsSummary } from './summary'
-import type { FastenerGlValue, FastenerState, FastenerType } from './types'
+import type { FastenerGlValue, FastenerType } from './types'
 import { fastenerVariants } from './variants'
 
 export * from './types'
@@ -23,9 +22,6 @@ declare global {
     }
     interface EveryPartCreator {
       fastener: Fastener
-    }
-    interface EveryPartState {
-      fastener: FastenerState
     }
     interface EveryPartVariants {
       fastener: typeof fastenerVariants
@@ -47,7 +43,6 @@ registerPartModule({
     calculateFasteningPoints,
     calculateGlValue,
     calculateNumFastenersToFasten,
-    calculateState,
   },
   schemas: fastenerSchemas,
   variants: fastenerVariants,

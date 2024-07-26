@@ -2,6 +2,7 @@ import { type AxisId, type Point3, axisIdToDirection, flipAxisId } from '@villag
 import {
   type FasteningPoint,
   type PartCreator,
+  type WithRequiredId,
   calculateFasteningPointsForAll,
   calculateNumFastenersToFasten,
 } from '@villagekit/part'
@@ -29,7 +30,9 @@ export type PossibleFastener = {
   endPoint: FasteningPoint
 }
 
-export function generateFastenerParts(partCreators: Array<PartCreator>): Array<PartCreator> {
+export function generateFastenerParts(
+  partCreators: Array<WithRequiredId<PartCreator>>,
+): Array<WithRequiredId<PartCreator>> {
   const fasteningPoints = calculateFasteningPointsForAll(partCreators)
   const fasteningMap = buildFasteningMap(fasteningPoints)
   const possibleFasteners = generatePossibleFasteners(fasteningMap)
@@ -200,13 +203,16 @@ function derivePartAdjacencies(possibleFasteners: Array<PossibleFastener>): {
   return { partAdjacencyMap, partPairPriorityOrder, partPairsById }
 }
 
-function getPartPairId(partA: PartCreator, partB: PartCreator): string {
+function getPartPairId(
+  partA: WithRequiredId<PartCreator>,
+  partB: WithRequiredId<PartCreator>,
+): string {
   return `${partA.id}__${partB.id}`
 }
 
 function getPartPairsFromFastener(
   possibleFastener: PossibleFastener,
-): Array<[PartCreator, PartCreator]> {
+): Array<[WithRequiredId<PartCreator>, WithRequiredId<PartCreator>]> {
   const parts = uniq(map(possibleFastener.fasteningPoints, 'part'))
   return pairwise(parts)
 }
@@ -219,7 +225,10 @@ function pairwise<T>(array: Array<T>): Array<[T, T]> {
   return result
 }
 
-function sortPartPairs(partA: PartCreator, partB: PartCreator): [PartCreator, PartCreator] {
+function sortPartPairs(
+  partA: WithRequiredId<PartCreator>,
+  partB: WithRequiredId<PartCreator>,
+): [WithRequiredId<PartCreator>, WithRequiredId<PartCreator>] {
   if (partA.id.localeCompare(partB.id) <= 0) {
     return [partA, partB]
   }
@@ -382,7 +391,9 @@ function calculateProximityAvoidanceWeight(
   })
 }
 
-function buildFastenerParts(chosenFasteners: Array<PossibleFastener>): Array<PartCreator> {
+function buildFastenerParts(
+  chosenFasteners: Array<PossibleFastener>,
+): Array<WithRequiredId<PartCreator>> {
   const groupedFasteners = groupBy(chosenFasteners, ({ startPoint, endPoint }) => {
     const fastenedLengthInGrids =
       Math.round(
@@ -395,7 +406,7 @@ function buildFastenerParts(chosenFasteners: Array<PossibleFastener>): Array<Par
     return fastenedLengthInGrids * 40
   })
 
-  const fastenerParts: Array<PartCreator> = []
+  const fastenerParts: Array<WithRequiredId<PartCreator>> = []
 
   forEach(groupedFasteners, (chosenFastenersForLength, fastenedLengthInMillimeters) => {
     const fasteners = map(chosenFastenersForLength, ({ axis, startPoint }) => ({

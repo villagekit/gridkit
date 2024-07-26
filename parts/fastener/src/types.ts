@@ -1,6 +1,5 @@
 import type { Length } from '@villagekit/units'
 import type { Quaternion, Vector3 } from 'three'
-import type { Fastener } from './creator'
 
 export type FastenerType = 'fastener'
 
@@ -27,12 +26,10 @@ export interface FastenerVariant {
   nutLength: Length
 }
 
-export type FastenerState = Pick<Fastener, 'type' | 'transform'> & {
+export type FastenerGlValue = {
+  type: FastenerType
   id: string
   variant: FastenerVariant
-}
-
-export type FastenerGlValue = Omit<FastenerState, 'transform'> & {
   extrusionLengthInMeters: number
   fastenedLengthInMeters: number
   position: Vector3

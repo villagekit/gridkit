@@ -1,6 +1,6 @@
 import { BasePartCreator } from '@villagekit/part/creator'
 import { convert, meter } from '@villagekit/units'
-import type { GridPanelFit, GridPanelHoles, GridPanelState, GridPanelVariant } from './types'
+import type { GridPanelFit, GridPanelHoles, GridPanelVariant } from './types'
 import { gridPanelVariants } from './variants'
 
 const getDefaultVariantId = (): keyof typeof gridPanelVariants => '40mm:8mm:12mm:douglas-fir'
@@ -135,7 +135,7 @@ export class GridPanel extends BasePartCreator<'gridpanel'> {
 interface BaseOptions {
   id?: string
   fit?: GridPanelFit
-  holes?: GridPanelState['holes']
+  holes?: GridPanelHoles
 }
 
 interface GridPanelOptions extends BaseOptions {

@@ -4,24 +4,8 @@ import { Box3, Matrix4, Quaternion, Vector3 } from 'three'
 
 import weakMemoize from '@emotion/weak-memoize'
 import type { Fastener } from './creator'
-import type { FastenerGlValue, FastenerState, FastenerVariant } from './types'
+import type { FastenerGlValue, FastenerVariant } from './types'
 import { fastenerVariants } from './variants'
-
-export function calculateState(creator: WithRequiredId<Fastener>): FastenerState {
-  const { type, id, variantId, transform } = creator
-
-  const variant = fastenerVariants[variantId]
-  if (variant == null) {
-    throw new Error(`Unknown gridbeam variant: ${variantId}`)
-  }
-
-  return {
-    type,
-    id,
-    variant,
-    transform,
-  }
-}
 
 const getExtrusionLength = weakMemoize(
   (variant: FastenerVariant) => convert(variant.extrusionLength, meter).value,
@@ -31,8 +15,13 @@ const getFastenedLength = weakMemoize(
   (variant: FastenerVariant) => convert(variant.fastenedLength, meter).value,
 )
 
-export function calculateGlValue(state: FastenerState): FastenerGlValue {
-  const { type, id, variant, transform } = state
+export function calculateGlValue(creator: WithRequiredId<Fastener>): FastenerGlValue {
+  const { type, id, variantId, transform } = creator
+
+  const variant = fastenerVariants[variantId]
+  if (variant == null) {
+    throw new Error(`Unknown gridbeam variant: ${variantId}`)
+  }
 
   const extrusionLengthInMeters = getExtrusionLength(variant)
   const fastenedLengthInMeters = getFastenedLength(variant)
@@ -44,8 +33,8 @@ export function calculateGlValue(state: FastenerState): FastenerGlValue {
   matrix.decompose(position, quaternion, scale)
 
   return {
-    id,
     type,
+    id,
     variant,
     position,
     quaternion,
@@ -54,24 +43,22 @@ export function calculateGlValue(state: FastenerState): FastenerGlValue {
   }
 }
 
-export function calculateBoundingBox(_value: FastenerGlValue): Box3 {
+export function calculateBoundingBox(_creator: Fastener): Box3 {
   return new Box3() // Does not apply to fastener part
 }
 
-export function calculateSummaryKey(summary: Fastener): string {
-  const { type, variantId } = summary
+export function calculateSummaryKey(creator: Fastener): string {
+  const { type, variantId } = creator
 
   return `${type}::${variantId}`
 }
 
-export function calculateEstimatedPrice(_state: FastenerState): number {
-  return 100
-}
-
-export function calculateFasteningPoints(_state: FastenerState): Array<FasteningPoint> {
+export function calculateFasteningPoints(
+  _creator: WithRequiredId<Fastener>,
+): Array<FasteningPoint> {
   return [] // Does not apply to fastener part
 }
 
-export function calculateNumFastenersToFasten(_state: FastenerState): number {
+export function calculateNumFastenersToFasten(_creator: Fastener): number {
   return 0
 }

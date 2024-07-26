@@ -4,7 +4,6 @@ import type { FasteningPoint, PartCreator, PartGlValue, WithRequiredId } from '.
 
 export function calculateGlValue(partCreator: WithRequiredId<PartCreator>): PartGlValue {
   const partModule = getPartModule(partCreator.type)
-  // @ts-ignore
   return partModule.methods.calculateGlValue(partCreator)
 }
 export function calculateGlValueForAll(
@@ -15,8 +14,7 @@ export function calculateGlValueForAll(
 
 export function calculateBoundingBox(partCreator: PartCreator): Box3 {
   const partModule = getPartModule(partCreator.type)
-  // @ts-ignore
-  return partModule.methods.calculateBoundingBox(partGlValue)
+  return partModule.methods.calculateBoundingBox(partCreator)
 }
 export function calculateBoundingBoxForAll(partCreators: Array<PartCreator>): Box3 {
   const boundingBoxes = partCreators.map(calculateBoundingBox)
@@ -27,20 +25,20 @@ export function calculateBoundingBoxForAll(partCreators: Array<PartCreator>): Bo
   return boundingBox
 }
 
-export function calculateFasteningPoints(partCreator: PartCreator): Array<FasteningPoint> {
+export function calculateFasteningPoints(
+  partCreator: WithRequiredId<PartCreator>,
+): Array<FasteningPoint> {
   const partModule = getPartModule(partCreator.type)
-  // @ts-ignore
   return partModule.methods.calculateFasteningPoints(partCreator)
 }
 
 export function calculateFasteningPointsForAll(
-  partCreators: Array<PartCreator>,
+  partCreators: Array<WithRequiredId<PartCreator>>,
 ): Array<FasteningPoint> {
   return partCreators.flatMap(calculateFasteningPoints)
 }
 
 export function calculateNumFastenersToFasten(partCreator: PartCreator): number {
   const partModule = getPartModule(partCreator.type)
-  // @ts-ignore
   return partModule.methods.calculateNumFastenersToFasten(partCreator)
 }

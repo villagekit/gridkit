@@ -13,19 +13,98 @@ import { convert, meter } from '@villagekit/units'
 import generateKey, { sorted as generateKeySorted } from 'deadbeef'
 import { Box3, Matrix4, Quaternion, Vector3 } from 'three'
 import type { GridPanel } from './creator'
-import type { GridPanelGlValue, GridPanelState } from './types'
+import type { GridPanelGlValue } from './types'
 import { gridPanelVariants } from './variants'
 
 const X_AXIS = axisIdToDirectionVector(AxisId.X)
 const Y_AXIS = axisIdToDirectionVector(AxisId.Y)
 const Z_AXIS = axisIdToDirectionVector(AxisId.Z)
 
-export function calculateState(creator: WithRequiredId<GridPanel>): GridPanelState {
-  const { type, id, variantId, sizeInGrids, fit, holes, transform } = creator
+export function calculateGlValue(creator: WithRequiredId<GridPanel>): GridPanelGlValue {
+  const { type, id, variantId, sizeInGrids, transform, holes } = creator
 
   const variant = gridPanelVariants[variantId]
   if (variant == null) {
-    throw new Error(`Unknown gridbeam variant: ${variantId}`)
+    throw new Error(`Unknown gridpanel variant: ${variantId}`)
+  }
+
+  const gridLengthInMeters = convert(variant.gridLength, meter).value
+  const holeDiameterInMeters = convert(variant.holeDiameter, meter).value
+  const thicknessInMeters = convert(variant.thickness, meter).value
+
+  const matrix = new Matrix4().fromArray(transform)
+  const position = new Vector3()
+  const quaternion = new Quaternion()
+  const scale = new Vector3()
+  matrix.decompose(position, quaternion, scale)
+
+  return {
+    type,
+    id,
+    variant,
+    sizeInGrids,
+    holes,
+    gridLengthInMeters,
+    holeDiameterInMeters,
+    thicknessInMeters,
+    position,
+    quaternion,
+  }
+}
+
+export function calculateBoundingBox(creator: GridPanel): Box3 {
+  const { variantId, sizeInGrids, transform } = creator
+
+  const variant = gridPanelVariants[variantId]
+  if (variant == null) {
+    throw new Error(`Unknown gridpanel variant: ${variantId}`)
+  }
+  const gridUnit = convert(variant.gridLength, meter).value
+  const halfGridUnit = 0.5 * gridUnit
+
+  const box = new Box3(
+    new Vector3(-halfGridUnit, -halfGridUnit, -halfGridUnit),
+    new Vector3(
+      sizeInGrids[0] * gridUnit - halfGridUnit,
+      sizeInGrids[1] * gridUnit - halfGridUnit,
+      halfGridUnit,
+    ),
+  )
+
+  box.applyMatrix4(new Matrix4().fromArray(transform))
+
+  return box
+}
+
+export function calculateSummaryKey(part: GridPanel): string {
+  const { type, sizeInGrids, variantId } = part
+  let { holes } = part
+
+  if (typeof holes === 'boolean') {
+    return generateKey(type, variantId, ...sizeInGrids, holes)
+  }
+
+  if (sizeInGrids[1] > sizeInGrids[0]) {
+    // need to "rotate" panel so main length is larger side
+    holes = holes.map((hole) => [hole[1], hole[0]])
+  }
+
+  return (
+    generateKey(type, variantId, ...sizeInGrids) +
+    generateKeySorted(...holes.map(([a, b]) => `${a},${b}`))
+  )
+}
+
+export function calculateFasteningPoints(
+  creator: WithRequiredId<GridPanel>,
+): Array<FasteningPoint> {
+  const { variantId, sizeInGrids, fit, holes, transform } = creator
+
+  if (holes === false) return []
+
+  const variant = gridPanelVariants[variantId]
+  if (variant == null) {
+    throw new Error(`Unknown gridpanel variant: ${variantId}`)
   }
 
   const gridLengthInMeters = convert(variant.gridLength, meter).value
@@ -88,126 +167,6 @@ export function calculateState(creator: WithRequiredId<GridPanel>): GridPanelSta
     thicknessAxis = flipAxisId(thicknessAxis)
   }
 
-  return {
-    type,
-    id,
-    variant,
-    mainAxis,
-    mainStart,
-    mainLength,
-    crossAxis,
-    crossStart,
-    crossLength,
-    thicknessAxis,
-    thicknessStart,
-    fit,
-    holes,
-  }
-}
-
-export function calculateGlValue(state: GridPanelState): GridPanelGlValue {
-  const {
-    variant: { gridLength, holeDiameter, thickness },
-    fit,
-    mainAxis,
-    mainStart,
-    mainLength,
-    crossAxis,
-    crossStart,
-    crossLength,
-    thicknessAxis,
-    thicknessStart,
-  } = state
-
-  const gridLengthInMeters = convert(gridLength, meter).value
-  const holeDiameterInMeters = convert(holeDiameter, meter).value
-  const thicknessInMeters = convert(thickness, meter).value
-
-  const sizeInMeters = axisValuesToVector({
-    [crossAxis]: crossLength * gridLengthInMeters,
-    [mainAxis]: mainLength * gridLengthInMeters,
-    [thicknessAxis]: thicknessInMeters,
-  } as AxisValues) as GridPanelGlValue['sizeInMeters']
-
-  const fitAdjustment = axisValuesToVector({
-    [crossAxis]: 0,
-    [mainAxis]: 0,
-    [thicknessAxis]: fit === 'top' ? gridLengthInMeters - thicknessInMeters : 0,
-  } as AxisValues)
-
-  const locationInGrids = axisValuesToVector({
-    [crossAxis]: crossStart,
-    [mainAxis]: mainStart,
-    [thicknessAxis]: thicknessStart,
-  } as AxisValues)
-  const locationInMeters = [
-    locationInGrids[0] * gridLengthInMeters + fitAdjustment[0],
-    locationInGrids[1] * gridLengthInMeters + fitAdjustment[1],
-    locationInGrids[2] * gridLengthInMeters + fitAdjustment[2],
-  ] as [number, number, number]
-
-  return {
-    ...state,
-    crossAxis,
-    crossLength,
-    fit,
-    gridLengthInMeters,
-    holeDiameterInMeters,
-    locationInGrids,
-    locationInMeters,
-    mainAxis,
-    mainLength,
-    sizeInMeters,
-    thicknessAxis,
-    thicknessInMeters,
-  }
-}
-
-export function calculateBoundingBox(value: GridPanelGlValue): Box3 {
-  const { sizeInMeters, locationInMeters } = value
-
-  return new Box3().setFromPoints([
-    new Vector3(...locationInMeters),
-    new Vector3(...locationInMeters).add(new Vector3(...sizeInMeters)),
-  ])
-}
-
-export function calculateSummaryKey(part: GridPanel): string {
-  const { type, sizeInGrids, variantId } = part
-  let { holes } = part
-
-  if (typeof holes === 'boolean') {
-    return generateKey(type, variantId, ...sizeInGrids, holes)
-  }
-
-  if (sizeInGrids[1] > sizeInGrids[0]) {
-    // need to "rotate" panel so main length is larger side
-    holes = holes.map((hole) => [hole[1], hole[0]])
-  }
-
-  return (
-    generateKey(type, variantId, ...sizeInGrids) +
-    generateKeySorted(...holes.map(([a, b]) => `${a},${b}`))
-  )
-}
-
-export function calculateFasteningPoints(state: GridPanelState): Array<FasteningPoint> {
-  const {
-    fit,
-    crossAxis,
-    crossStart,
-    crossLength,
-    mainAxis,
-    mainLength,
-    mainStart,
-    thicknessAxis,
-    thicknessStart,
-    holes = true,
-    variant: { gridLength, thickness },
-  } = state
-
-  if (holes === false) return []
-
   const mainAxisDirection = axisIdToDirection(mainAxis)
   const crossAxisDirection = axisIdToDirection(crossAxis)
 
@@ -222,7 +181,7 @@ export function calculateFasteningPoints(state: GridPanelState): Array<Fastening
   const offset = axisIdToDirection(axis)
 
   const direction = axisIdToDirection(axis)
-  const thicknessRatio = thickness.value / gridLength.value
+  const thicknessRatio = variant.thickness.value / variant.gridLength.value
 
   const holesMap = holes === true ? true : getHolesMap(holes)
 
@@ -267,7 +226,7 @@ export function calculateFasteningPoints(state: GridPanelState): Array<Fastening
         cellPosition: point,
         facePosition,
         gradient: gradient,
-        part: state,
+        part: creator,
       }
     }
   }
@@ -288,7 +247,7 @@ function getHolesMap(holes: Array<[number, number]>): Record<number, Record<numb
   return holesMap
 }
 
-export function calculateNumFastenersToFasten(_state: GridPanelState): number {
+export function calculateNumFastenersToFasten(_creator: GridPanel): number {
   return 2
 }
 

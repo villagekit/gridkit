@@ -13,7 +13,7 @@ import {
 } from 'three'
 import { mergeBufferGeometries } from 'three-stdlib'
 
-import type { FastenerGlValue, FastenerState } from './types'
+import type { FastenerGlValue, FastenerVariant } from './types'
 
 export function PartsGl(props: PartsGlProps<FastenerGlValue>) {
   const { parts } = props
@@ -60,7 +60,7 @@ interface FastenersProps {
   fastenedLengthInMeters: number
   positions: Array<Vector3>
   quarternions: Array<Quaternion>
-  variant: FastenerState['variant']
+  variant: FastenerVariant
 }
 
 export const Fasteners = memo(function Fasteners(props: FastenersProps) {

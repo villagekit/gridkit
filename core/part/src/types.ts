@@ -44,7 +44,9 @@ export type CalculatePartGlValue<Creator extends { id?: string }, GlValue> = (
   creator: WithRequiredId<Creator>,
 ) => GlValue
 export type CalculatePartBoundingBox<Creator> = (creator: Creator) => Box3
-export type CalculatePartFasteningPoints<Creator> = (creator: Creator) => Array<FasteningPoint>
+export type CalculatePartFasteningPoints<Creator extends { id?: string }> = (
+  creator: WithRequiredId<Creator>,
+) => Array<FasteningPoint>
 export type CalculateNumFastenersToFasten<Creator> = (creator: Creator) => number
 
 export type WithRequiredId<T extends { id?: string }> = { id: string } & {
@@ -63,7 +65,7 @@ export interface PartModule<Id extends PartTypeId, Creator extends PartCreator, 
   }
   methods: {
     calculateGlValue: CalculatePartGlValue<Creator, GlValue>
-    calculateBoundingBox: CalculatePartBoundingBox<GlValue>
+    calculateBoundingBox: CalculatePartBoundingBox<Creator>
     calculateFasteningPoints: CalculatePartFasteningPoints<Creator>
     calculateNumFastenersToFasten: CalculateNumFastenersToFasten<Creator>
   }

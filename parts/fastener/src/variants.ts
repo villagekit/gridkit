@@ -44,7 +44,6 @@ const baseVariant: Omit<FastenerVariant, 'id' | 'boltLength' | 'fastenedLength' 
   },
 }
 
-/* eslint-disable sort-keys-fix/sort-keys-fix */
 const boltLengths = {
   '35mm': {
     type: 'quantity',
@@ -204,7 +203,6 @@ export const fastenerVariants: Record<string, FastenerVariant> = {
     nutLength: nutLengths['25mm'],
   },
 }
-/* eslint-enable sort-keys-fix/sort-keys-fix */
 
 /*
 export function preload() {

@@ -6,11 +6,10 @@ import {
   calculateFasteningPoints,
   calculateGlValue,
   calculateNumFastenersToFasten,
-  calculateState,
 } from './methods'
 import { gridPanelSchemas } from './schemas'
 import { PartsSummary } from './summary'
-import type { GridPanelGlValue, GridPanelState, GridPanelType } from './types'
+import type { GridPanelGlValue, GridPanelType } from './types'
 import { gridPanelVariants } from './variants'
 
 export * from './svg/index'
@@ -25,9 +24,6 @@ declare global {
     }
     interface EveryPartCreator {
       gridpanel: GridPanel
-    }
-    interface EveryPartState {
-      gridpanel: GridPanelState
     }
     interface EveryPartVariants {
       gridpanel: typeof gridPanelVariants
@@ -49,7 +45,6 @@ registerPartModule({
     calculateFasteningPoints,
     calculateGlValue,
     calculateNumFastenersToFasten,
-    calculateState,
   },
   variants: gridPanelVariants,
   schemas: gridPanelSchemas,

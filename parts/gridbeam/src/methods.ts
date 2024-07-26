@@ -16,7 +16,7 @@ import { gridBeamVariants } from './variants'
 const X_AXIS = axisIdToDirectionVector(AxisId.X)
 
 export function calculateGlValue(creator: WithRequiredId<GridBeam>): GridBeamGlValue {
-  const { id, type, variantId, lengthInGrids, transform } = creator
+  const { type, id, variantId, lengthInGrids, transform } = creator
 
   const variant = gridBeamVariants[variantId]
   if (variant == null) {
@@ -34,8 +34,8 @@ export function calculateGlValue(creator: WithRequiredId<GridBeam>): GridBeamGlV
   const lengthInMeters = lengthInGrids * gridLengthInMeters
 
   return {
-    id,
     type,
+    id,
     variant,
     gridLengthInMeters,
     holeDiameterInMeters,
@@ -61,7 +61,7 @@ export function calculateBoundingBox(creator: GridBeam): Box3 {
     new Vector3(lengthInGrids * gridUnit - halfGridUnit, halfGridUnit, halfGridUnit),
   )
 
-  box.applyMatrix4(transform)
+  box.applyMatrix4(new Matrix4().fromArray(transform))
 
   return box
 }
@@ -81,7 +81,7 @@ const fasteningAxesByAxisId: Record<AxisId, Array<AxisId>> = {
   [AxisId['-Z']]: [AxisId.X, AxisId['-X'], AxisId.Y, AxisId['-Y']],
 }
 
-export function calculateFasteningPoints(creator: GridBeam): Array<FasteningPoint> {
+export function calculateFasteningPoints(creator: WithRequiredId<GridBeam>): Array<FasteningPoint> {
   const { variantId, lengthInGrids, transform } = creator
 
   const variant = gridBeamVariants[variantId]
