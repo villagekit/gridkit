@@ -427,6 +427,7 @@ function buildFastenerParts(
 
     for (let fastenerIndex = 0; fastenerIndex < fasteners.length; fastenerIndex++) {
       const fastener = fasteners[fastenerIndex]!
+      console.log('fastener', fastener)
       fastenerParts.push(
         Fastener.Line({
           ...fastener,
