@@ -186,6 +186,8 @@ export function calculateFasteningPoints(
     }
   }
 
+  console.log(fastenAxis, fit, start, fasteningPoints)
+
   return fasteningPoints
 }
 

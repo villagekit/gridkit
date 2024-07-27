@@ -105,17 +105,20 @@ export class GridPanel extends BasePartCreator<'gridpanel'> {
     const gridUnit = getGridLength(variant)
     const thickness = getThickness(variant)
 
+    const sizeInGrids: [number, number] = [Math.abs(x[0] - x[1]), Math.abs(z[0] - z[1])]
+
     let panel = new GridPanel({
       id,
       variantId,
-      sizeInGrids: [Math.abs(x[0] - x[1]), Math.abs(z[0] - z[1])],
+      sizeInGrids,
       fit,
       holes,
     })
       .rotate({
-        angle: z[0] <= z[1] ? 90 : -90,
+        angle: z[0] <= z[1] ? -90 : 90,
         direction: X_AXIS,
       })
+      .translate([0, 0, (z[0] <= z[1] ? 1 : -1) * ((sizeInGrids[1] - 1) * gridUnit)])
       .rotate({
         angle: x[0] <= x[1] ? 0 : 180,
         direction: Z_AXIS,
