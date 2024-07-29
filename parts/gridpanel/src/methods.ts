@@ -97,7 +97,7 @@ export function calculateSummaryKey(part: GridPanel): string {
 export function calculateFasteningPoints(
   creator: WithRequiredId<GridPanel>,
 ): Array<FasteningPoint> {
-  const { variantId, sizeInGrids, fit, holes, transform } = creator
+  const { variantId, sizeInGrids, holes, transform } = creator
 
   if (holes === false) return []
 
@@ -127,14 +127,12 @@ export function calculateFasteningPoints(
       `gridpanel thickness direction axis is not standard: [${thicknessDirection.join(', ')}]`,
     )
   }
-  const fastenAxis = fit !== 'top' ? flipAxisId(thicknessAxis) : thicknessAxis
+  const fastenAxis = flipAxisId(thicknessAxis)
   const fastenDirection = axisIdToDirection(fastenAxis)
 
   // reverse the fit adjustment
   position.sub(
-    new Vector3(...thicknessDirection).multiplyScalar(
-      (fit === 'top' ? 1 : -1) * 0.5 * (gridLengthInMeters - thicknessInMeters),
-    ),
+    new Vector3(...fastenDirection).multiplyScalar(0.5 * (gridLengthInMeters - thicknessInMeters)),
   )
 
   const [mainLength, crossLength] = sizeInGrids

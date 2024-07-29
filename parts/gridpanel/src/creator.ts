@@ -20,15 +20,13 @@ const mirrorZTransform = mirrorTransform('z')
 export class GridPanel extends BasePartCreator<'gridpanel'> {
   variantId: keyof typeof gridPanelVariants
   sizeInGrids: [number, number]
-  fit: GridPanelFit
   holes: GridPanelHoles
 
   constructor(options: GridPanelOptions) {
-    const { id, variantId = getDefaultVariantId(), sizeInGrids, fit, holes = true } = options
+    const { id, variantId = getDefaultVariantId(), sizeInGrids, holes = true } = options
     super('gridpanel', id)
     this.variantId = variantId
     this.sizeInGrids = sizeInGrids
-    this.fit = fit
     this.holes = holes
   }
 
@@ -47,7 +45,6 @@ export class GridPanel extends BasePartCreator<'gridpanel'> {
       id,
       variantId,
       sizeInGrids: [Math.abs(x[0] - x[1]), Math.abs(y[0] - y[1])],
-      fit,
       holes,
     })
 
@@ -56,6 +53,9 @@ export class GridPanel extends BasePartCreator<'gridpanel'> {
     }
     if (y[0] > y[1]) {
       panel = panel.applyTransform(mirrorYTransform)
+    }
+    if (fit === 'top') {
+      panel = panel.applyTransform(mirrorZTransform)
     }
 
     panel = panel.translate([x[0] * gridUnit, y[0] * gridUnit, z * gridUnit])
@@ -80,7 +80,6 @@ export class GridPanel extends BasePartCreator<'gridpanel'> {
       id,
       variantId,
       sizeInGrids: [Math.abs(y[0] - y[1]), Math.abs(z[0] - z[1])],
-      fit,
       holes,
     }).applyTransform(xyToYZTransform)
 
@@ -89,6 +88,9 @@ export class GridPanel extends BasePartCreator<'gridpanel'> {
     }
     if (z[0] > z[1]) {
       panel = panel.applyTransform(mirrorZTransform)
+    }
+    if (fit === 'top') {
+      panel = panel.applyTransform(mirrorXTransform)
     }
 
     panel = panel.translate([x * gridUnit, y[0] * gridUnit, z[0] * gridUnit])
@@ -115,15 +117,17 @@ export class GridPanel extends BasePartCreator<'gridpanel'> {
       id,
       variantId,
       sizeInGrids,
-      fit,
       holes,
     }).applyTransform(xyToXZTransform)
 
     if (x[0] > x[1]) {
-      panel = panel.applyTransform(mirrorYTransform)
+      panel = panel.applyTransform(mirrorXTransform)
     }
     if (z[0] > z[1]) {
       panel = panel.applyTransform(mirrorZTransform)
+    }
+    if (fit === 'top') {
+      panel = panel.applyTransform(mirrorYTransform)
     }
 
     panel = panel.translate([x[0] * gridUnit, y * gridUnit, z[0] * gridUnit])
@@ -146,7 +150,6 @@ interface BaseOptions {
 interface GridPanelOptions extends BaseOptions {
   variantId: keyof typeof gridPanelVariants
   sizeInGrids: [number, number]
-  fit: GridPanelFit
 }
 
 interface GridPanelXYOptions extends BaseOptions {
