@@ -5,23 +5,6 @@ import { fromCallback } from 'xstate'
 import type { Params, ParamsValues, PartVariantsByType, Parts, Presets } from '../types'
 import type { RenderEvent, RendererMachineEvent } from './'
 
-// @ts-ignore
-import partCreatorRaw from '../../../../core/part/dist/creator.js?raw'
-// @ts-ignore
-import comlinkRaw from '../../../../node_modules/comlink/dist/esm/comlink.js?raw'
-// @ts-ignore
-import threeRaw from '../../../../node_modules/three/build/three.module.js?raw'
-// @ts-ignore
-import fastenerCreatorRaw from '../../../../parts/fastener/dist-bundles/creator.js?raw'
-// @ts-ignore
-import gridbeamCreatorRaw from '../../../../parts/gridbeam/dist-bundles/creator.js?raw'
-// @ts-ignore
-import gridpanelCreatorRaw from '../../../../parts/gridpanel/dist-bundles/creator.js?raw'
-// @ts-ignore
-import mathRaw from '../../../../util/math/dist/index.js?raw'
-// @ts-ignore
-import unitsRaw from '../../../../util/units/dist/index.js?raw'
-
 type Evaluator = {
   loadModule: (code: string) => Promise<string>
   evaluateModule: () => Promise<{
@@ -132,20 +115,43 @@ const createEvaulatorIframe = () => {
   return iframe
 }
 
+// @ts-ignore
+const partCreatorUrl = (await import('../../../../core/part/dist/creator.js?url')).default
+// @ts-ignore
+const comlinkUrl = (await import('../../../../node_modules/comlink/dist/esm/comlink.js?url'))
+  .default
+// @ts-ignore
+const threeUrl = (await import('../../../../node_modules/three/build/three.module.js?url')).default
+// @ts-ignore
+const fastenerCreatorUrl = (await import('../../../../parts/fastener/dist-bundles/creator.js?url'))
+  .default
+// @ts-ignore
+const gridbeamCreatorUrl = (await import('../../../../parts/gridbeam/dist-bundles/creator.js?url'))
+  .default
+const gridpanelCreatorUrl =
+  // @ts-ignore
+  (await import('../../../../parts/gridpanel/dist-bundles/creator.js?url')).default
+// @ts-ignore
+const mathUrl = (await import('../../../../util/math/dist/index.js?url')).default
+// @ts-ignore
+const unitsUrl = (await import('../../../../util/units/dist/index.js?url')).default
+
+console.log('units url', unitsUrl)
+
 const createEvaluatorIframeSrc = () =>
   `
 <!doctype html>
 <script type="importmap">
 {
   "imports": {
-    "comlink": "data:application/javascript;base64,${encodeURI(encodeBase64(comlinkRaw))}",
-    "three": "data:application/javascript;base64,${encodeURI(encodeBase64(threeRaw))}",
-    "@villagekit/math": "data:application/javascript;base64,${encodeURI(encodeBase64(mathRaw))}",
-    "@villagekit/units": "data:application/javascript;base64,${encodeURI(encodeBase64(unitsRaw))}",
-    "@villagekit/part/creator": "data:application/javascript;base64,${encodeURI(encodeBase64(partCreatorRaw))}",
-    "@villagekit/part-gridbeam/creator": "data:application/javascript;base64,${encodeURI(encodeBase64(gridbeamCreatorRaw))}",
-    "@villagekit/part-gridpanel/creator": "data:application/javascript;base64,${encodeURI(encodeBase64(gridpanelCreatorRaw))}",
-    "@villagekit/part-fastener/creator": "data:application/javascript;base64,${encodeURI(encodeBase64(fastenerCreatorRaw))}",
+    "comlink": "${comlinkUrl}",
+    "three": "${threeUrl}",
+    "@villagekit/math": "${mathUrl}",
+    "@villagekit/units": "${unitsUrl}",
+    "@villagekit/part/creator": "${partCreatorUrl}",
+    "@villagekit/part-gridbeam/creator": "${gridbeamCreatorUrl}",
+    "@villagekit/part-gridpanel/creator": "${gridpanelCreatorUrl}",
+    "@villagekit/part-fastener/creator": "${fastenerCreatorUrl}",
     "@villagekit/design/kit": "data:,${encodeURI('')}"
   }
 }
