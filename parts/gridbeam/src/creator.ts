@@ -1,4 +1,4 @@
-import { changeOfBasisTransform } from '@villagekit/math'
+import { changeOfBasisTransform, mirrorTransform } from '@villagekit/math'
 import { BasePartCreator } from '@villagekit/part/creator'
 import { convert, meter } from '@villagekit/units'
 import { gridBeamVariants } from './variants'
@@ -12,6 +12,9 @@ const Z_AXIS: [number, number, number] = [0, 0, 1]
 const baseBasis = [X_AXIS, Y_AXIS, Z_AXIS] as const
 const xToYTransform = changeOfBasisTransform(baseBasis, [Y_AXIS, X_AXIS, Z_AXIS])
 const xToZTransform = changeOfBasisTransform(baseBasis, [Z_AXIS, Y_AXIS, X_AXIS])
+const mirrorXTransform = mirrorTransform('x')
+const mirrorYTransform = mirrorTransform('y')
+const mirrorZTransform = mirrorTransform('z')
 
 export class GridBeam extends BasePartCreator<'gridbeam'> {
   variantId: keyof typeof gridBeamVariants
@@ -33,20 +36,17 @@ export class GridBeam extends BasePartCreator<'gridbeam'> {
 
     const gridUnit = getGridLengthInMeters(variantId)
 
-    return (
-      new GridBeam({
-        id,
-        variantId,
-        lengthInGrids: Math.abs(x[0] - x[1]),
-      })
-        /*
-      .rotate({
-        angle: x[0] <= x[1] ? 0 : 180,
-        direction: Y_AXIS,
-      })
-      */
-        .translate([x[0] * gridUnit, y * gridUnit, z * gridUnit])
-    )
+    let beam = new GridBeam({
+      id,
+      variantId,
+      lengthInGrids: Math.abs(x[0] - x[1]),
+    })
+
+    if (x[0] > x[1]) {
+      beam = beam.applyTransform(mirrorXTransform)
+    }
+
+    return beam.translate([x[0] * gridUnit, y * gridUnit, z * gridUnit])
   }
 
   static Y(options: GridBeamYOptions) {
@@ -54,21 +54,17 @@ export class GridBeam extends BasePartCreator<'gridbeam'> {
 
     const gridUnit = getGridLengthInMeters(variantId)
 
-    return (
-      new GridBeam({
-        id,
-        variantId,
-        lengthInGrids: Math.abs(y[0] - y[1]),
-      })
-        /*
-      .rotate({
-        angle: y[0] <= y[1] ? 90 : -90,
-        direction: Z_AXIS,
-      })
-      */
-        .applyTransform(xToYTransform)
-        .translate([x * gridUnit, y[0] * gridUnit, z * gridUnit])
-    )
+    let beam = new GridBeam({
+      id,
+      variantId,
+      lengthInGrids: Math.abs(y[0] - y[1]),
+    }).applyTransform(xToYTransform)
+
+    if (y[0] > y[1]) {
+      beam = beam.applyTransform(mirrorYTransform)
+    }
+
+    return beam.translate([x * gridUnit, y[0] * gridUnit, z * gridUnit])
   }
 
   static Z(options: GridBeamZOptions) {
@@ -76,21 +72,17 @@ export class GridBeam extends BasePartCreator<'gridbeam'> {
 
     const gridUnit = getGridLengthInMeters(variantId)
 
-    return (
-      new GridBeam({
-        id,
-        variantId,
-        lengthInGrids: Math.abs(z[0] - z[1]),
-      })
-        /*
-      .rotate({
-        angle: z[0] <= z[1] ? -90 : 90,
-        direction: Y_AXIS,
-      })
-      */
-        .applyTransform(xToZTransform)
-        .translate([x * gridUnit, y * gridUnit, z[0] * gridUnit])
-    )
+    let beam = new GridBeam({
+      id,
+      variantId,
+      lengthInGrids: Math.abs(z[0] - z[1]),
+    }).applyTransform(xToZTransform)
+
+    if (z[0] > z[1]) {
+      beam = beam.applyTransform(mirrorZTransform)
+    }
+
+    return beam.translate([x * gridUnit, y * gridUnit, z[0] * gridUnit])
   }
 }
 

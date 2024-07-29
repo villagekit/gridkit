@@ -141,3 +141,14 @@ export function changeOfBasisTransform(a: Basis, b: Basis): TransformMatrix {
   const AB = new Matrix4().multiplyMatrices(A.invert(), B)
   return AB.toArray()
 }
+
+export function mirrorTransform(axis: 'x' | 'y' | 'z'): TransformMatrix {
+  switch (axis) {
+    case 'x':
+      return new Matrix4().makeScale(-1, 1, 1).toArray()
+    case 'y':
+      return new Matrix4().makeScale(1, -1, 1).toArray()
+    case 'z':
+      return new Matrix4().makeScale(1, 1, -1).toArray()
+  }
+}
