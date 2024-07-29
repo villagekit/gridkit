@@ -11,10 +11,7 @@ const Z_AXIS: [number, number, number] = [0, 0, 1]
 
 const baseBasis = [X_AXIS, Y_AXIS, Z_AXIS] as const
 const xToYTransform = changeOfBasisTransform(baseBasis, [Y_AXIS, X_AXIS, Z_AXIS])
-const xToZTransform = changeOfBasisTransform(baseBasis, [Z_AXIS, X_AXIS, Y_AXIS])
-
-const zUpToYUpTransform = changeOfBasisTransform([X_AXIS, Y_AXIS, Z_AXIS], [X_AXIS, Z_AXIS, Y_AXIS])
-console.log('zUpToYUpTransform', zUpToYUpTransform)
+const xToZTransform = changeOfBasisTransform(baseBasis, [Z_AXIS, Y_AXIS, X_AXIS])
 
 export class GridBeam extends BasePartCreator<'gridbeam'> {
   variantId: keyof typeof gridBeamVariants

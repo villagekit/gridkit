@@ -1,3 +1,4 @@
+import { changeOfBasisTransform } from '@villagekit/math'
 import { BasePartCreator } from '@villagekit/part/creator'
 import { convert, meter } from '@villagekit/units'
 import type { GridPanelFit, GridPanelHoles, GridPanelVariant } from './types'
@@ -8,6 +9,10 @@ const getDefaultVariantId = (): keyof typeof gridPanelVariants => '40mm:8mm:12mm
 const X_AXIS: [number, number, number] = [1, 0, 0]
 const Y_AXIS: [number, number, number] = [0, 1, 0]
 const Z_AXIS: [number, number, number] = [0, 0, 1]
+
+const baseBasis = [X_AXIS, Y_AXIS, Z_AXIS] as const
+const xyToYZTransform = changeOfBasisTransform(baseBasis, [Y_AXIS, Z_AXIS, X_AXIS])
+const xyToXZTransform = changeOfBasisTransform(baseBasis, [X_AXIS, Z_AXIS, Y_AXIS])
 
 export class GridPanel extends BasePartCreator<'gridpanel'> {
   variantId: keyof typeof gridPanelVariants
@@ -42,6 +47,7 @@ export class GridPanel extends BasePartCreator<'gridpanel'> {
       fit,
       holes,
     })
+      /*
       .rotate({
         angle: x[0] <= x[1] ? 0 : 180,
         direction: Y_AXIS,
@@ -50,6 +56,7 @@ export class GridPanel extends BasePartCreator<'gridpanel'> {
         angle: y[0] <= y[1] ? 0 : 180,
         direction: X_AXIS,
       })
+    */
       .translate([x[0] * gridUnit, y[0] * gridUnit, z * gridUnit])
 
     if (fit === 'bottom') {
@@ -75,6 +82,7 @@ export class GridPanel extends BasePartCreator<'gridpanel'> {
       fit,
       holes,
     })
+      /*
       .rotate({
         angle: 90,
         direction: Z_AXIS,
@@ -87,6 +95,8 @@ export class GridPanel extends BasePartCreator<'gridpanel'> {
         angle: y[0] <= y[1] ? 0 : 180,
         direction: Z_AXIS,
       })
+    */
+      .applyTransform(xyToYZTransform)
       .translate([x * gridUnit, y[0] * gridUnit, z[0] * gridUnit])
 
     if (fit === 'bottom') {
@@ -114,6 +124,7 @@ export class GridPanel extends BasePartCreator<'gridpanel'> {
       fit,
       holes,
     })
+      /*
       .rotate({
         angle: z[0] <= z[1] ? -90 : 90,
         direction: X_AXIS,
@@ -123,6 +134,8 @@ export class GridPanel extends BasePartCreator<'gridpanel'> {
         angle: x[0] <= x[1] ? 0 : 180,
         direction: Z_AXIS,
       })
+      */
+      .applyTransform(xyToXZTransform)
       .translate([x[0] * gridUnit, y * gridUnit, z[0] * gridUnit])
 
     if (fit === 'bottom') {

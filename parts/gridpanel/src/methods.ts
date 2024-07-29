@@ -47,6 +47,7 @@ export function calculateGlValue(creator: WithRequiredId<GridPanel>): GridPanelG
     thicknessInMeters,
     position,
     quaternion,
+    scale,
   }
 }
 
@@ -115,9 +116,10 @@ export function calculateFasteningPoints(
   const scale = new Vector3()
   matrix.decompose(position, quaternion, scale)
 
-  const mainDirection = X_AXIS.clone().applyQuaternion(quaternion).toArray()
-  const crossDirection = Y_AXIS.clone().applyQuaternion(quaternion).toArray()
-  const thicknessDirection = Z_AXIS.clone().applyQuaternion(quaternion).toArray()
+  matrix.setPosition(0, 0, 0)
+  const mainDirection = X_AXIS.clone().applyMatrix4(matrix).toArray()
+  const crossDirection = Y_AXIS.clone().applyMatrix4(matrix).toArray()
+  const thicknessDirection = Z_AXIS.clone().applyMatrix4(matrix).toArray()
 
   const thicknessAxis = directionToAxisId(thicknessDirection)
   if (thicknessAxis == null) {

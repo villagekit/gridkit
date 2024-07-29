@@ -31,4 +31,5 @@ export type GridPanelGlValue = {
   // transform
   position: Vector3
   quaternion: Quaternion
+  scale: Vector3
 }

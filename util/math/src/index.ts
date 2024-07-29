@@ -138,6 +138,6 @@ export function changeOfBasisTransform(a: Basis, b: Basis): TransformMatrix {
     new Vector3(...b[1]),
     new Vector3(...b[2]),
   )
-  const AB = new Matrix4().multiplyMatrices(B.invert(), A)
+  const AB = new Matrix4().multiplyMatrices(A.invert(), B)
   return AB.toArray()
 }

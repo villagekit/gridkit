@@ -27,4 +27,5 @@ export type GridBeamGlValue = {
   // transform
   position: Vector3
   quaternion: Quaternion
+  scale: Vector3
 }

@@ -38,6 +38,7 @@ export function PartGl(props: PartGlProps) {
       holeDiameterInMeters,
       position,
       quaternion,
+      scale,
       variant: { id: variantId, materials },
     },
   } = props
@@ -48,7 +49,12 @@ export function PartGl(props: PartGlProps) {
   }
 
   return (
-    <group name={`gridbeam-container-${id}`} position={position} quaternion={quaternion}>
+    <group
+      name={`gridbeam-container-${id}`}
+      position={position}
+      quaternion={quaternion}
+      scale={scale}
+    >
       <Beam
         id={id}
         gridLengthInMeters={gridLengthInMeters}

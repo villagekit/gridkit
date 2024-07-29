@@ -43,6 +43,7 @@ export function calculateGlValue(creator: WithRequiredId<GridBeam>): GridBeamGlV
     lengthInMeters,
     position,
     quaternion,
+    scale,
   }
 }
 
@@ -98,7 +99,8 @@ export function calculateFasteningPoints(creator: WithRequiredId<GridBeam>): Arr
   const gridLengthInMeters = convert(variant.gridLength, meter).value
   const locationInGrids = position.clone().divideScalar(gridLengthInMeters).toArray()
 
-  const direction = X_AXIS.clone().applyQuaternion(quaternion).toArray()
+  matrix.setPosition(0, 0, 0)
+  const direction = X_AXIS.clone().applyMatrix4(matrix).toArray()
   const axis = directionToAxisId(direction)
 
   if (axis == null) {

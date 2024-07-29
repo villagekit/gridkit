@@ -43,6 +43,7 @@ export function PartGl(props: PartGlProps) {
     thicknessInMeters,
     position,
     quaternion,
+    scale,
   } = part
   const { id: variantId, materials } = variant
 
@@ -61,6 +62,7 @@ export function PartGl(props: PartGlProps) {
         material={panelMaterial}
         position={position}
         quaternion={quaternion}
+        scale={scale}
       >
         {holes && (
           <Holes
@@ -84,6 +86,7 @@ interface PanelProps {
   material: PartMaterial
   position: Vector3
   quaternion: Quaternion
+  scale: Vector3
   children: React.ReactNode | Array<React.ReactNode>
 }
 
@@ -99,6 +102,7 @@ function Panel(props: PanelProps) {
     material,
     position,
     quaternion,
+    scale,
     children,
   } = props
 
@@ -192,7 +196,7 @@ function Panel(props: PanelProps) {
   if (texture == null) return null
 
   return (
-    <group name={`gridpanel-${id}`} position={position} quaternion={quaternion}>
+    <group name={`gridpanel-${id}`} position={position} quaternion={quaternion} scale={scale}>
       <mesh name="gridpanel-panel" geometry={geometry} castShadow receiveShadow>
         <meshLambertMaterial map={texture} />
       </mesh>
