@@ -1,4 +1,4 @@
-import { Vector3 as ThreeVector3 } from 'three'
+import { Matrix4, Vector3 } from 'three'
 
 export type Point2 = readonly [number, number]
 export type Point3 = readonly [number, number, number]
@@ -41,13 +41,13 @@ const directionByAxisId: Record<AxisId, Point3> = {
   [AxisId['-Z']]: [0, 0, -1],
 } as const
 
-const directionVectorByAxisId: Record<AxisId, ThreeVector3> = {
-  [AxisId.X]: new ThreeVector3(1, 0, 0),
-  [AxisId['-X']]: new ThreeVector3(-1, 0, 0),
-  [AxisId.Y]: new ThreeVector3(0, 1, 0),
-  [AxisId['-Y']]: new ThreeVector3(0, -1, 0),
-  [AxisId.Z]: new ThreeVector3(0, 0, 1),
-  [AxisId['-Z']]: new ThreeVector3(0, 0, -1),
+const directionVectorByAxisId: Record<AxisId, Vector3> = {
+  [AxisId.X]: new Vector3(1, 0, 0),
+  [AxisId['-X']]: new Vector3(-1, 0, 0),
+  [AxisId.Y]: new Vector3(0, 1, 0),
+  [AxisId['-Y']]: new Vector3(0, -1, 0),
+  [AxisId.Z]: new Vector3(0, 0, 1),
+  [AxisId['-Z']]: new Vector3(0, 0, -1),
 } as const
 
 const flippedAxisIdByAxisId = {
@@ -65,7 +65,7 @@ export function axisIdToDirection(axisId: AxisId) {
   return directionByAxisId[axisId]
 }
 
-export function axisIdToDirectionVector(axisId: AxisId): ThreeVector3 {
+export function axisIdToDirectionVector(axisId: AxisId): Vector3 {
   return directionVectorByAxisId[axisId]
 }
 
@@ -93,10 +93,10 @@ export function pointEquals(a: Point3, b: Point3, epsilon = Number.EPSILON * 100
 }
 
 export function isStandardDirection(direction: Point3): boolean {
-  return isStandardAxisVector(new ThreeVector3(...direction))
+  return isStandardAxisVector(new Vector3(...direction))
 }
 
-export function isStandardAxisVector(vector: ThreeVector3): boolean {
+export function isStandardAxisVector(vector: Vector3): boolean {
   if (vector.length() !== 1) return false
   return Math.abs(vector.x) === 1 || Math.abs(vector.y) === 1 || Math.abs(vector.z) === 1
 }
@@ -123,4 +123,21 @@ export function degToRad(degrees: number) {
 
 export function radToDeg(radians: number) {
   return radians * RAD2DEG
+}
+
+// https://math.stackexchange.com/a/628075
+export type Basis = readonly [Point3, Point3, Point3]
+export function changeOfBasisTransform(a: Basis, b: Basis): TransformMatrix {
+  const A = new Matrix4().makeBasis(
+    new Vector3(...a[0]),
+    new Vector3(...a[1]),
+    new Vector3(...a[2]),
+  )
+  const B = new Matrix4().makeBasis(
+    new Vector3(...b[0]),
+    new Vector3(...b[1]),
+    new Vector3(...b[2]),
+  )
+  const AB = new Matrix4().multiplyMatrices(B.invert(), A)
+  return AB.toArray()
 }
