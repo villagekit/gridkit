@@ -115,28 +115,37 @@ const createEvaulatorIframe = () => {
   return iframe
 }
 
-// @ts-ignore
-const partCreatorUrl = (await import('../../../../core/part/dist/creator.js?url')).default
-// @ts-ignore
-const comlinkUrl = (await import('../../../../node_modules/comlink/dist/esm/comlink.js?url'))
-  .default
-// @ts-ignore
-const threeUrl = (await import('../../../../node_modules/three/build/three.module.js?url')).default
-// @ts-ignore
-const fastenerCreatorUrl = (await import('../../../../parts/fastener/dist-bundles/creator.js?url'))
-  .default
-// @ts-ignore
-const gridbeamCreatorUrl = (await import('../../../../parts/gridbeam/dist-bundles/creator.js?url'))
-  .default
-const gridpanelCreatorUrl =
-  // @ts-ignore
-  (await import('../../../../parts/gridpanel/dist-bundles/creator.js?url')).default
-// @ts-ignore
-const mathUrl = (await import('../../../../util/math/dist/index.js?url')).default
-// @ts-ignore
-const unitsUrl = (await import('../../../../util/units/dist/index.js?url')).default
+const newModule = (code: string) =>
+  URL.createObjectURL(new Blob([code], { type: 'text/javascript' }))
 
-console.log('units url', unitsUrl)
+// @ts-ignore
+const partCreatorUrl = newModule(await import('../../../../core/part/dist/creator.js?raw').default)
+const comlinkUrl = newModule(
+  // @ts-ignore
+  await import('../../../../node_modules/comlink/dist/esm/comlink.js?raw').default,
+)
+const threeUrl = newModule(
+  // @ts-ignore
+  await import('../../../../node_modules/three/build/three.module.js?raw').default,
+)
+const fastenerCreatorUrl = newModule(
+  // @ts-ignore
+  await import('../../../../parts/fastener/dist-bundles/creator.js?raw').default,
+)
+const gridbeamCreatorUrl = newModule(
+  // @ts-ignore
+  await import('../../../../parts/gridbeam/dist-bundles/creator.js?raw').default,
+)
+const gridpanelCreatorUrl = newModule(
+  // @ts-ignore
+  await import('../../../../parts/gridpanel/dist-bundles/creator.js?raw').default,
+)
+// @ts-ignore
+const mathUrl = newModule(await import('../../../../util/math/dist/index.js?raw').default)
+// @ts-ignore
+const unitsUrl = newModule(await import('../../../../util/units/dist/index.js?raw').default)
+
+console.log('url', comlinkUrl)
 
 const createEvaluatorIframeSrc = () =>
   `
@@ -279,16 +288,6 @@ const createEvaluatorIframeSrc = () =>
 </html>
 `
 */
-
-const textEncoder = new TextEncoder()
-function encodeBase64(text: string) {
-  return bytesToBase64(textEncoder.encode(text))
-}
-
-function bytesToBase64(bytes: Uint8Array) {
-  const binString = Array.from(bytes, (byte) => String.fromCodePoint(byte)).join('')
-  return btoa(binString)
-}
 
 function getTraceMap(code: string) {
   const sourceMapLine = code.substring(code.lastIndexOf('\n', code.length - 1) + 1, code.length)
