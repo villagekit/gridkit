@@ -1,4 +1,4 @@
-import { type PartCreator } from '@villagekit/part'
+import type { PartCreator } from '@villagekit/part'
 import { flatten } from 'lodash-es'
 
 import type { Plugin } from './plugin'
