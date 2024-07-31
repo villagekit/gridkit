@@ -11,7 +11,10 @@
     },
     "./package.json": "./package.json"
   },
-  "files": ["./src", "./dist"],
+  "files": [
+    "./src",
+    "./dist"
+  ],
   "sideEffects": false,
   "scripts": {
     "build:pkg": "tsup src",
@@ -42,6 +45,7 @@
     "comlink": "^4.4.1",
     "dnum": "^2.13.1",
     "errorstacks": "^2.4.1",
+    "es-module-shims": "^1.10.0",
     "lodash-es": "^4.17.21",
     "p-debounce": "^4.0.0",
     "p-limit": "^6.1.0",
