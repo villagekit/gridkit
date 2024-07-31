@@ -1,5 +1,5 @@
 import { changeOfBasisTransform, mirrorTransform } from '@villagekit/math'
-import { BasePartCreator } from '@villagekit/part/creator'
+import { BasePartCreator, BasePartSpec } from '@villagekit/part/creator'
 import { convert, meter } from '@villagekit/units'
 import type { GridPanelFit, GridPanelHoles, GridPanelVariant } from './types'
 import { gridPanelVariants } from './variants'
@@ -17,17 +17,25 @@ const mirrorXTransform = mirrorTransform('x')
 const mirrorYTransform = mirrorTransform('y')
 const mirrorZTransform = mirrorTransform('z')
 
-export class GridPanel extends BasePartCreator<'gridpanel'> {
+export class GridPanelSpec extends BasePartSpec<'gridpanel'> {
   variantId: keyof typeof gridPanelVariants
   sizeInGrids: [number, number]
   holes: GridPanelHoles
 
-  constructor(options: GridPanelOptions) {
-    const { id, variantId = getDefaultVariantId(), sizeInGrids, holes = true } = options
-    super('gridpanel', id)
+  constructor(options: GridPanelSpecOptions) {
+    const { variantId = getDefaultVariantId(), sizeInGrids, holes = true } = options
+    super('gridpanel')
     this.variantId = variantId
     this.sizeInGrids = sizeInGrids
     this.holes = holes
+  }
+}
+
+export class GridPanel extends BasePartCreator<'gridpanel', GridPanelSpec> {
+  constructor(options: GridPanelOptions) {
+    const { id, variantId = getDefaultVariantId(), sizeInGrids, holes = true } = options
+    const spec = new GridPanelSpec({ variantId, sizeInGrids, holes })
+    super(spec, id)
   }
 
   static create(options: GridPanelOptions) {
@@ -140,6 +148,12 @@ export class GridPanel extends BasePartCreator<'gridpanel'> {
 
     return panel
   }
+}
+
+interface GridPanelSpecOptions {
+  variantId: keyof typeof gridPanelVariants
+  sizeInGrids: [number, number]
+  holes?: GridPanelHoles
 }
 
 interface BaseOptions {

@@ -12,13 +12,21 @@ export type ApplyRotationOptions = {
   rotation: TransformMatrix
 }
 
-export class BasePartCreator<PartType extends string> {
-  type: PartType
+export class BasePartSpec<Type extends string> {
+  type: Type
+
+  constructor(type: Type) {
+    this.type = type
+  }
+}
+
+export class BasePartCreator<Type extends string, Spec extends BasePartSpec<Type>> {
+  spec: Spec
   id?: string
   transform: TransformMatrix
 
-  constructor(type: PartType, id?: string, transform: TransformMatrix = new Matrix4().toArray()) {
-    this.type = type
+  constructor(spec: Spec, id?: string, transform: TransformMatrix = new Matrix4().toArray()) {
+    this.spec = spec
     this.id = id
     this.transform = transform
   }

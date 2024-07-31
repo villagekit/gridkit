@@ -1,16 +1,24 @@
 import { AxisId, type Point3, axisIdToDirectionVector } from '@villagekit/math'
-import { BasePartCreator } from '@villagekit/part/creator'
+import { BasePartCreator, BasePartSpec } from '@villagekit/part/creator'
 import { convert, meter } from '@villagekit/units'
 import { Matrix4, Quaternion, Vector3 } from 'three'
 import { fastenerVariants } from './variants'
 
-export class Fastener extends BasePartCreator<'fastener'> {
+export class FastenerSpec extends BasePartSpec<'fastener'> {
   variantId: keyof typeof fastenerVariants
 
+  constructor(options: FastenerSpecOptions) {
+    const { variantId } = options
+    super('fastener')
+    this.variantId = variantId
+  }
+}
+
+export class Fastener extends BasePartCreator<'fastener', FastenerSpec> {
   constructor(options: FastenerOptions) {
     const { id, variantId } = options
-    super('fastener', id)
-    this.variantId = variantId
+    const spec = new FastenerSpec({ variantId })
+    super(spec, id)
   }
 
   static create(options: FastenerOptions) {
@@ -45,14 +53,18 @@ export class Fastener extends BasePartCreator<'fastener'> {
   }
 }
 
-interface BaseOptions {
+interface FastenerSpecOptions {
+  variantId: keyof typeof fastenerVariants
+}
+
+interface BaseCreatorOptions {
   id?: string
   variantId: keyof typeof fastenerVariants
 }
 
-interface FastenerOptions extends BaseOptions {}
+interface FastenerOptions extends BaseCreatorOptions {}
 
-interface FastenerLineOptions extends BaseOptions {
+interface FastenerLineOptions extends BaseCreatorOptions {
   start: Point3
   end: Point3
 }

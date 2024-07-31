@@ -1,5 +1,5 @@
 import { changeOfBasisTransform, mirrorTransform } from '@villagekit/math'
-import { BasePartCreator } from '@villagekit/part/creator'
+import { BasePartCreator, BasePartSpec } from '@villagekit/part/creator'
 import { convert, meter } from '@villagekit/units'
 import { gridBeamVariants } from './variants'
 
@@ -16,15 +16,23 @@ const mirrorXTransform = mirrorTransform('x')
 const mirrorYTransform = mirrorTransform('y')
 const mirrorZTransform = mirrorTransform('z')
 
-export class GridBeam extends BasePartCreator<'gridbeam'> {
+export class GridBeamSpec extends BasePartSpec<'gridbeam'> {
   variantId: keyof typeof gridBeamVariants
   lengthInGrids: number
 
   constructor(options: GridBeamOptions) {
-    const { id, variantId, lengthInGrids } = options
-    super('gridbeam', id)
+    const { variantId, lengthInGrids } = options
+    super('gridbeam')
     this.variantId = variantId ?? getDefaultVariantId()
     this.lengthInGrids = lengthInGrids
+  }
+}
+
+export class GridBeam extends BasePartCreator<'gridbeam', GridBeamSpec> {
+  constructor(options: GridBeamOptions) {
+    const { id, variantId, lengthInGrids } = options
+    const spec = new GridBeamSpec({ variantId, lengthInGrids })
+    super(spec, id)
   }
 
   static create(options: GridBeamOptions) {
@@ -86,30 +94,32 @@ export class GridBeam extends BasePartCreator<'gridbeam'> {
   }
 }
 
-interface BaseOptions {
-  id?: string
-}
-
-interface GridBeamOptions extends BaseOptions {
+interface GridBeamSpecOptions {
   variantId: keyof typeof gridBeamVariants
   lengthInGrids: number
 }
 
-interface GridBeamXOptions extends BaseOptions {
+interface BaseCreatorOptions {
+  id?: string
+}
+
+interface GridBeamOptions extends BaseCreatorOptions, GridBeamSpecOptions {}
+
+interface GridBeamXOptions extends BaseCreatorOptions {
   variantId?: keyof typeof gridBeamVariants
   x: [number, number]
   y: number
   z: number
 }
 
-interface GridBeamYOptions extends BaseOptions {
+interface GridBeamYOptions extends BaseCreatorOptions {
   variantId?: keyof typeof gridBeamVariants
   x: number
   y: [number, number]
   z: number
 }
 
-interface GridBeamZOptions extends BaseOptions {
+interface GridBeamZOptions extends BaseCreatorOptions {
   variantId?: keyof typeof gridBeamVariants
   x: number
   y: number
