@@ -1,40 +1,55 @@
-import 'es-module-shims/wasm'
 import * as Comlink from 'comlink'
+import { init as initModuleLexer, parse as parseModule } from 'es-module-lexer'
 
-/*
-// @ts-ignore
-importScripts('https://ga.jspm.io/npm:es-module-shims@1.6.2/dist/es-module-shims.wasm.js')
-// @ts-ignore
-// importScripts('https://ga.jspm.io/npm:comlink@4.4.1/dist/umd/comlink.js')
-importScripts('https://unpkg.com/comlink/dist/umd/comlink.js')
-*/
-
-const loadedImportMap = new Promise<void>((resolve) => {
-  loadImports().then((importMap) => {
-    console.log('import map', importMap)
-    // @ts-ignore
-    importShim.addImportMap(importMap)
-
-    resolve()
-  })
-})
-
-function loadImport(code: string) {
-  return URL.createObjectURL(new Blob([code], { type: 'text/javascript' }))
+interface ImportMap {
+  [moduleId: string]: string
 }
 
-async function loadImports() {
-  const modules = await Promise.all([
+async function loadImports(): Promise<ImportMap> {
+  await initModuleLexer
+
+  const modules1 = await Promise.all([
     // @ts-ignore
     import('../../../../node_modules/comlink/dist/esm/comlink.js?raw'),
     // @ts-ignore
     import('../../../../node_modules/three/build/three.module.js?raw'),
+  ])
+  const loaded1 = modules1.map((module) => loadImport(module.default))
+  const [comlink, three] = loaded1
+
+  const importMap2 = {
+    comlink: comlink!,
+    three: three!,
+  }
+
+  const modules2 = await Promise.all([
     // @ts-ignore
     import('../../../../util/math/dist/index.js?raw'),
     // @ts-ignore
     import('../../../../util/units/dist/index.js?raw'),
+  ])
+  const loaded2 = modules2.map((module) => loadImport(module.default, importMap2))
+  const [math, units] = loaded2
+
+  const importMap3 = {
+    ...importMap2,
+    '@villagekit/math': math!,
+    '@villagekit/units': units!,
+  }
+
+  const modules3 = await Promise.all([
     // @ts-ignore
     import('../../../../core/part/dist/creator.js?raw'),
+  ])
+  const loaded3 = modules3.map((module) => loadImport(module.default, importMap3))
+  const [partBase] = loaded3
+
+  const importMap4 = {
+    ...importMap3,
+    '@villagekit/part/creator': partBase!,
+  }
+
+  const modules4 = await Promise.all([
     // @ts-ignore
     import('../../../../parts/gridbeam/dist-bundles/creator.js?raw'),
     // @ts-ignore
@@ -42,31 +57,30 @@ async function loadImports() {
     // @ts-ignore
     import('../../../../parts/fastener/dist-bundles/creator.js?raw'),
   ])
-  const loaded = modules.map((module: any) => module.default).map(loadImport)
-  const [comlink, three, math, units, partBase, partGridbeam, partGridpanel, partFastener] = loaded
-  const imports = {
-    comlink: comlink,
-    three: three,
-    '@villagekit/math': math,
-    '@villagekit/units': units,
-    '@villagekit/part/creator': partBase,
-    '@villagekit/part-gridbeam/creator': partGridbeam,
-    '@villagekit/part-gridpanel/creator': partGridpanel,
-    '@villagekit/part-fastener/creator': partFastener,
+  const loaded4 = modules4.map((module) => loadImport(module.default, importMap4))
+  const [partGridbeam, partGridpanel, partFastener] = loaded4
+
+  return {
+    ...importMap4,
+    '@villagekit/part-gridbeam/creator': partGridbeam!,
+    '@villagekit/part-gridpanel/creator': partGridpanel!,
+    '@villagekit/part-fastener/creator': partFastener!,
     '@villagekit/design/kit': loadImport(''),
   }
-  return { imports }
 }
+
+const loadedImportMap = loadImports()
 
 let moduleUrl: string | null = null
 let module: any = null
 
-function loadModule(code: string) {
+async function loadModule(code: string) {
   if (moduleUrl != null) {
     URL.revokeObjectURL(moduleUrl)
   }
 
-  moduleUrl = URL.createObjectURL(new Blob([code], { type: 'text/javascript' }))
+  const nextCode = replaceImport(code, await loadedImportMap)
+  moduleUrl = URL.createObjectURL(new Blob([nextCode], { type: 'text/javascript' }))
 
   return moduleUrl
 }
@@ -76,10 +90,7 @@ async function evaluateModule() {
     throw new Error('Unexpected: Module not loaded')
   }
 
-  await loadedImportMap
-
-  // @ts-ignore
-  module = await importShim(moduleUrl)
+  module = await import(moduleUrl)
 
   const { parameters, presets, parts, plugins } = module
 
@@ -100,3 +111,36 @@ const exports = {
 }
 
 Comlink.expose(exports)
+
+function loadImport(code: string, importMap?: ImportMap): string {
+  const nextCode = importMap == null ? code : replaceImport(code, importMap)
+  return URL.createObjectURL(new Blob([nextCode], { type: 'text/javascript' }))
+}
+
+function replaceImport(code: string, importMap: ImportMap): string {
+  const [imports] = parseModule(code)
+
+  if (imports.length === 0) return code
+
+  const nextCode = []
+  let lastEnd = 0
+  for (const { s, e } of imports) {
+    const start = s
+    const end = e
+
+    nextCode.push(code.slice(lastEnd, start))
+
+    const moduleId = code.slice(start, end)
+    const nextModuleId = importMap[moduleId]
+    if (nextModuleId == null) {
+      throw new Error(`Module ${moduleId} not found in importMap`)
+    }
+    nextCode.push(nextModuleId)
+
+    lastEnd = end
+  }
+
+  nextCode.push(code.slice(lastEnd))
+
+  return nextCode.join('')
+}

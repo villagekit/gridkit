@@ -45,7 +45,7 @@
     "comlink": "^4.4.1",
     "dnum": "^2.13.1",
     "errorstacks": "^2.4.1",
-    "es-module-shims": "^1.10.0",
+    "es-module-lexer": "^1.5.4",
     "lodash-es": "^4.17.21",
     "p-debounce": "^4.0.0",
     "p-limit": "^6.1.0",
