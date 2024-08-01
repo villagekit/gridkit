@@ -18,6 +18,14 @@ export class BasePartSpec<Type extends string> {
   constructor(type: Type) {
     this.type = type
   }
+
+  static deserialize(_object: object) {
+    throw new Error('Not implemented')
+  }
+
+  serialize(): object {
+    throw new Error('Not implemented')
+  }
 }
 
 export class BasePartCreator<Type extends string, Spec extends BasePartSpec<Type>> {

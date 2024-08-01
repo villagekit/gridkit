@@ -12,6 +12,17 @@ export class FastenerSpec extends BasePartSpec<'fastener'> {
     super('fastener')
     this.variantId = variantId
   }
+
+  static fromJson(object: FastenerSpecOptions) {
+    return new FastenerSpec(object)
+  }
+
+  toJson() {
+    return {
+      type: 'fastener',
+      variantId: this.variantId,
+    }
+  }
 }
 
 export class Fastener extends BasePartCreator<'fastener', FastenerSpec> {
