@@ -1,5 +1,6 @@
 import { type TransformMatrix, degToRad } from '@villagekit/math'
 import { Matrix4, Vector3 } from 'three'
+import type { ClassProperties } from './types'
 
 export type RotateOptions = {
   angle: number
@@ -12,18 +13,42 @@ export type ApplyRotationOptions = {
   rotation: TransformMatrix
 }
 
-export class BasePartSpec<Type extends string> {
+export class BasePartSpec<Type extends string, Serialized> {
   type: Type
 
   constructor(type: Type) {
     this.type = type
   }
+
+  serialize(): Serialized {
+    throw new Error('Unimplemented')
+  }
+
+  static deserialize<
+    Type extends string,
+    Serialized,
+    Spec extends typeof BasePartSpec<Type, Serialized>,
+  >(_object: Serialized): InstanceType<Spec> {
+    throw new Error('Unimplemented')
+  }
 }
 
-export class BasePartCreator<Spec extends BasePartSpec<any>> {
-  public spec: Spec
+export type SerializedOfSpec<Spec> = Spec extends BasePartSpec<any, infer Serialized>
+  ? Serialized
+  : never
+
+export type BasePartCreatorSerialized<Spec> = {
+  spec: SerializedOfSpec<Spec>
   id?: string
   transform: TransformMatrix
+}
+
+export class BasePartCreator<Spec extends BasePartSpec<any, any>> {
+  spec: Spec
+  id?: string
+  transform: TransformMatrix
+
+  static Spec<Spec extends BasePartSpec<any, any>>: typeof Spec
 
   get type() {
     return this.spec.type
@@ -33,6 +58,22 @@ export class BasePartCreator<Spec extends BasePartSpec<any>> {
     this.spec = spec
     this.id = id
     this.transform = transform
+  }
+
+  serialize(): BasePartCreatorSerialized<Spec> {
+    return {
+      spec: this.spec.serialize(),
+      id: this.id,
+      transform: this.transform,
+    }
+  }
+
+  static deserialize<
+    Spec extends typeof BasePartSpec<any, any>,
+    Creator extends typeof BasePartCreator<InstanceType<Spec>>,
+  >(object: BasePartCreatorSerialized<Spec>): InstanceType<Creator> {
+    const { spec, id, transform } = object
+    return new this(spec, id, transform)
   }
 
   clone() {
