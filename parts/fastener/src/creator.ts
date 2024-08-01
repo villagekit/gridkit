@@ -7,33 +7,26 @@ import { fastenerVariants } from './variants'
 export class FastenerSpec extends BasePartSpec<'fastener'> {
   variantId: keyof typeof fastenerVariants
 
-  constructor(options: FastenerSpecOptions) {
-    const { variantId } = options
+  constructor(variantId: keyof typeof fastenerVariants) {
     super('fastener')
     this.variantId = variantId
-  }
-
-  static fromJson(object: FastenerSpecOptions) {
-    return new FastenerSpec(object)
-  }
-
-  toJson() {
-    return {
-      type: 'fastener',
-      variantId: this.variantId,
-    }
   }
 }
 
 export class Fastener extends BasePartCreator<'fastener', FastenerSpec> {
-  constructor(options: FastenerOptions) {
-    const { id, variantId } = options
-    const spec = new FastenerSpec({ variantId })
-    super(spec, id)
+  static create(options: FastenerOptions) {
+    const { variantId, id } = options
+    const spec = new FastenerSpec(variantId)
+    return new Fastener(spec, id)
   }
 
-  static create(options: FastenerOptions) {
-    return new Fastener(options)
+  static deserialize(object: Fastener) {
+    const {
+      spec: { variantId },
+      id,
+    } = object
+    const spec = new FastenerSpec(variantId)
+    return new Fastener(spec, id)
   }
 
   static Grid(options: FastenerLineOptions) {
@@ -54,7 +47,7 @@ export class Fastener extends BasePartCreator<'fastener', FastenerSpec> {
       .multiplyScalar(0.5 * gridUnit)
       .toArray()
 
-    return new Fastener({
+    return Fastener.create({
       id,
       variantId,
     })
@@ -62,10 +55,6 @@ export class Fastener extends BasePartCreator<'fastener', FastenerSpec> {
       .translate(offset)
       .translate([start[0] * gridUnit, start[1] * gridUnit, start[2] * gridUnit])
   }
-}
-
-interface FastenerSpecOptions {
-  variantId: keyof typeof fastenerVariants
 }
 
 interface BaseCreatorOptions {

@@ -52,6 +52,8 @@ export type CalculatePartFasteningPoints<Creator extends { id?: string }> = (
   creator: WithRequiredId<Creator>,
 ) => Array<FasteningPoint>
 export type CalculateNumFastenersToFasten<Creator> = (creator: Creator) => number
+export type SerializePart<Creator> = (creator: Creator) => object
+export type DeserializePart<Creator> = (object: object & { spec: { type: PartTypeId } }) => Creator
 
 export type WithRequiredId<T extends { id?: string }> = { id: string } & {
   [Key in keyof T as Exclude<Key, 'id'>]: T[Key]
@@ -78,6 +80,8 @@ export interface PartModule<
     calculateBoundingBox: CalculatePartBoundingBox<Creator>
     calculateFasteningPoints: CalculatePartFasteningPoints<Creator>
     calculateNumFastenersToFasten: CalculateNumFastenersToFasten<Creator>
+    serializePart: SerializePart<Creator>
+    deserializePart: DeserializePart<Creator>
   }
   schemas: Array<ZodDiscriminatedUnionOption<'type'>>
 }

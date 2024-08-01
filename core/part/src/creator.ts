@@ -18,25 +18,48 @@ export class BasePartSpec<Type extends string> {
   constructor(type: Type) {
     this.type = type
   }
-
-  static deserialize(_object: object) {
-    throw new Error('Not implemented')
-  }
-
-  serialize(): object {
-    throw new Error('Not implemented')
-  }
 }
 
-export class BasePartCreator<Type extends string, Spec extends BasePartSpec<Type>> {
-  spec: Spec
+export type ClassProperties<C> = {
+  [Key in keyof C as C[Key] extends Function ? never : Key]: C[Key]
+}
+
+export class BasePartCreator<Spec extends BasePartSpec<any>> {
+  public spec: Spec
   id?: string
   transform: TransformMatrix
+
+  get type() {
+    return this.spec.type
+  }
 
   constructor(spec: Spec, id?: string, transform: TransformMatrix = new Matrix4().toArray()) {
     this.spec = spec
     this.id = id
     this.transform = transform
+  }
+
+  static serialize<Creator extends typeof BasePartCreator<any>>(
+    this: Creator,
+    object: InstanceType<Creator>,
+  ): ClassProperties<InstanceType<Creator>> {
+    return object as ClassProperties<InstanceType<Creator>>
+  }
+
+  static deserializeSpec<Spec extends typeof BasePartCreator<any>>(
+    this: Spec,
+    _object: ClassProperties<InstanceType<Spec>>,
+  ): InstanceType<Spec> {
+    throw new Error('Not implemented')
+  }
+
+  static deserialize<Creator extends typeof BasePartCreator<any>>(
+    this: Creator,
+    object: ClassProperties<InstanceType<Creator>>,
+  ): InstanceType<Creator> {
+    const { spec: specObj, id, transform } = object
+    const spec = this.deserializeSpec(specObj)
+    return new this(spec, id, transform) as InstanceType<Creator>
   }
 
   clone() {

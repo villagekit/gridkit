@@ -1,6 +1,6 @@
 import { Box3 } from 'three'
 import { getPartModule } from './modules'
-import type { FasteningPoint, PartCreator, PartGlValue, WithRequiredId } from './types'
+import type { FasteningPoint, PartCreator, PartGlValue, PartTypeId, WithRequiredId } from './types'
 
 export function calculateGlValue(partCreator: WithRequiredId<PartCreator>): PartGlValue {
   const partModule = getPartModule(partCreator.type)
@@ -41,4 +41,14 @@ export function calculateFasteningPointsForAll(
 export function calculateNumFastenersToFasten(partCreator: PartCreator): number {
   const partModule = getPartModule(partCreator.type)
   return partModule.methods.calculateNumFastenersToFasten(partCreator)
+}
+
+export function serializePart(partCreator: PartCreator): object {
+  const partModule = getPartModule(partCreator.type)
+  return partModule.methods.serializePart(partCreator)
+}
+
+export function deserializePart(object: object & { spec: { type: PartTypeId } }): PartCreator {
+  const partModule = getPartModule(object.spec.type)
+  return partModule.methods.deserializePart(object)
 }
