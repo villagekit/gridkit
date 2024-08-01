@@ -1,9 +1,15 @@
 import { Box3 } from 'three'
 import { getPartModule } from './modules'
-import type { FasteningPoint, PartCreator, PartGlValue, PartTypeId, WithRequiredId } from './types'
+import type {
+  ClassProperties,
+  FasteningPoint,
+  PartCreator,
+  PartGlValue,
+  WithRequiredId,
+} from './types'
 
 export function calculateGlValue(partCreator: WithRequiredId<PartCreator>): PartGlValue {
-  const partModule = getPartModule(partCreator.type)
+  const partModule = getPartModule(partCreator.spec.type)
   return partModule.methods.calculateGlValue(partCreator)
 }
 export function calculateGlValueForAll(
@@ -13,7 +19,7 @@ export function calculateGlValueForAll(
 }
 
 export function calculateBoundingBox(partCreator: PartCreator): Box3 {
-  const partModule = getPartModule(partCreator.type)
+  const partModule = getPartModule(partCreator.spec.type)
   return partModule.methods.calculateBoundingBox(partCreator)
 }
 export function calculateBoundingBoxForAll(partCreators: Array<PartCreator>): Box3 {
@@ -28,7 +34,7 @@ export function calculateBoundingBoxForAll(partCreators: Array<PartCreator>): Bo
 export function calculateFasteningPoints(
   partCreator: WithRequiredId<PartCreator>,
 ): Array<FasteningPoint> {
-  const partModule = getPartModule(partCreator.type)
+  const partModule = getPartModule(partCreator.spec.type)
   return partModule.methods.calculateFasteningPoints(partCreator)
 }
 
@@ -39,16 +45,16 @@ export function calculateFasteningPointsForAll(
 }
 
 export function calculateNumFastenersToFasten(partCreator: PartCreator): number {
-  const partModule = getPartModule(partCreator.type)
+  const partModule = getPartModule(partCreator.spec.type)
   return partModule.methods.calculateNumFastenersToFasten(partCreator)
 }
 
-export function serializePart(partCreator: PartCreator): object {
-  const partModule = getPartModule(partCreator.type)
+export function serializePart(partCreator: PartCreator): ClassProperties<PartCreator> {
+  const partModule = getPartModule(partCreator.spec.type)
   return partModule.methods.serializePart(partCreator)
 }
 
-export function deserializePart(object: object & { spec: { type: PartTypeId } }): PartCreator {
+export function deserializePart(object: ClassProperties<PartCreator>): PartCreator {
   const partModule = getPartModule(object.spec.type)
   return partModule.methods.deserializePart(object)
 }

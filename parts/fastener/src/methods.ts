@@ -1,4 +1,4 @@
-import type { FasteningPoint, WithRequiredId } from '@villagekit/part'
+import type { ClassProperties, FasteningPoint, WithRequiredId } from '@villagekit/part'
 import { convert, meter } from '@villagekit/units'
 import { Box3, Matrix4, Quaternion, Vector3 } from 'three'
 
@@ -66,11 +66,11 @@ export function calculateNumFastenersToFasten(_creator: Fastener): number {
   return 0
 }
 
-export function serializePart(creator: Fastener): object {
+export function serializePart(creator: Fastener): ClassProperties<Fastener> {
   return creator
 }
 
-export function deserializePart(object: any): Fastener {
+export function deserializePart(object: ClassProperties<Fastener>): Fastener {
   const {
     spec: { variantId },
     id,

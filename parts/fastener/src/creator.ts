@@ -13,7 +13,7 @@ export class FastenerSpec extends BasePartSpec<'fastener'> {
   }
 }
 
-export class Fastener extends BasePartCreator<'fastener', FastenerSpec> {
+export class Fastener extends BasePartCreator<FastenerSpec> {
   static create(options: FastenerOptions) {
     const { variantId, id } = options
     const spec = new FastenerSpec(variantId)

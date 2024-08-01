@@ -20,10 +20,6 @@ export class BasePartSpec<Type extends string> {
   }
 }
 
-export type ClassProperties<C> = {
-  [Key in keyof C as C[Key] extends Function ? never : Key]: C[Key]
-}
-
 export class BasePartCreator<Spec extends BasePartSpec<any>> {
   public spec: Spec
   id?: string
@@ -37,29 +33,6 @@ export class BasePartCreator<Spec extends BasePartSpec<any>> {
     this.spec = spec
     this.id = id
     this.transform = transform
-  }
-
-  static serialize<Creator extends typeof BasePartCreator<any>>(
-    this: Creator,
-    object: InstanceType<Creator>,
-  ): ClassProperties<InstanceType<Creator>> {
-    return object as ClassProperties<InstanceType<Creator>>
-  }
-
-  static deserializeSpec<Spec extends typeof BasePartCreator<any>>(
-    this: Spec,
-    _object: ClassProperties<InstanceType<Spec>>,
-  ): InstanceType<Spec> {
-    throw new Error('Not implemented')
-  }
-
-  static deserialize<Creator extends typeof BasePartCreator<any>>(
-    this: Creator,
-    object: ClassProperties<InstanceType<Creator>>,
-  ): InstanceType<Creator> {
-    const { spec: specObj, id, transform } = object
-    const spec = this.deserializeSpec(specObj)
-    return new this(spec, id, transform) as InstanceType<Creator>
   }
 
   clone() {

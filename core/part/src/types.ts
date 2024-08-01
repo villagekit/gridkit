@@ -14,7 +14,7 @@ declare global {
       noop: { type: 'noop' }
     }
     export interface EveryPartCreator {
-      noop: { type: 'noop'; id: string }
+      noop: { spec: { type: 'noop' }; id?: string }
     }
     export interface EveryPartVariants {
       noop: { noop: null }
@@ -44,6 +44,10 @@ export type FasteningPoint = {
   gradient: number
 }
 
+export type ClassProperties<C> = {
+  [Key in keyof C as C[Key] extends Function ? never : Key]: C[Key]
+}
+
 export type CalculatePartGlValue<Creator extends { id?: string }, GlValue> = (
   creator: WithRequiredId<Creator>,
 ) => GlValue
@@ -52,8 +56,8 @@ export type CalculatePartFasteningPoints<Creator extends { id?: string }> = (
   creator: WithRequiredId<Creator>,
 ) => Array<FasteningPoint>
 export type CalculateNumFastenersToFasten<Creator> = (creator: Creator) => number
-export type SerializePart<Creator> = (creator: Creator) => object
-export type DeserializePart<Creator> = (object: object & { spec: { type: PartTypeId } }) => Creator
+export type SerializePart<Creator> = (creator: Creator) => ClassProperties<Creator>
+export type DeserializePart<Creator> = (object: ClassProperties<Creator>) => Creator
 
 export type WithRequiredId<T extends { id?: string }> = { id: string } & {
   [Key in keyof T as Exclude<Key, 'id'>]: T[Key]
