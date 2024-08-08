@@ -12,6 +12,10 @@ export type ApplyRotationOptions = {
   rotation: TransformMatrix
 }
 
+export type Constructor<M> = {
+  new (...args: Array<any>): M
+}
+
 export class BasePartSpec<Type extends string, Serialized> {
   type: Type
 
@@ -27,7 +31,7 @@ export class BasePartSpec<Type extends string, Serialized> {
     Type extends string,
     Serialized extends object,
     Spec extends BasePartSpec<Type, Serialized>,
-  >(this: { new (): Spec }, _object: Serialized): Spec {
+  >(this: Constructor<Spec>, _object: Serialized): Spec {
     throw new Error('Unimplemented')
   }
 }

@@ -1,5 +1,5 @@
 import { AxisId, type Point3, axisIdToDirectionVector } from '@villagekit/math'
-import { BasePartCreator, BasePartSpec } from '@villagekit/part/creator'
+import { BasePartCreator, BasePartSpec, type Constructor } from '@villagekit/part/creator'
 import { convert, meter } from '@villagekit/units'
 import { Matrix4, Quaternion, Vector3 } from 'three'
 import { fastenerVariants } from './variants'
@@ -21,7 +21,7 @@ export class FastenerSpec extends BasePartSpec<'fastener', FastenerSpecSerialize
     return { type: 'fastener', variantId: this.variantId }
   }
 
-  static deserialize(object: FastenerSpecSerialized): FastenerSpec {
+  static deserialize(this: Constructor<FastenerSpec>, object: FastenerSpecSerialized) {
     const { variantId } = object
     return new FastenerSpec(variantId)
   }
