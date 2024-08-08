@@ -12,41 +12,20 @@ export type ApplyRotationOptions = {
   rotation: TransformMatrix
 }
 
-export type Constructor<M> = {
-  new (...args: Array<any>): M
+export interface Serializeable<Instance, Serialized> {
+  serialize(instance: Instance): Serialized
+  deserialize(object: Serialized): Instance
 }
 
-export class BasePartSpec<Type extends string, Serialized> {
+export interface Typed<Type extends string> {
   type: Type
-
-  constructor(type: Type) {
-    this.type = type
-  }
-
-  serialize(): Serialized {
-    throw new Error('Unimplemented')
-  }
-
-  static deserialize<
-    Type extends string,
-    Serialized extends object,
-    Spec extends BasePartSpec<Type, Serialized>,
-  >(this: Constructor<Spec>, _object: Serialized): Spec {
-    throw new Error('Unimplemented')
-  }
 }
 
-export type SerializedOfSpec<Spec> = Spec extends BasePartSpec<any, infer Serialized>
+export type SerializedOf<Instance> = Instance extends Serializeable<Instance, infer Serialized>
   ? Serialized
   : never
 
-export type SerializedOfBasePartCreator<Spec> = {
-  spec: SerializedOfSpec<Spec>
-  id?: string
-  transform: TransformMatrix
-}
-
-export class BasePartCreator<Spec extends BasePartSpec<any, any>> {
+export class BasePartCreator<Spec extends Typed<any> & Serializeable<Spec, any>> {
   spec: Spec
   id?: string
   transform: TransformMatrix
@@ -59,30 +38,6 @@ export class BasePartCreator<Spec extends BasePartSpec<any, any>> {
     this.spec = spec
     this.id = id
     this.transform = transform
-  }
-
-  serialize(): SerializedOfBasePartCreator<Spec> {
-    return {
-      spec: this.spec.serialize(),
-      id: this.id,
-      transform: this.transform,
-    }
-  }
-
-  static deserializeSpec<Spec extends BasePartSpec<any, any>>(
-    this: { new (...args: any): Spec },
-    _specObject: SerializedOfSpec<Spec>,
-  ): Spec {
-    throw new Error('Unimplemented')
-  }
-
-  static deserialize<Spec extends BasePartSpec<any, any>, Creator extends BasePartCreator<Spec>>(
-    this: { new (...args: any): Creator; deserializeSpec(object: SerializedOfSpec<Spec>): Spec },
-    object: SerializedOfBasePartCreator<Spec>,
-  ): Creator {
-    const { spec: specObj, id, transform } = object
-    const spec = this.deserializeSpec(specObj)
-    return new this(spec, id, transform)
   }
 
   clone() {
@@ -137,3 +92,42 @@ export class BasePartCreator<Spec extends BasePartSpec<any, any>> {
     return next
   }
 }
+
+export type SerializedOfBasePartCreator<Spec> = {
+  spec: SerializedOf<Spec>
+  id?: string
+  transform: TransformMatrix
+}
+
+export function serializePartCreator<
+  Spec extends Typed<any> & Serializeable<Spec, any>,
+  Creator extends BasePartCreator<Spec>,
+>(
+  serializeSpec: (spec: Spec) => SerializedOf<Spec>,
+  creator: Creator,
+): SerializedOfBasePartCreator<Spec> {
+  const { spec: specInstance, id, transform } = creator
+  const spec = serializeSpec(specInstance)
+  return {
+    spec,
+    id,
+    transform,
+  }
+}
+
+export function serializePart
+
+/*
+  static deserializeSpec<T>(_specObject: object): T {
+    throw new Error('Unimplemented')
+  }
+
+  static deserialize<Spec extends BasePartSpec<any, any>, Creator extends BasePartCreator<Spec>>(
+    this: { new (...args: any): Creator; deserializeSpec(object: SerializedOfSpec<Spec>): Spec },
+    object: SerializedOfBasePartCreator<Spec>,
+  ): Creator {
+    const { spec: specObj, id, transform } = object
+    const spec = this.deserializeSpec(specObj)
+    return new this(spec, id, transform)
+  }
+*/
