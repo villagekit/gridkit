@@ -1,6 +1,5 @@
 import { type TransformMatrix, degToRad } from '@villagekit/math'
 import { Matrix4, Vector3 } from 'three'
-import type { ClassProperties } from './types'
 
 export type RotateOptions = {
   angle: number
@@ -13,7 +12,7 @@ export type ApplyRotationOptions = {
   rotation: TransformMatrix
 }
 
-export class BasePartSpec<Type extends string, Serialized> {
+export class BasePartSpec<Type extends string, Serialized extends object> {
   type: Type
 
   constructor(type: Type) {
@@ -26,7 +25,7 @@ export class BasePartSpec<Type extends string, Serialized> {
 
   static deserialize<
     Type extends string,
-    Serialized,
+    Serialized extends object,
     Spec extends typeof BasePartSpec<Type, Serialized>,
   >(_object: Serialized): InstanceType<Spec> {
     throw new Error('Unimplemented')
@@ -37,7 +36,7 @@ export type SerializedOfSpec<Spec> = Spec extends BasePartSpec<any, infer Serial
   ? Serialized
   : never
 
-export type BasePartCreatorSerialized<Spec> = {
+export type SerializedOfBasePartCreator<Spec> = {
   spec: SerializedOfSpec<Spec>
   id?: string
   transform: TransformMatrix
@@ -47,8 +46,6 @@ export class BasePartCreator<Spec extends BasePartSpec<any, any>> {
   spec: Spec
   id?: string
   transform: TransformMatrix
-
-  static Spec<Spec extends BasePartSpec<any, any>>: typeof Spec
 
   get type() {
     return this.spec.type
@@ -60,7 +57,7 @@ export class BasePartCreator<Spec extends BasePartSpec<any, any>> {
     this.transform = transform
   }
 
-  serialize(): BasePartCreatorSerialized<Spec> {
+  serialize(): SerializedOfBasePartCreator<Spec> {
     return {
       spec: this.spec.serialize(),
       id: this.id,
@@ -68,12 +65,19 @@ export class BasePartCreator<Spec extends BasePartSpec<any, any>> {
     }
   }
 
+  static deserializeSpec<Spec extends typeof BasePartSpec<any, any>>(
+    _specObject: SerializedOfSpec<InstanceType<Spec>>,
+  ): InstanceType<Spec> {
+    throw new Error('Unimplemented')
+  }
+
   static deserialize<
     Spec extends typeof BasePartSpec<any, any>,
     Creator extends typeof BasePartCreator<InstanceType<Spec>>,
-  >(object: BasePartCreatorSerialized<Spec>): InstanceType<Creator> {
-    const { spec, id, transform } = object
-    return new this(spec, id, transform)
+  >(object: SerializedOfBasePartCreator<Spec>): InstanceType<Creator> {
+    const { spec: specObj, id, transform } = object
+    const spec = this.deserializeSpec(specObj)
+    return new this(spec, id, transform) as InstanceType<Creator>
   }
 
   clone() {
