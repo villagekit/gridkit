@@ -4,12 +4,12 @@ import { convert, meter } from '@villagekit/units'
 import { Matrix4, Quaternion, Vector3 } from 'three'
 import { fastenerVariants } from './variants'
 
-export type FastenerSerialized = {
+export type FastenerSpecSerialized = {
   type: 'fastener'
   variantId: keyof typeof fastenerVariants
 }
 
-export class FastenerSpec extends BasePartSpec<'fastener', FastenerSerialized> {
+export class FastenerSpec extends BasePartSpec<'fastener', FastenerSpecSerialized> {
   variantId: keyof typeof fastenerVariants
 
   constructor(variantId: keyof typeof fastenerVariants) {
@@ -17,11 +17,11 @@ export class FastenerSpec extends BasePartSpec<'fastener', FastenerSerialized> {
     this.variantId = variantId
   }
 
-  serialize(): FastenerSerialized {
+  serialize(): FastenerSpecSerialized {
     return { type: 'fastener', variantId: this.variantId }
   }
 
-  static deserialize(object: FastenerSerialized): FastenerSpec {
+  static deserialize(object: FastenerSpecSerialized): FastenerSpec {
     const { variantId } = object
     return new FastenerSpec(variantId)
   }
@@ -34,13 +34,8 @@ export class Fastener extends BasePartCreator<FastenerSpec> {
     return new Fastener(spec, id)
   }
 
-  static deserialize(object: Fastener) {
-    const {
-      spec: { variantId },
-      id,
-    } = object
-    const spec = new FastenerSpec(variantId)
-    return new Fastener(spec, id)
+  static deserializeSpec(object: FastenerSpecSerialized) {
+    return FastenerSpec.deserialize(object)
   }
 
   static Grid(options: FastenerLineOptions) {
