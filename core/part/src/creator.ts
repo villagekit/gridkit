@@ -12,20 +12,25 @@ export type ApplyRotationOptions = {
   rotation: TransformMatrix
 }
 
-export interface Serializeable<Instance, Serialized> {
-  serialize(instance: Instance): Serialized
-  deserialize(object: Serialized): Instance
+export abstract class Serializeable<Serialized> {
+  abstract serialize(_instance: this): Serialized
+
+  static deserialize<Serialized, T extends Serializeable<Serialized>>(_object: Serialized): T {
+    throw new Error('Not implemented')
+  }
 }
+
+export type SerializedOf<Instance> = Instance extends Serializeable<infer Serialized>
+  ? Serialized
+  : never
 
 export interface Typed<Type extends string> {
   type: Type
 }
 
-export type SerializedOf<Instance> = Instance extends Serializeable<Instance, infer Serialized>
-  ? Serialized
-  : never
+export type TypeOf<T> = T extends Typed<infer Type> ? Type : never
 
-export class BasePartCreator<Spec extends Typed<any> & Serializeable<Spec, any>> {
+export class BasePartCreator<Spec extends Typed<any> & Serializeable<any>> {
   spec: Spec
   id?: string
   transform: TransformMatrix
@@ -99,6 +104,7 @@ export type SerializedOfBasePartCreator<Spec> = {
   transform: TransformMatrix
 }
 
+/*
 export function serializePartCreator<
   Spec extends Typed<any> & Serializeable<Spec, any>,
   Creator extends BasePartCreator<Spec>,
