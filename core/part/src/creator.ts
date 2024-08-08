@@ -12,7 +12,7 @@ export type ApplyRotationOptions = {
   rotation: TransformMatrix
 }
 
-export class BasePartSpec<Type extends string, Serialized extends object> {
+export class BasePartSpec<Type extends string, Serialized> {
   type: Type
 
   constructor(type: Type) {
@@ -23,17 +23,21 @@ export class BasePartSpec<Type extends string, Serialized extends object> {
     throw new Error('Unimplemented')
   }
 
-  static deserialize(_object: object) {
+  static deserialize<
+    Type extends string,
+    Serialized extends object,
+    Spec extends BasePartSpec<Type, Serialized>,
+  >(this: { new (): Spec }, _object: Serialized): Spec {
     throw new Error('Unimplemented')
   }
 }
 
-export type SpecSerialized<Spec> = Spec extends BasePartSpec<any, infer Serialized>
+export type SerializedOfSpec<Spec> = Spec extends BasePartSpec<any, infer Serialized>
   ? Serialized
   : never
 
-export type BasePartCreatorSerialized<Spec> = {
-  spec: SpecSerialized<Spec>
+export type SerializedOfBasePartCreator<Spec> = {
+  spec: SerializedOfSpec<Spec>
   id?: string
   transform: TransformMatrix
 }
@@ -53,7 +57,7 @@ export class BasePartCreator<Spec extends BasePartSpec<any, any>> {
     this.transform = transform
   }
 
-  serialize(): BasePartCreatorSerialized<Spec> {
+  serialize(): SerializedOfBasePartCreator<Spec> {
     return {
       spec: this.spec.serialize(),
       id: this.id,
@@ -61,15 +65,17 @@ export class BasePartCreator<Spec extends BasePartSpec<any, any>> {
     }
   }
 
-  static deserializeSpec<Spec extends typeof BasePartSpec<any, any>>(
-    _specObject: SpecSerialized<InstanceType<Spec>>,
-  ): InstanceType<Spec> {
+  static deserializeSpec<Spec extends BasePartSpec<any, any>>(
+    this: { new (...args: any): Spec },
+    _specObject: SerializedOfSpec<Spec>,
+  ): Spec {
     throw new Error('Unimplemented')
   }
 
-  static deserialize<Spec extends typeof BasePartSpec<any, any>>(
-    object: BasePartCreatorSerialized<Spec>,
-  ) {
+  static deserialize<Spec extends BasePartSpec<any, any>, Creator extends BasePartCreator<Spec>>(
+    this: { new (...args: any): Creator; deserializeSpec(object: SerializedOfSpec<Spec>): Spec },
+    object: SerializedOfBasePartCreator<Spec>,
+  ): Creator {
     const { spec: specObj, id, transform } = object
     const spec = this.deserializeSpec(specObj)
     return new this(spec, id, transform)
