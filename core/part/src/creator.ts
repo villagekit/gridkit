@@ -18,6 +18,8 @@ export type ApplyRotationOptions = {
   rotation: TransformMatrix
 }
 
+export type SpecOfCreator<Creator> = Creator extends BasePartCreator<infer Spec> ? Spec : never
+
 export class BasePartCreator<Spec extends Typed<any>> {
   spec: Spec
   id?: string
