@@ -1,6 +1,12 @@
 import { type TransformMatrix, degToRad } from '@villagekit/math'
 import { Matrix4, Vector3 } from 'three'
 
+export interface Typed<Type extends string> {
+  type: Type
+}
+
+export type TypeOf<T> = T extends Typed<infer Type> ? Type : never
+
 export type RotateOptions = {
   angle: number
   origin?: [number, number, number]
@@ -12,22 +18,7 @@ export type ApplyRotationOptions = {
   rotation: TransformMatrix
 }
 
-export interface Serializeable<Instance, Serialized> {
-  serialize(instance: Instance): Serialized
-  deserialize(object: Serialized): Instance
-}
-
-export type SerializedOf<Instance> = Instance extends Serializeable<Instance, infer Serialized>
-  ? Serialized
-  : never
-
-export interface Typed<Type extends string> {
-  type: Type
-}
-
-export type TypeOf<T> = T extends Typed<infer Type> ? Type : never
-
-export class BasePartCreator<Spec extends Typed<any> & Serializeable<any>> {
+export class BasePartCreator<Spec extends Typed<any>> {
   spec: Spec
   id?: string
   transform: TransformMatrix
@@ -95,42 +86,74 @@ export class BasePartCreator<Spec extends Typed<any> & Serializeable<any>> {
   }
 }
 
-export type SerializedOfBasePartCreator<Spec> = {
-  spec: SerializedOf<Spec>
+type CreatorSerialized<SpecSerialized> = {
+  spec: SpecSerialized
   id?: string
   transform: TransformMatrix
 }
 
-/*
-export function serializePartCreator<
-  Spec extends Typed<any> & Serializeable<Spec, any>,
-  Creator extends BasePartCreator<Spec>,
+export function createSerializer<
+  Type extends string,
+  Spec extends Typed<Type>,
+  SpecSerialized extends Typed<Type>,
+  Creator extends typeof BasePartCreator<Spec>,
 >(
-  serializeSpec: (spec: Spec) => SerializedOf<Spec>,
-  creator: Creator,
-): SerializedOfBasePartCreator<Spec> {
-  const { spec: specInstance, id, transform } = creator
-  const spec = serializeSpec(specInstance)
+  type: Type,
+  CreatorClass: Creator,
+  serializeSpec: (spec: Spec) => SpecSerialized,
+  deserializeSpec: (object: SpecSerialized) => Spec,
+): Serializer<Type, InstanceType<Creator>, CreatorSerialized<SpecSerialized>> {
   return {
-    spec,
-    id,
-    transform,
+    type,
+    serialize(creator) {
+      const { spec: specInstance, id, transform } = creator
+      const spec = serializeSpec(specInstance)
+      return {
+        spec,
+        id,
+        transform,
+      }
+    },
+    deserialize(object) {
+      const { spec: specObject, id, transform } = object
+      const spec = deserializeSpec(specObject)
+      return new CreatorClass(spec, id, transform) as InstanceType<Creator>
+    },
   }
 }
 
-export function serializePart
+type Serializer<Type extends string, Instance, Serialized> = {
+  type: Type
+  serialize: (instance: Instance) => Serialized
+  deserialize: (object: Serialized) => Instance
+}
 
-/*
-  static deserializeSpec<T>(_specObject: object): T {
-    throw new Error('Unimplemented')
-  }
+interface Serializers {
+  [Type: string]: Serializer<typeof Type, any, any>
+}
 
-  static deserialize<Spec extends BasePartSpec<any, any>, Creator extends BasePartCreator<Spec>>(
-    this: { new (...args: any): Creator; deserializeSpec(object: SerializedOfSpec<Spec>): Spec },
-    object: SerializedOfBasePartCreator<Spec>,
-  ): Creator {
-    const { spec: specObj, id, transform } = object
-    const spec = this.deserializeSpec(specObj)
-    return new this(spec, id, transform)
+const serializers: Serializers = {}
+
+export function registerSerializer<Type extends string, Instance, Serialized>(
+  serializer: Serializer<Type, Instance, Serialized>,
+) {
+  serializers[serializer.type] = serializer
+}
+
+function getSerializer(type: string): Serializer<any, any, any> {
+  const serializer = serializers[type]
+  if (serializer == null) {
+    throw new Error(`Unknown serializer type: ${type}`)
   }
-*/
+  return serializer
+}
+
+export function serialize(instance: any): any {
+  const serializer = getSerializer(instance.type)
+  return serializer.serialize(instance)
+}
+
+export function deserialize(object: any): any {
+  const serializer = getSerializer(object.type)
+  return serializer.deserialize(object)
+}

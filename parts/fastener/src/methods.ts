@@ -1,9 +1,9 @@
-import type { ClassProperties, FasteningPoint, WithRequiredId } from '@villagekit/part'
+import type { FasteningPoint, WithRequiredId } from '@villagekit/part'
 import { convert, meter } from '@villagekit/units'
 import { Box3, Matrix4, Quaternion, Vector3 } from 'three'
 
 import weakMemoize from '@emotion/weak-memoize'
-import { Fastener, FastenerSpec } from './creator'
+import type { Fastener } from './creator'
 import type { FastenerGlValue, FastenerVariant } from './types'
 import { fastenerVariants } from './variants'
 
@@ -64,17 +64,4 @@ export function calculateFasteningPoints(
 
 export function calculateNumFastenersToFasten(_creator: Fastener): number {
   return 0
-}
-
-export function serializePart(creator: Fastener): ClassProperties<Fastener> {
-  return creator
-}
-
-export function deserializePart(object: ClassProperties<Fastener>): Fastener {
-  const {
-    spec: { variantId },
-    id,
-  } = object
-  const spec = new FastenerSpec(variantId)
-  return new Fastener(spec, id)
 }
