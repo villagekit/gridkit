@@ -12,15 +12,12 @@ export type ApplyRotationOptions = {
   rotation: TransformMatrix
 }
 
-export abstract class Serializeable<Serialized> {
-  abstract serialize(_instance: this): Serialized
-
-  static deserialize<Serialized, T extends Serializeable<Serialized>>(_object: Serialized): T {
-    throw new Error('Not implemented')
-  }
+export interface Serializeable<Instance, Serialized> {
+  serialize(instance: Instance): Serialized
+  deserialize(object: Serialized): Instance
 }
 
-export type SerializedOf<Instance> = Instance extends Serializeable<infer Serialized>
+export type SerializedOf<Instance> = Instance extends Serializeable<Instance, infer Serialized>
   ? Serialized
   : never
 
