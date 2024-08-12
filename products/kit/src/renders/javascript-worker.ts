@@ -1,3 +1,8 @@
+import '@villagekit/part-gridpanel/creator'
+import '@villagekit/part-gridbeam/creator'
+import '@villagekit/part-fastener/creator'
+
+import { serialize } from '@villagekit/part/creator'
 import * as Comlink from 'comlink'
 import { init as initModuleLexer, parse as parseModule } from 'es-module-lexer'
 
@@ -90,18 +95,23 @@ async function evaluateModule() {
     throw new Error('Unexpected: Module not loaded')
   }
 
+  /* @vite-ignore */
   module = await import(moduleUrl)
 
-  const { parameters, presets, parts, plugins } = module
-
-  if (typeof parts === 'function') {
+  if (typeof module.parts === 'function') {
+    const { parameters, presets, plugins } = module
     return { parameters, presets, plugins }
   }
-  return { parts, plugins }
+
+  const { parts: partInstances, plugins } = module
+  const partObjects = partInstances.map(serialize)
+  return { parts: partObjects, plugins }
 }
 
 function evaluateParts(parameters: any, partVariants: any) {
-  return module.parts(parameters, partVariants)
+  const partInstances = module.parts(parameters, partVariants)
+  const partObjects = partInstances.map(serialize)
+  return partObjects
 }
 
 const exports = {

@@ -1,4 +1,9 @@
+import '@villagekit/part-gridpanel/creator'
+import '@villagekit/part-gridbeam/creator'
+import '@villagekit/part-fastener/creator'
+
 import { AnyMap, type TraceMap, originalPositionFor } from '@jridgewell/trace-mapping'
+import { deserialize } from '@villagekit/part/creator'
 import * as Comlink from 'comlink'
 import { parseStackTrace } from 'errorstacks'
 import { fromCallback } from 'xstate'
@@ -47,36 +52,43 @@ export const javascriptRenderer = fromCallback<RenderEvent, RendererMachineEvent
 
       if (jsModule == null) return
 
-      const { parameters, presets, parts, plugins } = jsModule
+      if (jsModule.parameters == null || jsModule.presets == null) {
+        const { plugins } = jsModule
+        const partObjects = jsModule.parts ?? []
+        const partInstances = partObjects.map(deserialize)
+        const event: RendererMachineEvent = {
+          type: 'renderer.success',
+          render: {
+            type: 'static',
+            parts: partInstances,
+            plugins,
+          },
+        }
+        sendBack(event)
+      } else {
+        const { parameters, presets, plugins } = jsModule
+        const event: RendererMachineEvent = {
+          type: 'renderer.success',
+          render: {
+            type: 'parametric',
+            parameters,
+            presets,
+            parts: async (paramsValues: ParamsValues, partVariants: PartVariantsByType) => {
+              try {
+                const partObjects = await evaluator.evaluateParts(paramsValues, partVariants)
+                const partInstances = partObjects.map(deserialize)
+                return partInstances
+              } catch (error) {
+                sendEvaluationError(error)
+                return []
+              }
+            },
+            plugins,
+          },
+        }
 
-      const event: RendererMachineEvent =
-        parameters == null || presets == null
-          ? {
-              type: 'renderer.success',
-              render: {
-                type: 'static',
-                parts: parts != null ? parts : [],
-                plugins,
-              },
-            }
-          : {
-              type: 'renderer.success',
-              render: {
-                type: 'parametric',
-                parameters,
-                presets,
-                parts: async (paramsValues: ParamsValues, partVariants: PartVariantsByType) => {
-                  try {
-                    return await evaluator.evaluateParts(paramsValues, partVariants)
-                  } catch (error) {
-                    sendEvaluationError(error)
-                    return []
-                  }
-                },
-                plugins,
-              },
-            }
-      sendBack(event)
+        sendBack(event)
+      }
 
       function sendEvaluationError(error: unknown) {
         console.error('error', error)

@@ -1,6 +1,12 @@
 import { changeOfBasisTransform, mirrorTransform } from '@villagekit/math'
-import { BasePartCreator, BasePartSpec } from '@villagekit/part/creator'
+import {
+  BasePartCreator,
+  type Typed,
+  createSerializer,
+  registerSerializer,
+} from '@villagekit/part/creator'
 import { convert, meter } from '@villagekit/units'
+import type { GridBeamType } from './types'
 import { gridBeamVariants } from './variants'
 
 const getDefaultVariantId = () => '40mm:8mm:douglas-fir'
@@ -16,27 +22,37 @@ const mirrorXTransform = mirrorTransform('x')
 const mirrorYTransform = mirrorTransform('y')
 const mirrorZTransform = mirrorTransform('z')
 
-export class GridBeamSpec extends BasePartSpec<'gridbeam'> {
+export class GridBeamSpec implements Typed<GridBeamType> {
+  type: GridBeamType
   variantId: keyof typeof gridBeamVariants
   lengthInGrids: number
 
-  constructor(options: GridBeamOptions) {
-    const { variantId, lengthInGrids } = options
-    super('gridbeam')
+  constructor(lengthInGrids: number, variantId?: keyof typeof gridBeamVariants) {
+    this.type = 'gridbeam'
     this.variantId = variantId ?? getDefaultVariantId()
     this.lengthInGrids = lengthInGrids
   }
 }
 
-export class GridBeam extends BasePartCreator<'gridbeam', GridBeamSpec> {
-  constructor(options: GridBeamOptions) {
-    const { id, variantId, lengthInGrids } = options
-    const spec = new GridBeamSpec({ variantId, lengthInGrids })
-    super(spec, id)
-  }
+export type GridBeamSpecSerialized = {
+  type: GridBeamType
+  variantId: keyof typeof gridBeamVariants
+  lengthInGrids: number
+}
+function serializeSpec(instance: GridBeamSpec): GridBeamSpecSerialized {
+  const { variantId, lengthInGrids } = instance
+  return { type: 'gridbeam', variantId, lengthInGrids }
+}
+function deserializeSpec(object: GridBeamSpecSerialized): GridBeamSpec {
+  const { variantId, lengthInGrids } = object
+  return new GridBeamSpec(lengthInGrids, variantId)
+}
 
+export class GridBeam extends BasePartCreator<GridBeamSpec> {
   static create(options: GridBeamOptions) {
-    return new GridBeam(options)
+    const { variantId, lengthInGrids, id } = options
+    const spec = new GridBeamSpec(lengthInGrids, variantId)
+    return new GridBeam(spec, id)
   }
 
   static X(options: GridBeamXOptions) {
@@ -44,7 +60,7 @@ export class GridBeam extends BasePartCreator<'gridbeam', GridBeamSpec> {
 
     const gridUnit = getGridLengthInMeters(variantId)
 
-    let beam = new GridBeam({
+    let beam = GridBeam.create({
       id,
       variantId,
       lengthInGrids: Math.abs(x[0] - x[1]),
@@ -62,7 +78,7 @@ export class GridBeam extends BasePartCreator<'gridbeam', GridBeamSpec> {
 
     const gridUnit = getGridLengthInMeters(variantId)
 
-    let beam = new GridBeam({
+    let beam = GridBeam.create({
       id,
       variantId,
       lengthInGrids: Math.abs(y[0] - y[1]),
@@ -80,7 +96,7 @@ export class GridBeam extends BasePartCreator<'gridbeam', GridBeamSpec> {
 
     const gridUnit = getGridLengthInMeters(variantId)
 
-    let beam = new GridBeam({
+    let beam = GridBeam.create({
       id,
       variantId,
       lengthInGrids: Math.abs(z[0] - z[1]),
@@ -134,3 +150,5 @@ function getGridLengthInMeters(variantId: string): number {
   const { gridLength } = variant
   return convert(gridLength, meter).value
 }
+
+registerSerializer(createSerializer('gridbeam', GridBeam, serializeSpec, deserializeSpec))

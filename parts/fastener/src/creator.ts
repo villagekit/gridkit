@@ -1,11 +1,17 @@
 import { AxisId, type Point3, axisIdToDirectionVector } from '@villagekit/math'
-import { BasePartCreator, createSerializer, registerSerializer } from '@villagekit/part/creator'
+import {
+  BasePartCreator,
+  type Typed,
+  createSerializer,
+  registerSerializer,
+} from '@villagekit/part/creator'
 import { convert, meter } from '@villagekit/units'
 import { Matrix4, Quaternion, Vector3 } from 'three'
+import type { FastenerType } from './types'
 import { fastenerVariants } from './variants'
 
-export class FastenerSpec {
-  type: 'fastener'
+export class FastenerSpec implements Typed<FastenerType> {
+  type: FastenerType
   variantId: keyof typeof fastenerVariants
 
   constructor(variantId: keyof typeof fastenerVariants) {
@@ -15,7 +21,7 @@ export class FastenerSpec {
 }
 
 export type FastenerSpecSerialized = {
-  type: 'fastener'
+  type: FastenerType
   variantId: keyof typeof fastenerVariants
 }
 function serializeSpec(instance: FastenerSpec): FastenerSpecSerialized {
