@@ -55,7 +55,9 @@ export const javascriptRenderer = fromCallback<RenderEvent, RendererMachineEvent
       if (jsModule.parameters == null || jsModule.presets == null) {
         const { plugins } = jsModule
         const partObjects = jsModule.parts ?? []
+        console.log('eval: part objects', partObjects)
         const partInstances = partObjects.map(deserialize)
+        console.log('eval: part instances', partInstances)
         const event: RendererMachineEvent = {
           type: 'renderer.success',
           render: {
@@ -76,7 +78,9 @@ export const javascriptRenderer = fromCallback<RenderEvent, RendererMachineEvent
             parts: async (paramsValues: ParamsValues, partVariants: PartVariantsByType) => {
               try {
                 const partObjects = await evaluator.evaluateParts(paramsValues, partVariants)
+                console.log('eval: part objects', partObjects)
                 const partInstances = partObjects.map(deserialize)
+                console.log('eval: part instances', partInstances)
                 return partInstances
               } catch (error) {
                 sendEvaluationError(error)

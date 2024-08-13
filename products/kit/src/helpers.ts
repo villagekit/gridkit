@@ -1,6 +1,7 @@
 import type { PartCreator } from '@villagekit/part'
 import type { Parts, RecursiveArray } from './types'
 
+// TODO: Need to re-think where and how this happens.
 export function getPartCreatorsFromKitParts(parts: Parts): Array<PartCreator> {
   const results: Array<PartCreator> = []
   deepForEach(parts, (value, indices) => {
@@ -13,7 +14,10 @@ export function getPartCreatorsFromKitParts(parts: Parts): Array<PartCreator> {
         : indices.length === 1
           ? value.id
           : `${indices.slice(0, -1).join('__')}__${value.id}`
-    const result: PartCreator = { ...value, id }
+
+    // @ts-ignore
+    const result: PartCreator = value.clone()
+    result.id = id
     results.push(result)
   })
   return results

@@ -112,7 +112,7 @@ export function createSerializer<
       const { spec: specInstance, id, transform } = creator
       const spec = serializeSpec(specInstance)
       return {
-        type: spec.type,
+        type,
         spec,
         id,
         transform,
@@ -145,7 +145,6 @@ export function registerSerializer<Type extends string, Instance, Serialized>(
 }
 
 function getSerializer(type: string): Serializer<any, any, any> {
-  console.log('serializers', Object.keys(serializers))
   const serializer = serializers[type]
   if (serializer == null) {
     throw new Error(`Unknown serializer type: ${type}`)
@@ -154,13 +153,11 @@ function getSerializer(type: string): Serializer<any, any, any> {
 }
 
 export function serialize(instance: any): any {
-  console.log('serialize', instance)
   const serializer = getSerializer(instance.type)
   return serializer.serialize(instance)
 }
 
 export function deserialize(object: any): any {
-  console.log('deserialize', object)
   const serializer = getSerializer(object.type)
   return serializer.deserialize(object)
 }

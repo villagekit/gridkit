@@ -40,7 +40,9 @@ export const SmartFastenerPlugin: Plugin<SmartFastenerPluginState> = {
     const deferred = Deferred<Array<WithRequiredId<PartCreator>>>()
     deferredsByRequest[requestId] = deferred
 
+    console.log('plugin input: part creators', partCreators)
     const partObjects = partCreators.map(serialize)
+    console.log('plugin input: part objects', partObjects)
     const request: WorkerRequestData = { partObjects, requestId }
     worker.postMessage(request)
 
