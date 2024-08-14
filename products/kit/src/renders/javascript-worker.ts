@@ -1,6 +1,7 @@
 import '@villagekit/part-gridpanel/creator'
 import '@villagekit/part-gridbeam/creator'
 import '@villagekit/part-fastener/creator'
+import './javascript-comlink'
 
 import { BasePartCreator, deserialize, serialize } from '@villagekit/part/creator'
 import * as Comlink from 'comlink'
@@ -76,62 +77,50 @@ async function loadImports(): Promise<ImportMap> {
 
 const loadedImportMap = loadImports()
 
-let moduleUrl: string | null = null
-let module: any = null
-
-Comlink.transferHandlers.set('PartCreator', {
-  canHandle: (obj: unknown): obj is unknown =>
-    console.log('obj', obj) || (obj != null && obj instanceof BasePartCreator),
-  serialize: (obj) => [serialize(obj), []],
-  deserialize,
-})
+let modUrl: string | null = null
+let mod: any = null
 
 async function loadModule(code: string) {
-  if (moduleUrl != null) {
-    URL.revokeObjectURL(moduleUrl)
+  if (modUrl != null) {
+    URL.revokeObjectURL(modUrl)
   }
 
   const nextCode = replaceImport(code, await loadedImportMap)
-  moduleUrl = URL.createObjectURL(new Blob([nextCode], { type: 'text/javascript' }))
+  modUrl = URL.createObjectURL(new Blob([nextCode], { type: 'text/javascript' }))
 
-  return moduleUrl
+  return modUrl
 }
 
 async function evaluateModule() {
-  if (moduleUrl == null) {
+  if (modUrl == null) {
     throw new Error('Unexpected: Module not loaded')
   }
 
   /* @vite-ignore */
-  module = await import(moduleUrl)
+  mod = await import(modUrl)
 
-  if (typeof module.parts === 'function') {
-    const { parameters, presets, plugins } = module
-    return { parameters, presets, plugins }
+  // wrap part function return values in type marker
+  const parts =
+    typeof mod.parts === 'function'
+      ? (...args: Parameters<typeof mod.parts>) => {
+          const value = mod.parts(...args)
+          value.isParts = true
+          return value
+        }
+      : mod.parts
+
+  return {
+    isModule: true,
+    parameters: mod.parameters,
+    presets: mod.presets,
+    parts,
+    plugins: mod.plugins,
   }
-
-  /*
-  const { parts: partInstances, plugins } = module
-  const partObjects = partInstances.map(serialize)
-  return { parts: partObjects, plugins }
-  */
-  const { parts, plugins } = module
-  return { parts, plugins }
-}
-
-function evaluateParts(parameters: any, partVariants: any) {
-  /*
-  const partInstances = module.parts(parameters, partVariants)
-  const partObjects = partInstances.map(serialize)
-  return partObjects
-  */
-  return module.parts(parameters, partVariants)
 }
 
 const exports = {
   loadModule,
   evaluateModule,
-  evaluateParts,
 }
 
 Comlink.expose(exports)

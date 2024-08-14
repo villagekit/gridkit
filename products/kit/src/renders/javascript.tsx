@@ -1,31 +1,33 @@
 import '@villagekit/part-gridpanel/creator'
 import '@villagekit/part-gridbeam/creator'
 import '@villagekit/part-fastener/creator'
+import './javascript-comlink'
 
 import { AnyMap, type TraceMap, originalPositionFor } from '@jridgewell/trace-mapping'
-import { BasePartCreator, deserialize, serialize } from '@villagekit/part/creator'
 import * as Comlink from 'comlink'
 import { parseStackTrace } from 'errorstacks'
 import { fromCallback } from 'xstate'
-import type { Params, ParamsValues, PartVariantsByType, Parts, Presets } from '../types'
+import type { Params, ParamsValues, PartVariantsByType, Parts, PartsFn, Presets } from '../types'
 import type { RenderEvent, RendererMachineEvent } from './'
 
 type Evaluator = {
   loadModule: (code: string) => Promise<string>
-  evaluateModule: () => Promise<{
-    parameters: Params | null
-    presets: Presets<any> | null
-    parts: Parts | null
-    plugins: Array<string> | undefined
-  }>
+  evaluateModule: () => Promise<
+    | {
+        type: 'static'
+        parts?: Parts
+        plugins?: Array<string>
+      }
+    | {
+        type: 'parametric'
+        parameters: Params
+        presets: Presets<any>
+        parts: PartsFn<any>
+        plugins?: Array<string>
+      }
+  >
   evaluateParts: (paramsValues: ParamsValues, partVariants: PartVariantsByType) => Promise<Parts>
 }
-
-Comlink.transferHandlers.set('PartCreator', {
-  canHandle: (obj: unknown): obj is unknown => obj != null && obj instanceof BasePartCreator,
-  serialize: (obj) => [serialize(obj), []],
-  deserialize,
-})
 
 export const javascriptRenderer = fromCallback<RenderEvent, RendererMachineEvent>(
   ({ sendBack, receive }) => {
@@ -58,24 +60,8 @@ export const javascriptRenderer = fromCallback<RenderEvent, RendererMachineEvent
 
       if (jsModule == null) return
 
-      if (jsModule.parameters == null || jsModule.presets == null) {
-        const { plugins } = jsModule
-        /*
-        const partObjects = jsModule.parts ?? []
-        console.log('eval: part objects', partObjects)
-        const partInstances = partObjects.map(deserialize)
-        console.log('eval: part instances', partInstances)
-        const event: RendererMachineEvent = {
-          type: 'renderer.success',
-          render: {
-            type: 'static',
-            parts: partInstances,
-            plugins,
-          },
-        }
-        */
-        const parts = jsModule.parts ?? []
-        console.log('parts', parts)
+      if (jsModule.type === 'static') {
+        const { parts = [], plugins } = jsModule
         const event: RendererMachineEvent = {
           type: 'renderer.success',
           render: {
@@ -86,7 +72,7 @@ export const javascriptRenderer = fromCallback<RenderEvent, RendererMachineEvent
         }
         sendBack(event)
       } else {
-        const { parameters, presets, plugins } = jsModule
+        const { parameters, presets, parts, plugins } = jsModule
         const event: RendererMachineEvent = {
           type: 'renderer.success',
           render: {
@@ -95,11 +81,7 @@ export const javascriptRenderer = fromCallback<RenderEvent, RendererMachineEvent
             presets,
             parts: async (paramsValues: ParamsValues, partVariants: PartVariantsByType) => {
               try {
-                const partObjects = await evaluator.evaluateParts(paramsValues, partVariants)
-                console.log('eval: part objects', partObjects)
-                const partInstances = partObjects.map(deserialize)
-                console.log('eval: part instances', partInstances)
-                return partInstances
+                return parts(paramsValues, partVariants)
               } catch (error) {
                 sendEvaluationError(error)
                 return []
@@ -108,7 +90,6 @@ export const javascriptRenderer = fromCallback<RenderEvent, RendererMachineEvent
             plugins,
           },
         }
-
         sendBack(event)
       }
 
