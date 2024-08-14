@@ -2,7 +2,7 @@ import '@villagekit/part-gridpanel/creator'
 import '@villagekit/part-gridbeam/creator'
 import '@villagekit/part-fastener/creator'
 
-import { serialize } from '@villagekit/part/creator'
+import { BasePartCreator, deserialize, serialize } from '@villagekit/part/creator'
 import * as Comlink from 'comlink'
 import { init as initModuleLexer, parse as parseModule } from 'es-module-lexer'
 
@@ -79,6 +79,13 @@ const loadedImportMap = loadImports()
 let moduleUrl: string | null = null
 let module: any = null
 
+Comlink.transferHandlers.set('PartCreator', {
+  canHandle: (obj: unknown): obj is unknown =>
+    console.log('obj', obj) || (obj != null && obj instanceof BasePartCreator),
+  serialize: (obj) => [serialize(obj), []],
+  deserialize,
+})
+
 async function loadModule(code: string) {
   if (moduleUrl != null) {
     URL.revokeObjectURL(moduleUrl)
@@ -103,15 +110,22 @@ async function evaluateModule() {
     return { parameters, presets, plugins }
   }
 
+  /*
   const { parts: partInstances, plugins } = module
   const partObjects = partInstances.map(serialize)
   return { parts: partObjects, plugins }
+  */
+  const { parts, plugins } = module
+  return { parts, plugins }
 }
 
 function evaluateParts(parameters: any, partVariants: any) {
+  /*
   const partInstances = module.parts(parameters, partVariants)
   const partObjects = partInstances.map(serialize)
   return partObjects
+  */
+  return module.parts(parameters, partVariants)
 }
 
 const exports = {

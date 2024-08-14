@@ -3,7 +3,7 @@ import '@villagekit/part-gridbeam/creator'
 import '@villagekit/part-fastener/creator'
 
 import { AnyMap, type TraceMap, originalPositionFor } from '@jridgewell/trace-mapping'
-import { deserialize } from '@villagekit/part/creator'
+import { BasePartCreator, deserialize, serialize } from '@villagekit/part/creator'
 import * as Comlink from 'comlink'
 import { parseStackTrace } from 'errorstacks'
 import { fromCallback } from 'xstate'
@@ -20,6 +20,12 @@ type Evaluator = {
   }>
   evaluateParts: (paramsValues: ParamsValues, partVariants: PartVariantsByType) => Promise<Parts>
 }
+
+Comlink.transferHandlers.set('PartCreator', {
+  canHandle: (obj: unknown): obj is unknown => obj != null && obj instanceof BasePartCreator,
+  serialize: (obj) => [serialize(obj), []],
+  deserialize,
+})
 
 export const javascriptRenderer = fromCallback<RenderEvent, RendererMachineEvent>(
   ({ sendBack, receive }) => {
@@ -54,6 +60,7 @@ export const javascriptRenderer = fromCallback<RenderEvent, RendererMachineEvent
 
       if (jsModule.parameters == null || jsModule.presets == null) {
         const { plugins } = jsModule
+        /*
         const partObjects = jsModule.parts ?? []
         console.log('eval: part objects', partObjects)
         const partInstances = partObjects.map(deserialize)
@@ -63,6 +70,17 @@ export const javascriptRenderer = fromCallback<RenderEvent, RendererMachineEvent
           render: {
             type: 'static',
             parts: partInstances,
+            plugins,
+          },
+        }
+        */
+        const parts = jsModule.parts ?? []
+        console.log('parts', parts)
+        const event: RendererMachineEvent = {
+          type: 'renderer.success',
+          render: {
+            type: 'static',
+            parts,
             plugins,
           },
         }
