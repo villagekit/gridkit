@@ -88,44 +88,6 @@ export class BasePartCreator<Spec extends Typed<any>> {
   }
 }
 
-type DefaultCreatorSerialized<SpecSerialized extends Typed<any>> = {
-  type: SpecSerialized['type']
-  spec: SpecSerialized
-  id?: string
-  transform: TransformMatrix
-}
-
-function createDefaultSerializeCreator<
-  Type extends string,
-  Spec extends Typed<Type>,
-  SpecSerialized extends Typed<Type>,
-  Creator extends typeof BasePartCreator<Spec>,
->(serializeSpec: (spec: Spec) => SpecSerialized) {
-  return (creator: InstanceType<Creator>): DefaultCreatorSerialized<SpecSerialized> => {
-    const { spec: specInstance, id, transform } = creator
-    const spec = serializeSpec(specInstance)
-    return {
-      type: spec.type,
-      spec,
-      id,
-      transform,
-    }
-  }
-}
-
-function createDefaultDeserializeCreator<
-  Type extends string,
-  Spec extends Typed<Type>,
-  SpecSerialized extends Typed<Type>,
-  Creator extends typeof BasePartCreator<Spec>,
->(deserializeSpec: (object: SpecSerialized) => Spec, CreatorClass: Creator) {
-  return (object: DefaultCreatorSerialized<SpecSerialized>): InstanceType<Creator> => {
-    const { spec: specObject, id, transform } = object
-    const spec = deserializeSpec(specObject)
-    return new CreatorClass(spec, id, transform) as InstanceType<Creator>
-  }
-}
-
 type Serializer<
   Type extends string,
   Spec extends { new (...args: Array<any>): Typed<Type> },
@@ -162,10 +124,14 @@ export function registerSerializer<
     'serializeCreator' | 'deserializeCreator'
   >,
 ) {
-  const { type, Spec, serializeSpec, deserializeSpec, Creator } = options
   const {
-    serializeCreator = createDefaultSerializeCreator(serializeSpec),
-    deserializeCreator = createDefaultDeserializeCreator(deserializeSpec, Creator),
+    type,
+    Spec,
+    serializeSpec,
+    deserializeSpec,
+    Creator,
+    serializeCreator = defaultSerializeCreator,
+    deserializeCreator = defaultDeserializeCreator,
   } = options
   serializers[type] = {
     type,
@@ -204,4 +170,44 @@ export function deserializeSpec(instance: any): any {
 export function deserializeCreator(object: any): any {
   const serializer = getSerializer(object.type)
   return serializer.deserializeCreator(object)
+}
+
+type DefaultCreatorSerialized<SpecSerialized extends Typed<any>> = {
+  type: SpecSerialized['type']
+  spec: SpecSerialized
+  id?: string
+  transform: TransformMatrix
+}
+
+function defaultSerializeCreator<
+  Type extends string,
+  Spec extends { new (...args: Array<any>): Typed<Type> },
+  SpecSerialized extends Typed<Type>,
+  Creator extends typeof BasePartCreator<InstanceType<Spec>>,
+>(
+  this: Serializer<Type, Spec, SpecSerialized, Creator, DefaultCreatorSerialized<SpecSerialized>>,
+  creator: InstanceType<Creator>,
+): DefaultCreatorSerialized<SpecSerialized> {
+  const { spec: specInstance, id, transform } = creator
+  const spec = this.serializeSpec(specInstance)
+  return {
+    type: spec.type,
+    spec,
+    id,
+    transform,
+  }
+}
+
+function defaultDeserializeCreator<
+  Type extends string,
+  Spec extends { new (...args: Array<any>): Typed<Type> },
+  SpecSerialized extends Typed<Type>,
+  Creator extends typeof BasePartCreator<InstanceType<Spec>>,
+>(
+  this: Serializer<Type, Spec, SpecSerialized, Creator, DefaultCreatorSerialized<SpecSerialized>>,
+  object: DefaultCreatorSerialized<SpecSerialized>,
+): InstanceType<Creator> {
+  const { spec: specObject, id, transform } = object
+  const spec = this.deserializeSpec(specObject)
+  return new this.Creator(spec, id, transform) as InstanceType<Creator>
 }

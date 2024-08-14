@@ -1,5 +1,6 @@
 import * as Comlink from 'comlink'
 import { deserializeRecursiveParts, serializeRecursiveParts } from '../helpers'
+import type { Parts } from '../types'
 
 Comlink.transferHandlers.set('MODULE', {
   canHandle: (mod): mod is unknown => mod != null && (mod as any).isModule,
@@ -30,12 +31,10 @@ Comlink.transferHandlers.set('PARTS', {
   canHandle(value): value is unknown {
     return value != null && (value as any).isParts
   },
-  serialize(value) {
-    // @ts-ignore
-    return [serializeParts(value), []]
+  serialize(value: Parts) {
+    return [serializeRecursiveParts(value), []]
   },
-  deserialize(obj) {
-    // @ts-ignore
-    return deserializeParts(obj)
+  deserialize(obj: Array<any>) {
+    return deserializeRecursiveParts(obj)
   },
 })
