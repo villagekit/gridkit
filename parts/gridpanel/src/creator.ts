@@ -1,10 +1,5 @@
 import { changeOfBasisTransform, mirrorTransform } from '@villagekit/math'
-import {
-  BasePartCreator,
-  type Typed,
-  createSerializer,
-  registerSerializer,
-} from '@villagekit/part/creator'
+import { BasePartCreator, type Typed, registerSerializer } from '@villagekit/part/creator'
 import { convert, meter } from '@villagekit/units'
 import type { GridPanelFit, GridPanelHoles, GridPanelType, GridPanelVariant } from './types'
 import { gridPanelVariants } from './variants'
@@ -222,4 +217,10 @@ function getThickness(variant: GridPanelVariant): number {
   return convert(thickness, meter).value
 }
 
-registerSerializer(createSerializer('gridpanel', GridPanel, serializeSpec, deserializeSpec))
+registerSerializer({
+  type: 'gridpanel',
+  Spec: GridPanelSpec,
+  serializeSpec,
+  deserializeSpec,
+  Creator: GridPanel,
+})

@@ -88,63 +88,97 @@ export class BasePartCreator<Spec extends Typed<any>> {
   }
 }
 
-type CreatorSerialized<SpecSerialized extends Typed<any>> = {
+type DefaultCreatorSerialized<SpecSerialized extends Typed<any>> = {
   type: SpecSerialized['type']
   spec: SpecSerialized
   id?: string
   transform: TransformMatrix
 }
 
-export function createSerializer<
+function createDefaultSerializeCreator<
   Type extends string,
   Spec extends Typed<Type>,
   SpecSerialized extends Typed<Type>,
   Creator extends typeof BasePartCreator<Spec>,
->(
-  type: Type,
-  CreatorClass: Creator,
-  serializeSpec: (spec: Spec) => SpecSerialized,
-  deserializeSpec: (object: SpecSerialized) => Spec,
-): Serializer<Type, InstanceType<Creator>, CreatorSerialized<SpecSerialized>> {
-  return {
-    type,
-    serialize(creator) {
-      const { spec: specInstance, id, transform } = creator
-      const spec = serializeSpec(specInstance)
-      return {
-        type,
-        spec,
-        id,
-        transform,
-      }
-    },
-    deserialize(object) {
-      const { spec: specObject, id, transform } = object
-      const spec = deserializeSpec(specObject)
-      return new CreatorClass(spec, id, transform) as InstanceType<Creator>
-    },
+>(serializeSpec: (spec: Spec) => SpecSerialized) {
+  return (creator: InstanceType<Creator>): DefaultCreatorSerialized<SpecSerialized> => {
+    const { spec: specInstance, id, transform } = creator
+    const spec = serializeSpec(specInstance)
+    return {
+      type: spec.type,
+      spec,
+      id,
+      transform,
+    }
   }
 }
 
-type Serializer<Type extends string, Instance, Serialized> = {
-  type: Type
-  serialize: (instance: Instance) => Serialized
-  deserialize: (object: Serialized) => Instance
+function createDefaultDeserializeCreator<
+  Type extends string,
+  Spec extends Typed<Type>,
+  SpecSerialized extends Typed<Type>,
+  Creator extends typeof BasePartCreator<Spec>,
+>(deserializeSpec: (object: SpecSerialized) => Spec, CreatorClass: Creator) {
+  return (object: DefaultCreatorSerialized<SpecSerialized>): InstanceType<Creator> => {
+    const { spec: specObject, id, transform } = object
+    const spec = deserializeSpec(specObject)
+    return new CreatorClass(spec, id, transform) as InstanceType<Creator>
+  }
 }
 
+type Serializer<
+  Type extends string,
+  Spec extends { new (...args: Array<any>): Typed<Type> },
+  SpecSerialized extends Typed<Type>,
+  Creator extends typeof BasePartCreator<InstanceType<Spec>>,
+  CreatorSerialized extends Typed<Type> = DefaultCreatorSerialized<SpecSerialized>,
+> = {
+  type: Type
+  Spec: Spec
+  serializeSpec: (instance: InstanceType<Spec>) => SpecSerialized
+  deserializeSpec: (object: SpecSerialized) => InstanceType<Spec>
+  Creator: Creator
+  serializeCreator: (instance: InstanceType<Creator>) => CreatorSerialized
+  deserializeCreator: (object: CreatorSerialized) => InstanceType<Creator>
+}
+
+type Optional<T extends object, K extends keyof T = keyof T> = Omit<T, K> & Partial<Pick<T, K>>
+
 interface Serializers {
-  [Type: string]: Serializer<typeof Type, any, any>
+  [Type: string]: Serializer<typeof Type, any, any, any, any>
 }
 
 const serializers: Serializers = {}
 
-export function registerSerializer<Type extends string, Instance, Serialized>(
-  serializer: Serializer<Type, Instance, Serialized>,
+export function registerSerializer<
+  Type extends string,
+  Spec extends { new (...args: Array<any>): Typed<Type> },
+  SpecSerialized extends Typed<Type>,
+  Creator extends typeof BasePartCreator<InstanceType<Spec>>,
+  CreatorSerialized extends Typed<Type> = DefaultCreatorSerialized<SpecSerialized>,
+>(
+  options: Optional<
+    Serializer<Type, Spec, SpecSerialized, Creator, CreatorSerialized>,
+    'serializeCreator' | 'deserializeCreator'
+  >,
 ) {
-  serializers[serializer.type] = serializer
+  const { type, Spec, serializeSpec, deserializeSpec, Creator } = options
+  const {
+    serializeCreator = createDefaultSerializeCreator(serializeSpec),
+    deserializeCreator = createDefaultDeserializeCreator(deserializeSpec, Creator),
+  } = options
+  serializers[type] = {
+    type,
+    Spec,
+    deserializeSpec,
+    serializeSpec,
+    Creator,
+    deserializeCreator,
+    serializeCreator,
+  }
 }
 
-function getSerializer(type: string): Serializer<any, any, any> {
+function getSerializer(type: string): Serializer<any, any, any, any, any> {
   const serializer = serializers[type]
   if (serializer == null) {
     throw new Error(`Unknown serializer type: ${type}`)
@@ -152,12 +186,22 @@ function getSerializer(type: string): Serializer<any, any, any> {
   return serializer
 }
 
-export function serialize(instance: any): any {
+export function serializeSpec(instance: any): any {
   const serializer = getSerializer(instance.type)
-  return serializer.serialize(instance)
+  return serializer.serializeSpec(instance)
 }
 
-export function deserialize(object: any): any {
+export function serializeCreator(instance: any): any {
+  const serializer = getSerializer(instance.type)
+  return serializer.serializeCreator(instance)
+}
+
+export function deserializeSpec(instance: any): any {
+  const serializer = getSerializer(instance.type)
+  return serializer.deserializeSpec(instance)
+}
+
+export function deserializeCreator(object: any): any {
   const serializer = getSerializer(object.type)
-  return serializer.deserialize(object)
+  return serializer.deserializeCreator(object)
 }

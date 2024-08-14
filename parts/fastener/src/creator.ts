@@ -1,10 +1,5 @@
 import { AxisId, type Point3, axisIdToDirectionVector } from '@villagekit/math'
-import {
-  BasePartCreator,
-  type Typed,
-  createSerializer,
-  registerSerializer,
-} from '@villagekit/part/creator'
+import { BasePartCreator, type Typed, registerSerializer } from '@villagekit/part/creator'
 import { convert, meter } from '@villagekit/units'
 import { Matrix4, Quaternion, Vector3 } from 'three'
 import type { FastenerType } from './types'
@@ -80,4 +75,10 @@ interface FastenerLineOptions extends BaseCreatorOptions {
   end: Point3
 }
 
-registerSerializer(createSerializer('fastener', Fastener, serializeSpec, deserializeSpec))
+registerSerializer({
+  type: 'fastener',
+  Spec: FastenerSpec,
+  serializeSpec,
+  deserializeSpec,
+  Creator: Fastener,
+})

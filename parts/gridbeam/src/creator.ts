@@ -1,10 +1,5 @@
 import { changeOfBasisTransform, mirrorTransform } from '@villagekit/math'
-import {
-  BasePartCreator,
-  type Typed,
-  createSerializer,
-  registerSerializer,
-} from '@villagekit/part/creator'
+import { BasePartCreator, type Typed, registerSerializer } from '@villagekit/part/creator'
 import { convert, meter } from '@villagekit/units'
 import type { GridBeamType } from './types'
 import { gridBeamVariants } from './variants'
@@ -151,4 +146,10 @@ function getGridLengthInMeters(variantId: string): number {
   return convert(gridLength, meter).value
 }
 
-registerSerializer(createSerializer('gridbeam', GridBeam, serializeSpec, deserializeSpec))
+registerSerializer({
+  type: 'gridbeam',
+  Spec: GridBeamSpec,
+  serializeSpec,
+  deserializeSpec,
+  Creator: GridBeam,
+})

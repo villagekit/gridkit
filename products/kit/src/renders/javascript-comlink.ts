@@ -1,5 +1,5 @@
 import * as Comlink from 'comlink'
-import { deserializeParts, serializeParts } from '../helpers'
+import { deserializeRecursiveParts, serializeRecursiveParts } from '../helpers'
 
 Comlink.transferHandlers.set('MODULE', {
   canHandle: (mod): mod is unknown => mod != null && (mod as any).isModule,
@@ -11,13 +11,13 @@ Comlink.transferHandlers.set('MODULE', {
       return [{ type: 'parametric', parameters, presets, parts: port2, plugins }, [port2]]
     }
     const { plugins } = mod
-    const parts = serializeParts(mod.parts)
+    const parts = serializeRecursiveParts(mod.parts)
     return [{ type: 'static', parts, plugins }, []]
   },
   deserialize(obj: any) {
     if (obj.type === 'static') {
       const { plugins } = obj
-      const parts = deserializeParts(obj.parts)
+      const parts = deserializeRecursiveParts(obj.parts)
       return { type: 'static', parts, plugins }
     }
     const { parameters, presets, plugins } = obj

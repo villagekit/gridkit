@@ -1,28 +1,28 @@
 import type { PartCreator, WithRequiredId } from '@villagekit/part'
-import { deserialize, serialize } from '@villagekit/part/creator'
+import { deserializeCreator, serializeCreator } from '@villagekit/part/creator'
 import type { Parts, RecursiveArray } from './types'
 
-export function serializeParts(parts: Parts): Array<any> {
+export function serializeRecursiveParts(parts: Parts): Array<any> {
   return parts.map((part) => {
     if (part == null || typeof part === 'boolean') {
       return part
     }
     if (Array.isArray(part)) {
-      return serializeParts(part)
+      return serializeRecursiveParts(part)
     }
-    return serialize(part)
+    return serializeCreator(part)
   })
 }
 
-export function deserializeParts(parts: Array<any>): Parts {
+export function deserializeRecursiveParts(parts: Array<any>): Parts {
   return parts.map((part) => {
     if (part == null || typeof part === 'boolean') {
       return part
     }
     if (Array.isArray(part)) {
-      return deserializeParts(part)
+      return deserializeRecursiveParts(part)
     }
-    return deserialize(part)
+    return deserializeCreator(part)
   })
 }
 

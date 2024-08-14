@@ -7,7 +7,7 @@ import '@villagekit/part-fastener/creator'
 
 import type { PartCreator, WithRequiredId } from '@villagekit/part'
 
-import { deserialize, serialize } from '@villagekit/part/creator'
+import { deserializeCreator, serializeCreator } from '@villagekit/part/creator'
 import { generateFastenerParts } from './lib'
 
 export interface WorkerRequestData {
@@ -23,9 +23,9 @@ export interface WorkerResponseData {
 self.addEventListener('message', (ev) => {
   const request = ev.data as WorkerRequestData
   const { requestId, partObjects } = request
-  const partCreators = partObjects.map(deserialize)
+  const partCreators = partObjects.map(deserializeCreator)
   const newPartCreators: Array<WithRequiredId<PartCreator>> = generateFastenerParts(partCreators)
-  const newPartObjects = newPartCreators.map(serialize)
+  const newPartObjects = newPartCreators.map(serializeCreator)
   const response: WorkerResponseData = { newPartObjects, requestId }
   self.postMessage(response)
 })
