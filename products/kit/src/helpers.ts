@@ -1,5 +1,30 @@
 import type { PartCreator } from '@villagekit/part'
+import { deserialize, serialize } from '@villagekit/part/creator'
 import type { Parts, RecursiveArray } from './types'
+
+export function serializeParts(parts: Parts): Array<any> {
+  return parts.map((part) => {
+    if (part == null || typeof part === 'boolean') {
+      return part
+    }
+    if (Array.isArray(part)) {
+      return serializeParts(part)
+    }
+    return serialize(part)
+  })
+}
+
+export function deserializeParts(parts: Array<any>): Parts {
+  return parts.map((part) => {
+    if (part == null || typeof part === 'boolean') {
+      return part
+    }
+    if (Array.isArray(part)) {
+      return deserializeParts(part)
+    }
+    return deserialize(part)
+  })
+}
 
 // TODO: Need to re-think where and how this happens.
 export function getPartCreatorsFromKitParts(parts: Parts): Array<PartCreator> {

@@ -1,7 +1,5 @@
-import { deserialize, serialize } from '@villagekit/part/creator'
-
 import * as Comlink from 'comlink'
-import type { Parts } from '../types'
+import { deserializeParts, serializeParts } from '../helpers'
 
 Comlink.transferHandlers.set('MODULE', {
   canHandle: (mod): mod is unknown => mod != null && (mod as any).isModule,
@@ -41,27 +39,3 @@ Comlink.transferHandlers.set('PARTS', {
     return deserializeParts(obj)
   },
 })
-
-function serializeParts(parts: Parts): Array<any> {
-  return parts.map((part) => {
-    if (part == null || typeof part === 'boolean') {
-      return part
-    }
-    if (Array.isArray(part)) {
-      return serializeParts(part)
-    }
-    return serialize(part)
-  })
-}
-
-function deserializeParts(parts: Array<any>): Parts {
-  return parts.map((part) => {
-    if (part == null || typeof part === 'boolean') {
-      return part
-    }
-    if (Array.isArray(part)) {
-      return deserializeParts(part)
-    }
-    return deserialize(part)
-  })
-}
