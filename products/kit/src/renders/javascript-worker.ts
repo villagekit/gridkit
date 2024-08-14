@@ -3,7 +3,6 @@ import '@villagekit/part-gridbeam/creator'
 import '@villagekit/part-fastener/creator'
 import './javascript-comlink'
 
-import { BasePartCreator, deserialize, serialize } from '@villagekit/part/creator'
 import * as Comlink from 'comlink'
 import { init as initModuleLexer, parse as parseModule } from 'es-module-lexer'
 

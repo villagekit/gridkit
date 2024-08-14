@@ -1,4 +1,4 @@
-import type { PartCreator } from '@villagekit/part'
+import type { PartCreator, WithRequiredId } from '@villagekit/part'
 import { deserialize, serialize } from '@villagekit/part/creator'
 import type { Parts, RecursiveArray } from './types'
 
@@ -27,8 +27,8 @@ export function deserializeParts(parts: Array<any>): Parts {
 }
 
 // TODO: Need to re-think where and how this happens.
-export function getPartCreatorsFromKitParts(parts: Parts): Array<PartCreator> {
-  const results: Array<PartCreator> = []
+export function getPartCreatorsFromKitParts(parts: Parts): Array<WithRequiredId<PartCreator>> {
+  const results: Array<WithRequiredId<PartCreator>> = []
   deepForEach(parts, (value, indices) => {
     if (value === false || value === undefined || value === null) {
       return
@@ -43,7 +43,7 @@ export function getPartCreatorsFromKitParts(parts: Parts): Array<PartCreator> {
     // @ts-ignore
     const result: PartCreator = value.clone()
     result.id = id
-    results.push(result)
+    results.push(result as WithRequiredId<PartCreator>)
   })
   return results
 }
