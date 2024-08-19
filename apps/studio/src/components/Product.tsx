@@ -12,17 +12,17 @@ import {
   Box,
   Flex,
   Heading,
-  useDimensions,
-  Tabs,
-  TabList,
-  TabPanels,
   Tab,
+  TabList,
   TabPanel,
+  TabPanels,
+  Tabs,
+  useDimensions,
 } from '@villagekit/ui'
+import { useRef } from 'react'
 import { Resplit } from 'react-resplit'
 import { Loading } from './Loading'
 import { ProductEditor } from './ProductEditor'
-import { useRef } from 'react'
 
 export default function Product() {
   const hasProduct = useHasProduct()
