@@ -1,21 +1,23 @@
 import { SvgContextProvider } from '@villagekit/part/base/grid'
 import { Box } from '@villagekit/ui'
+import type { GridBeamSpec } from '../creator'
 import { BeamSvg } from './beam-svg'
 
 const GRID_SPACING = 40
 
 interface SummaryGridBeamSvgProps {
-  sizeInGrids: number
+  part: GridBeamSpec
   displayUnit?: 'gu' | 'mm'
 }
 
 export function SummaryGridBeamSvg(props: SummaryGridBeamSvgProps) {
-  const { sizeInGrids, displayUnit = 'gu' } = props
+  const { part, displayUnit = 'gu' } = props
+  const { lengthInGrids } = part
 
   const beamHeight = GRID_SPACING
   const maxBeamWidth = GRID_SPACING * 60
 
-  const label = `${sizeInGrids} unit grid beam`
+  const label = `${lengthInGrids} unit grid beam`
 
   return (
     <SvgContextProvider displayUnit={displayUnit}>
@@ -28,7 +30,7 @@ export function SummaryGridBeamSvg(props: SummaryGridBeamSvgProps) {
           xmlns={'http://www.w3.org/2000/svg'}
         >
           <title>{label}</title>
-          <BeamSvg sizeInGrids={sizeInGrids} showSizeMarker showShadow />
+          <BeamSvg sizeInGrids={lengthInGrids} showSizeMarker showShadow />
         </svg>
       </Box>
     </SvgContextProvider>

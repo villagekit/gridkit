@@ -1,19 +1,19 @@
 import { SvgContextProvider } from '@villagekit/part/base/grid'
 import { Box } from '@villagekit/ui'
 import { useMemo } from 'react'
-import type { GridPanelHoles } from '../types'
+import type { GridPanelSpec } from '../creator'
 import { PanelSvg } from './panel-svg'
 
 const GRID_SPACING = 40
 
 interface SummaryGridPanelSvgProps {
-  sizeInGrids: [number, number]
-  holes?: GridPanelHoles
+  part: GridPanelSpec
   displayUnit?: 'gu' | 'mm'
 }
 
 export function SummaryGridPanelSvg(props: SummaryGridPanelSvgProps) {
-  const { sizeInGrids, holes, displayUnit = 'gu' } = props
+  const { part, displayUnit = 'gu' } = props
+  const { sizeInGrids, holes } = part
   const [sizeInGridsX, sizeInGridsY] = sizeInGrids
 
   const maxPanelWidth = GRID_SPACING * 60
