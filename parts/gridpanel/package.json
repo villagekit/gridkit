@@ -19,8 +19,18 @@
     "./type-bundles/creator.d.ts": "./dist-type-bundles/creator.d.ts",
     "./package.json": "./package.json"
   },
-  "files": ["./src", "./dist", "./dist-bundles", "./dist-type-bundles"],
-  "sideEffects": ["./src/index.ts", "./dist/index.js", "./src/creator.ts", "./dist/creator.js"],
+  "files": [
+    "./src",
+    "./dist",
+    "./dist-bundles",
+    "./dist-type-bundles"
+  ],
+  "sideEffects": [
+    "./src/index.ts",
+    "./dist/index.js",
+    "./src/creator.ts",
+    "./dist/creator.js"
+  ],
   "scripts": {
     "build:dist": "tsup src",
     "build:dist-bundles": "rollup dist/creator.js --file ./dist-bundles/creator.js --format esm",
@@ -40,6 +50,7 @@
   },
   "homepage": "https://github.com/villagekit/villagekit/tree/main/parts/gridpanel#readme",
   "dependencies": {
+    "@tarikjabiri/dxf": "^2.8.9",
     "@villagekit/math": "^0.6.0",
     "@villagekit/part": "^0.6.0",
     "@villagekit/ui": "^0.6.0",

@@ -1,6 +1,7 @@
+import type { DxfDocument } from '@tarikjabiri/dxf'
 import { Box3 } from 'three'
 import { getPartModule } from './modules'
-import type { FasteningPoint, PartCreator, PartGlValue, WithRequiredId } from './types'
+import type { FasteningPoint, PartCreator, PartGlValue, PartSpec, WithRequiredId } from './types'
 
 export function calculateGlValue(partCreator: WithRequiredId<PartCreator>): PartGlValue {
   const partModule = getPartModule(partCreator.spec.type)
@@ -41,4 +42,12 @@ export function calculateFasteningPointsForAll(
 export function calculateNumFastenersToFasten(partCreator: PartCreator): number {
   const partModule = getPartModule(partCreator.spec.type)
   return partModule.methods.calculateNumFastenersToFasten(partCreator)
+}
+
+export function calculateDxf(partSpec: PartSpec): Promise<DxfDocument> {
+  const partModule = getPartModule(partSpec.type)
+  if (partModule.methods.calculateDxf == null) {
+    throw new Error(`calculateDxf not defined for part type ${partSpec.type}`)
+  }
+  return partModule.methods.calculateDxf(partSpec)
 }

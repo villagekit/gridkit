@@ -1,3 +1,4 @@
+import type { DxfDocument } from '@tarikjabiri/dxf'
 import {
   AxisId,
   axisIdToDirection,
@@ -195,4 +196,8 @@ function getHolesMap(holes: Array<[number, number]>): Record<number, Record<numb
 
 export function calculateNumFastenersToFasten(_creator: GridPanel): number {
   return 2
+}
+
+export async function calculateDxf(spec: GridPanelSpec): Promise<DxfDocument> {
+  return (await import('./dxf')).calculateDxf(spec)
 }
