@@ -17,7 +17,7 @@ const mirrorXTransform = mirrorTransform('x')
 const mirrorYTransform = mirrorTransform('y')
 const mirrorZTransform = mirrorTransform('z')
 
-export class GridBeamSpec extends BasePartSpec<'gridbeam'> {
+export class GridBeamSpec extends BasePartSpec<GridBeamType> {
   variantId: keyof typeof gridBeamVariants
   lengthInGrids: number
 
@@ -159,7 +159,6 @@ function getGridLengthInMeters(variantId: string): number {
 
 registerSerializer({
   type: 'gridbeam',
-  Spec: GridBeamSpec,
   serializeSpec,
   deserializeSpec,
   Creator: GridBeam,

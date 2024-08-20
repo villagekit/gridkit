@@ -112,7 +112,6 @@ type Serializer<
   CreatorSerialized extends Typed<Type> = DefaultCreatorSerialized<SpecSerialized>,
 > = {
   type: Type
-  Spec: Spec
   serializeSpec: (instance: Spec) => SpecSerialized
   deserializeSpec: (object: SpecSerialized) => Spec
   Creator: Creator
@@ -142,7 +141,6 @@ export function registerSerializer<
 ) {
   const {
     type,
-    Spec,
     serializeSpec,
     deserializeSpec,
     Creator,
@@ -151,7 +149,6 @@ export function registerSerializer<
   } = options
   serializers[type] = {
     type,
-    Spec,
     deserializeSpec,
     serializeSpec,
     Creator,
