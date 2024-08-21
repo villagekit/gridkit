@@ -10,7 +10,7 @@ import {
 import type { FasteningPoint, WithRequiredId } from '@villagekit/part'
 import { convert, meter } from '@villagekit/units'
 import { Box3, Matrix4, Quaternion, Vector3 } from 'three'
-import type { GridPanel } from './creator'
+import type { GridPanel, GridPanelSpec } from './creator'
 import type { GridPanelGlValue } from './types'
 import { gridPanelVariants } from './variants'
 
@@ -198,6 +198,6 @@ export function calculateNumFastenersToFasten(_creator: GridPanel): number {
   return 2
 }
 
-export async function calculateDxf(spec: GridPanelSpec): Promise<DxfDocument> {
-  return (await import('./dxf')).calculateDxf(spec)
+export async function exportDxf(spec: GridPanelSpec): Promise<DxfDocument> {
+  return (await import('./dxf')).exportDxf(spec)
 }

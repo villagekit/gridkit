@@ -51,7 +51,7 @@ export type CalculatePartFasteningPoints<Creator extends { id?: string }> = (
   creator: WithRequiredId<Creator>,
 ) => Array<FasteningPoint>
 export type CalculateNumFastenersToFasten<Creator> = (creator: Creator) => number
-export type CalculateDxf<Spec> = (spec: Spec) => Promise<DxfDocument>
+export type ExportDxf<Spec> = (spec: Spec) => Promise<DxfDocument>
 
 export type WithRequiredId<T extends { id?: string }> = { id: string } & {
   [Key in keyof T as Exclude<Key, 'id'>]: T[Key]
@@ -90,7 +90,7 @@ export interface PartModule<
     calculateBoundingBox: CalculatePartBoundingBox<Creator>
     calculateFasteningPoints: CalculatePartFasteningPoints<Creator>
     calculateNumFastenersToFasten: CalculateNumFastenersToFasten<Creator>
-    calculateDxf?: CalculateDxf<Spec>
+    exportDxf?: ExportDxf<Spec>
   }
   schemas: Array<ZodDiscriminatedUnionOption<'type'>>
 }
