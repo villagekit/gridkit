@@ -16,6 +16,7 @@ export abstract class BasePartSpec<Type extends string> implements Typed<Type> {
 
   abstract equals(_other: this): boolean
 
+  // comparator to sort for order displayed in parts list
   abstract compare(_other: this): number
 
   normalize(): this {

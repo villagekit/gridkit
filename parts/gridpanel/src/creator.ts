@@ -44,7 +44,7 @@ export class GridPanelSpec extends BasePartSpec<GridPanelType> {
   }
 
   compare(other: this): number {
-    return compareXYs(this.sizeInGrids, other.sizeInGrids)
+    return -compareXYs(this.sizeInGrids, other.sizeInGrids)
   }
 
   normalize(): this {
@@ -270,6 +270,7 @@ function holesEquals(a: GridPanelHoles, b: GridPanelHoles) {
 }
 
 type XY = [number, number]
+// XY sort comparator for ascending order
 function compareXYs(a: XY, b: XY) {
   if (a[0] === b[0]) {
     // if x values are the same, compare y values
