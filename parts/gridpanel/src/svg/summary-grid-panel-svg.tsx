@@ -16,9 +16,6 @@ export function SummaryGridPanelSvg(props: SummaryGridPanelSvgProps) {
   const { sizeInGrids, holes } = part
   const [sizeInGridsX, sizeInGridsY] = sizeInGrids
 
-  const maxPanelWidth = GRID_SPACING * 60
-  const panelHeight = GRID_SPACING * sizeInGridsY
-
   const label = useMemo(
     () =>
       displayUnit === 'gu'
@@ -34,7 +31,7 @@ export function SummaryGridPanelSvg(props: SummaryGridPanelSvgProps) {
           role="img"
           aria-label={label}
           width="100%"
-          viewBox={`-4 0 ${maxPanelWidth + GRID_SPACING * 2} ${panelHeight + GRID_SPACING}`}
+          viewBox={`-4 0 ${62 * GRID_SPACING} ${(sizeInGridsY + 1) * GRID_SPACING}`}
           xmlns="http://www.w3.org/2000/svg"
         >
           <title>{label}</title>

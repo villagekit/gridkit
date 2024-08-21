@@ -24,8 +24,6 @@ export function FastenerSvg(props: FastenerSvgProps) {
     nutLength,
   } = variant
 
-  const maxWidth = GRID_SPACING * 60
-
   // TODO: would be great to have some formatting functions for util-units
   const boltsLabel = boltLabel
   const nutsLabel = 'nut'
@@ -37,7 +35,7 @@ export function FastenerSvg(props: FastenerSvgProps) {
         role="img"
         aria-label={label}
         width="100%"
-        viewBox={`-4 0 ${maxWidth + GRID_SPACING * 2} ${GRID_SPACING * 2}`}
+        viewBox={`-4 0 ${62 * GRID_SPACING} ${2 * GRID_SPACING}`}
         xmlns={'http://www.w3.org/2000/svg'}
       >
         <title>{label}</title>
