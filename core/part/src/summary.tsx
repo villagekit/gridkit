@@ -59,7 +59,9 @@ export function PartsSummaryForType(props: PartsSummaryForTypeProps): React.Reac
   const partQuotas = useMemo(() => {
     const partQuotaType = groupParts ? 'grouped' : 'single'
     // @ts-ignore
-    const partQuotas = partsToPartQuotas(partQuotaType, parts)
+    const normalizedParts = parts.map((part) => part.normalize())
+    // @ts-ignore
+    const partQuotas = partsToPartQuotas(partQuotaType, normalizedParts)
     return partQuotas.sort(({ part: partA }, { part: partB }) => partA.compare(partB))
   }, [parts, groupParts])
 
@@ -98,7 +100,7 @@ function PartSummary(props: PartSummaryProps) {
   const { displayUnit } = useSummaryContext()
 
   return (
-    <HStack role="listitem" alignItems="flex-start" spacing="4" sx={{ width: '100%' }}>
+    <HStack role="listitem" alignItems="center" spacing="4" sx={{ width: '100%' }}>
       {quota.type === 'grouped' && <PartCount count={quota.count} />}
 
       <Svg displayUnit={displayUnit} part={part} />
