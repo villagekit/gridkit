@@ -1,4 +1,3 @@
-import type { DxfDocument } from '@tarikjabiri/dxf'
 import { Button, HStack, Text, VStack } from '@villagekit/ui'
 import { groupBy, map } from 'lodash-es'
 import { nanoid } from 'nanoid'
