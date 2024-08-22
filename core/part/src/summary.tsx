@@ -137,7 +137,11 @@ function PartSummary(props: PartSummaryProps) {
       {quota.type === 'grouped' && <PartCount count={quota.count} />}
 
       <Svg displayUnit={displayUnit} part={part} />
-      {hasExportDxf && <Button onClick={exportDxfToFile}>Export .dxf</Button>}
+      {hasExportDxf && (
+        <Button variant="secondary" onClick={exportDxfToFile} aria-label="Export .dxf" size="xs">
+          .dxf
+        </Button>
+      )}
     </HStack>
   )
 }
