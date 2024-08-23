@@ -10,6 +10,7 @@
     "dev:app:studio": "npm run dev:app -w '@villagekit/studio'",
     "dev:app:storybook": "npm run dev:app -w '@villagekit/storybook'",
     "deps": "turbo deps",
+    "types": "turbo types",
     "lint": "turbo lint",
     "format": "biome check --apply .",
     "format:unsafe": "biome check --apply-unsafe .",
