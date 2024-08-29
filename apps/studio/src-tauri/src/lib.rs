@@ -1,5 +1,5 @@
 use serde::{Deserialize, Serialize};
-use std::{collections::BTreeMap, path::PathBuf};
+use std::path::PathBuf;
 use tauri::Manager;
 use toml::{de::Error as TomlDeError, ser::Error as TomlSerError};
 
@@ -9,11 +9,12 @@ pub fn run() {
         .plugin(tauri_plugin_shell::init())
         .invoke_handler(tauri::generate_handler![
             list_workspaces,
+            // open_workspace,
             add_workspace,
             remove_workspace,
             list_products,
             get_product_meta,
-            get_product_assembly_meta,
+            get_product_file,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
@@ -118,7 +119,8 @@ struct ProductIndex {
 
 #[tauri::command]
 async fn list_products(workspace_path: PathBuf) -> Result<Vec<ProductIndex>> {
-    let mut dir_reader = tokio::fs::read_dir(workspace_path).await?;
+    let workspace_products_path = workspace_path.join("products");
+    let mut dir_reader = tokio::fs::read_dir(workspace_products_path).await?;
     let mut products = Vec::new();
     loop {
         let Some(next_dir_entry) = dir_reader.next_entry().await? else {
@@ -145,8 +147,11 @@ async fn list_products(workspace_path: PathBuf) -> Result<Vec<ProductIndex>> {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "kebab-case")]
 enum ProductType {
-    Assembly,
+    Kit,
 }
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+struct ProductExports(String);
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 struct ProductMeta {
@@ -156,6 +161,8 @@ struct ProductMeta {
     description: Option<String>,
     #[serde(rename = "type")]
     typ: ProductType,
+    exports: ProductExports,
+    tags: Vec<String>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -165,91 +172,16 @@ struct ProductMetaFile {
 
 #[tauri::command]
 async fn get_product_meta(product_path: PathBuf) -> Result<ProductMeta> {
-    let product_meta_path = product_path.join("meta.toml");
+    let product_meta_path = product_path.join("villagekit.toml");
     let product_meta_string = tokio::fs::read_to_string(product_meta_path).await?;
     let product_meta: ProductMetaFile =
         toml::from_str(&product_meta_string).map_err(Error::ParseToml)?;
     Ok(product_meta.product)
 }
 
-#[derive(Debug, Clone, PartialEq, PartialOrd, Serialize, Deserialize)]
-#[serde(tag = "type", rename_all = "kebab-case")]
-enum ProductParameterOptions {
-    #[serde(rename_all = "kebab-case")]
-    Boolean {
-        label: String,
-        #[serde(default)]
-        description: Option<String>,
-        #[serde(default)]
-        short_id: Option<String>,
-    },
-    #[serde(rename_all = "kebab-case")]
-    Number {
-        label: String,
-        #[serde(default)]
-        description: Option<String>,
-        #[serde(default)]
-        short_id: Option<String>,
-        #[serde(default)]
-        min: Option<f64>,
-        #[serde(default)]
-        max: Option<f64>,
-        #[serde(default)]
-        step: Option<f64>,
-    },
-    #[serde(rename_all = "kebab-case")]
-    Choice {
-        label: String,
-        #[serde(default)]
-        description: Option<String>,
-        #[serde(default)]
-        short_id: Option<String>,
-        options: BTreeMap<String, String>,
-    },
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
-struct ProductParameterId(String);
-
-#[derive(Debug, Clone, PartialEq, PartialOrd, Serialize, Deserialize)]
-struct ProductParameters(BTreeMap<ProductParameterId, ProductParameterOptions>);
-
-#[derive(Debug, Clone, PartialEq, PartialOrd, Serialize, Deserialize)]
-#[serde(untagged)]
-enum ProductParameterValue {
-    Number(f64),
-    Boolean(bool),
-    Choice(String),
-}
-
-#[derive(Debug, Clone, PartialEq, PartialOrd, Serialize, Deserialize)]
-struct ProductParameterValues(BTreeMap<String, ProductParameterValue>);
-
-#[derive(Debug, Clone, PartialEq, PartialOrd, Serialize, Deserialize)]
-struct ProductPresetValue {
-    label: String,
-    #[serde(flatten)]
-    values: ProductParameterValues,
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
-struct ProductPresetId(String);
-
-#[derive(Debug, Clone, PartialEq, PartialOrd, Serialize, Deserialize)]
-struct ProductPresets(BTreeMap<ProductPresetId, ProductPresetValue>);
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-struct ProductAssemblyMeta {
-    parameters: ProductParameters,
-    presets: ProductPresets,
-}
-
 #[tauri::command]
-async fn get_product_assembly_meta(product_path: PathBuf) -> Result<ProductAssemblyMeta> {
-    let product_assembly_meta_path = product_path.join("assembly.toml");
-    let product_assembly_meta_string =
-        tokio::fs::read_to_string(product_assembly_meta_path).await?;
-    let product_assembly_meta: ProductAssemblyMeta =
-        toml::from_str(&product_assembly_meta_string).map_err(Error::ParseToml)?;
-    Ok(product_assembly_meta)
+async fn get_product_file(product_path: PathBuf, file_name: &str) -> Result<String> {
+    let product_file_path = product_path.join(file_name);
+    let product_file = tokio::fs::read_to_string(product_file_path).await?;
+    Ok(product_file)
 }
