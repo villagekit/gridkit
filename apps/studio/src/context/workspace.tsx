@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useMemo, useState } from 'react'
-import type { Workspace } from './workspaces'
 import { useListProductsQuery } from '../client'
+import type { Workspace } from './workspaces'
 
 export interface WorkspaceOptions {
   workspace: Workspace
