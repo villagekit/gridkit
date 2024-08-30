@@ -88,10 +88,10 @@ const invokeFetcher = async <TArgs extends Record<string, unknown>, TResult>(
   command: string,
   args?: TArgs,
 ): Promise<TResult> => {
-  console.log(`${command} with args ${JSON.stringify(args)}`)
+  // console.log(`${command} with args ${JSON.stringify(args)}`)
   try {
     const result: TResult = await invoke(command, args)
-    console.log(`${command} -> `, result)
+    // console.log(`${command} -> `, result)
     return result
   } catch (error) {
     console.error(`invoke command ${command}`, error)

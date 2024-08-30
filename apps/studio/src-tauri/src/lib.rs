@@ -81,7 +81,6 @@ async fn load_app_config(app_handle: tauri::AppHandle) -> Result<AppConfig> {
 async fn save_app_config(app_handle: tauri::AppHandle, app_config: AppConfig) -> Result<()> {
     let app_config_path = get_app_config_path(app_handle).await?;
     let config_string = toml::to_string_pretty(&app_config).map_err(Error::DisplayToml)?;
-    println!("app_config_path: {:?}", app_config_path);
     tokio::fs::write(app_config_path, config_string).await?;
     Ok(())
 }

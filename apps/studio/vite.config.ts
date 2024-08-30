@@ -1,6 +1,5 @@
 import { readFile, readdir, realpath } from 'node:fs/promises'
 import { join } from 'node:path'
-import react from '@vitejs/plugin-react'
 import { reverse, sortBy } from 'lodash-es'
 import { defineConfig } from 'vite'
 import tsconfigPaths from 'vite-tsconfig-paths'
@@ -9,7 +8,7 @@ const host = process.env.TAURI_DEV_HOST
 
 // https://vitejs.dev/config/
 export default defineConfig(async () => ({
-  plugins: [react(), tsconfigPaths()],
+  plugins: [tsconfigPaths()],
 
   // Vite options tailored for Tauri development and only applied in `tauri dev` or `tauri build`
   //
@@ -36,7 +35,6 @@ export default defineConfig(async () => ({
     exclude: ['@swc/wasm-web'],
   },
   resolve: {
-    mainFields: ['module', 'jsnext:main', 'jsnext'],
     alias: {
       ...(await workspaceAliases()),
     },
