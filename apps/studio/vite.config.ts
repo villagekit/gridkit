@@ -1,7 +1,7 @@
 import { readFile, readdir, realpath } from 'node:fs/promises'
 import { join } from 'node:path'
 import { reverse, sortBy } from 'lodash-es'
-import { defineConfig } from 'vite'
+import { type BuildOptions, defineConfig } from 'vite'
 import tsconfigPaths from 'vite-tsconfig-paths'
 
 const host = process.env.TAURI_DEV_HOST
@@ -34,12 +34,29 @@ export default defineConfig(async () => ({
   optimizeDeps: {
     exclude: ['@swc/wasm-web'],
   },
+  worker: {
+    format: 'es',
+  },
   resolve: {
     alias: {
       ...(await workspaceAliases()),
     },
   },
+  build: {
+    rollupOptions: {
+      onwarn: quietUseClientDirective,
+    },
+  },
 }))
+
+// https://github.com/TanStack/query/pull/5161#issuecomment-1506683450
+type RollupOnWarn = NonNullable<BuildOptions['rollupOptions']>['onwarn']
+const quietUseClientDirective: RollupOnWarn = (warning, warn) => {
+  if (warning.code === 'MODULE_LEVEL_DIRECTIVE' && warning.message.includes(`"use client"`)) {
+    return
+  }
+  warn(warning)
+}
 
 async function workspaceAliases() {
   const aliases: Record<string, string> = {}

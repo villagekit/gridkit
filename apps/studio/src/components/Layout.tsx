@@ -27,7 +27,7 @@ export function ProvidersLayout({ children }: LayoutProps) {
       new QueryClient({
         defaultOptions: {
           queries: {
-            useErrorBoundary: process.env.NODE_ENV === 'development',
+            throwOnError: process.env.NODE_ENV === 'development',
           },
         },
       }),

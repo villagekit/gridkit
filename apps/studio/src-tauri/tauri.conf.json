@@ -3,9 +3,9 @@
   "version": "0.1.0",
   "identifier": "com.villagekit.studio.app",
   "build": {
-    "beforeDevCommand": "npm run vite",
+    "beforeDevCommand": "npm run js:dev",
     "devUrl": "http://localhost:1420",
-    "beforeBuildCommand": "npm run build",
+    "beforeBuildCommand": "npm run js:build",
     "frontendDist": "../dist"
   },
   "app": {

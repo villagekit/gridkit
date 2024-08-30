@@ -5,9 +5,9 @@
   "type": "module",
   "scripts": {
     "dev:app": "tauri dev",
-    "vite": "vite",
-    "build": "tsc && vite build",
-    "preview": "vite preview",
+    "build:app": "tauri build",
+    "js:dev": "vite",
+    "js:build": "tsc && vite build",
     "tauri": "tauri"
   },
   "dependencies": {
