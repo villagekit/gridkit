@@ -11,17 +11,48 @@
     "tauri": "tauri"
   },
   "dependencies": {
+    "@catppuccin/palette": "^0.2.0",
+    "@codemirror/autocomplete": "^6.16.2",
+    "@codemirror/lang-javascript": "^6.2.2",
+    "@codemirror/lint": "^6.8.0",
+    "@codemirror/state": "^6.4.1",
+    "@codemirror/view": "^6.27.0",
+    "@tanstack/react-query": "^5",
+    "@tanstack/react-query-devtools": "^5",
+    "@tauri-apps/api": ">=2.0.0-rc.0",
+    "@tauri-apps/plugin-shell": ">=2.0.0-rc.0",
+    "@typescript/vfs": "^1.5.3",
+    "@valtown/codemirror-ts": "^2.1.1",
+    "@villagekit/design": "^0.7.2",
+    "@villagekit/math": "^0.7.1",
+    "@villagekit/parameters": "^0.7.2",
+    "@villagekit/part": "^0.7.2",
+    "@villagekit/part-fastener": "^0.7.2",
+    "@villagekit/part-gridbeam": "^0.7.2",
+    "@villagekit/part-gridpanel": "^0.7.2",
+    "@villagekit/plugin-smart-fasteners": "^0.7.2",
+    "@villagekit/product": "^0.7.2",
+    "@villagekit/product-kit": "^0.7.2",
+    "@villagekit/ui": "^0.7.2",
+    "@xstate/react": "^4.1.1",
+    "codemirror": "^6.0.1",
+    "codemirror-theme-catppuccin": "^0.3.0",
+    "comlink": "^4.4.1",
+    "lodash-es": "^4.17.21",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "@tauri-apps/api": ">=2.0.0-rc.0",
-    "@tauri-apps/plugin-shell": ">=2.0.0-rc.0"
+    "react-icons": "^5.2.1",
+    "react-resplit": "^1.3.1",
+    "three": "^0.165.0",
+    "xstate": "^5.13.1",
+    "zod": "^3.23.8"
   },
   "devDependencies": {
+    "@tauri-apps/cli": ">=2.0.0-rc.0",
     "@types/react": "^18.2.15",
     "@types/react-dom": "^18.2.7",
     "@vitejs/plugin-react": "^4.2.1",
     "typescript": "^5.2.2",
-    "vite": "^5.3.1",
-    "@tauri-apps/cli": ">=2.0.0-rc.0"
+    "vite": "^5.3.1"
   }
 }
