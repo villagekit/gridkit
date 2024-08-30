@@ -36,7 +36,7 @@ export function ProvidersLayout({ children }: LayoutProps) {
   return (
     <ChakraProvider theme={theme}>
       <QueryClientProvider client={queryClient}>
-        <ReactQueryDevtools />
+        <ReactQueryDevtools buttonPosition="bottom-left" />
         {children}
       </QueryClientProvider>
     </ChakraProvider>
