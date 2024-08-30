@@ -155,14 +155,14 @@ struct ProductExports(String);
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 struct ProductMeta {
-    id: String,
+    name: String,
     label: String,
     #[serde(default)]
     description: Option<String>,
+    tags: Vec<String>,
     #[serde(rename = "type")]
     typ: ProductType,
     exports: ProductExports,
-    tags: Vec<String>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

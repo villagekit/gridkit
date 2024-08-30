@@ -25,7 +25,6 @@ export function useOpenWorkspaceMutation(
 ) {
   return useMutation<OpenWorkspaceResult, Error, OpenWorkspaceArgs>({
     mutationFn: async (_args) => {
-      console.log('open workspace')
       // Open a selection dialog for image files
       const selected = await open({
         directory: true,
@@ -89,8 +88,11 @@ const invokeFetcher = async <TArgs extends Record<string, unknown>, TResult>(
   command: string,
   args?: TArgs,
 ): Promise<TResult> => {
+  console.log(`${command} with args ${JSON.stringify(args)}`)
   try {
-    return invoke(command, args)
+    const result: TResult = await invoke(command, args)
+    console.log(`${command} -> `, result)
+    return result
   } catch (error) {
     console.error(`invoke command ${command}`, error)
     throw error
