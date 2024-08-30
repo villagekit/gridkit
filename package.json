@@ -4,6 +4,7 @@
   "scripts": {
     "postinstall": "patch-package",
     "build:app": "turbo build:app",
+    "build:app:studio": "npm run build:app -w '@villagekit/studio'",
     "build:pkg": "turbo build:pkg",
     "dev:pkg": "turbo watch build:pkg",
     "dev:app": "turbo watch build:pkg dev:app",

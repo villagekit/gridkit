@@ -8,7 +8,9 @@
     "build:app": "tauri build",
     "js:dev": "vite",
     "js:build": "tsc && vite build",
-    "tauri": "tauri"
+    "tauri": "tauri",
+    "types": "tsc -p ./tsconfig.json --noEmit",
+    "lint": "biome check ."
   },
   "dependencies": {
     "@catppuccin/palette": "^0.2.0",
