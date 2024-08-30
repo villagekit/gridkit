@@ -32,6 +32,9 @@ export default defineConfig(async () => ({
       ignored: ['**/src-tauri/**'],
     },
   },
+  optimizeDeps: {
+    exclude: ['@swc/wasm-web'],
+  },
   resolve: {
     mainFields: ['module', 'jsnext:main', 'jsnext'],
     alias: {
