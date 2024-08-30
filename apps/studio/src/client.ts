@@ -5,6 +5,7 @@ import {
   useQuery,
 } from '@tanstack/react-query'
 import { invoke } from '@tauri-apps/api/core'
+import { open } from '@tauri-apps/plugin-dialog'
 import type { ProductMeta } from '@villagekit/product'
 import type { ProductIndex } from './context/workspace'
 import type { Workspace } from './context/workspaces'
@@ -18,10 +19,22 @@ export function useListWorkspacesQuery(options?: ExtendedQueryOptions<ListWorksp
 }
 
 export type OpenWorkspaceArgs = {}
+export type OpenWorkspaceResult = string | null
 export function useOpenWorkspaceMutation(
-  options: UseMutationOptions<void, Error, OpenWorkspaceArgs>,
+  options: UseMutationOptions<OpenWorkspaceResult, Error, OpenWorkspaceArgs>,
 ) {
-  return useInvokeMutation<OpenWorkspaceArgs, void>('open_workspace', options)
+  return useMutation<OpenWorkspaceResult, Error, OpenWorkspaceArgs>({
+    mutationFn: async (_args) => {
+      console.log('open workspace')
+      // Open a selection dialog for image files
+      const selected = await open({
+        directory: true,
+        canCreateDirectories: true,
+      })
+      return selected
+    },
+    ...options,
+  })
 }
 
 export type AddWorkspaceArgs = { workspace: Workspace }

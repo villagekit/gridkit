@@ -7,9 +7,9 @@ use toml::{de::Error as TomlDeError, ser::Error as TomlSerError};
 pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_shell::init())
+        .plugin(tauri_plugin_dialog::init())
         .invoke_handler(tauri::generate_handler![
             list_workspaces,
-            // open_workspace,
             add_workspace,
             remove_workspace,
             list_products,
