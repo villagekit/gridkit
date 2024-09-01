@@ -46,7 +46,7 @@ function useWorkspaces(): WorkspacesState {
 
   const addWorkspaceMutation = useAddWorkspaceMutation({
     onSuccess() {
-      queryClient.invalidateQueries({ queryKey: ['list-workspaces'] })
+      queryClient.invalidateQueries({ queryKey: ['list_workspaces'] })
     },
   })
   const addWorkspace = useCallback(
@@ -58,7 +58,7 @@ function useWorkspaces(): WorkspacesState {
 
   const removeWorkspaceMutation = useRemoveWorkspaceMutation({
     onSuccess() {
-      queryClient.invalidateQueries({ queryKey: ['list-workspaces'] })
+      queryClient.invalidateQueries({ queryKey: ['list_workspaces'] })
     },
   })
   const removeWorkspace = useCallback(
