@@ -7,8 +7,11 @@ const host = process.env.TAURI_DEV_HOST
 export default defineConfig({
   plugins: [
     pluginReact({
+      swcReactOptions: {
+        refresh: false,
+      },
       reactRefreshOptions: {
-        exclude: [/.*/, /worker.ts$/],
+        exclude: /.*/,
       },
     }),
     pluginSourceBuild(),
