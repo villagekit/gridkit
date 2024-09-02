@@ -51,12 +51,12 @@ runs:
         node-version-file: '.nvmrc'
 
     - name: Install dependencies
-      if: inputs.install-packages == 'true' && (inputs.setup-cache-only == 'false' || steps.lookup.outputs.cache-hit != 'true')
+      if: inputs.install-packages == 'true' && inputs.setup-cache-only == 'false'
       run: pnpm install
       shell: bash
 
     - name: Prune pnpm store
-      if: steps.lookup.outputs.cache-hit != 'true'
+      if: inputs.setup-cache-only == 'true'
       shell: bash
       run: |
         pnpm store prune
