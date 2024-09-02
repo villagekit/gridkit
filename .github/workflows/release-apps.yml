@@ -1,11 +1,13 @@
 name: Release Apps
 
 on:
-  release:
-    types: [published]
+  # release:
+  #  types: [published]
 
   push:
-    branches: ['tauri-release']
+    branches:
+      - release/studio
+      - tauri-release
 
   workflow_dispatch:
 
@@ -70,10 +72,13 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           projectPath: ./apps/studio
-          releaseId: ${{ github.event_name == 'release' && github.event.release.id || '' }}
-          tagName: ${{ github.event_name == 'release' && github.event.release.tag_name || 'app-v__VERSION__' }}
-          releaseDraft: ${{ github.event_name == 'release' && github.event.release.draft || true }}
-          prerelease: ${{ github.event_name == 'release' && github.event.release.prerelease || true }}
+          # releaseId: ${{ github.event_name == 'release' && github.event.release.id || '' }}
+          # tagName: ${{ github.event_name == 'release' && github.event.release.tag_name || 'app-v__VERSION__' }}
+          # releaseDraft: ${{ github.event_name == 'release' && github.event.release.draft || true }}
+          # prerelease: ${{ github.event_name == 'release' && github.event.release.prerelease || true }}
+          tagName: app-v__VERSION__
+          releaseDraft: true
+          prerelease: true
           releaseName: 'Village Kit Studio v__VERSION__'
           releaseBody: 'See the assets to download this version and install.'
           args: ${{ matrix.args }}
