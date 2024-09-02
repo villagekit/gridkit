@@ -57,7 +57,7 @@ runs:
       shell: bash
 
     - name: Prune pnpm store
-      if: inputs.install-packages == 'true' && (inputs.setup-cache-only == 'false' || steps.lookup.outputs.cache-hit != 'true')
+      if: inputs.setup-cache-only == 'false' || steps.lookup.outputs.cache-hit != 'true'
       shell: bash
       run: |
         pnpm store prune
