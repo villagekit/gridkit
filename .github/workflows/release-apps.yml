@@ -34,12 +34,7 @@ jobs:
     steps:
       - uses: nschloe/action-cached-lfs-checkout@v1
 
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          registry-url: 'https://registry.npmjs.org/'
-          node-version-file: '.nvmrc'
-          cache: 'npm'
+      - uses: ./.github/actions/setup-pnpm
 
       - name: Install Rust stable
         uses: dtolnay/rust-toolchain@stable
@@ -60,11 +55,8 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-turbo-
 
-      - name: Install npm dependencies
-        run: npm install
-
       - name: Builds workspace packages
-        run: npm run build:pkg
+        run: pnpm run build:pkg
 
       - uses: tauri-apps/tauri-action@v0
         env:

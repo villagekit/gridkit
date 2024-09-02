@@ -7,6 +7,14 @@ on:
     types: [opened, synchronize]
 
 jobs:
+  pnpm:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-pnpm
+        with:
+          setup-cache-only: 'true'
+
   build:
     runs-on: ubuntu-latest
     strategy:
@@ -18,11 +26,7 @@ jobs:
       - name: Checkout the commit
         uses: actions/checkout@v4
 
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version-file: '.nvmrc'
-          cache: 'npm'
+      - uses: ./.github/actions/setup-pnpm
 
       - name: Setup turbo cache
         uses: actions/cache@v4
@@ -32,8 +36,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-turbo-
 
-      - name: Install dependencies
-        run: npm install
-
       - name: Run ${{ matrix.task }}
-        run: FORCE_COLOR=1 npm run ${{ matrix.task }} ${{ env.CLI_ARGS }}
+        run: pnpm run ${{ matrix.task }} ${{ env.CLI_ARGS }}
+        env:
+          FORCE_COLOR: 1
