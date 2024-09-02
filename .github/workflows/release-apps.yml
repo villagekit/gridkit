@@ -4,6 +4,9 @@ on:
   release:
     types: [published]
 
+  push:
+    branches: ['tauri-release']
+
   workflow_dispatch:
 
 jobs:
