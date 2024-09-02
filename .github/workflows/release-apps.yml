@@ -19,14 +19,14 @@ jobs:
 
       matrix:
         include:
-          # - platform: 'macos-latest' # for Arm based macs (M1 and above).
-          #   args: '--target aarch64-apple-darwin'
-          # - platform: 'macos-latest' # for Intel based macs.
-          #   args: '--target x86_64-apple-darwin'
+          - platform: 'macos-latest' # for Arm based macs (M1 and above).
+            args: '--target aarch64-apple-darwin'
+          - platform: 'macos-latest' # for Intel based macs.
+            args: '--target x86_64-apple-darwin'
           - platform: 'ubuntu-22.04'
             args: ''
-          # - platform: 'windows-latest'
-          #   args: ''
+          - platform: 'windows-latest'
+            args: ''
 
     runs-on: ${{ matrix.platform }}
 
@@ -74,6 +74,14 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
 
+      - name: Setup turbo cache
+        uses: actions/cache@v4
+        with:
+          path: .turbo
+          key: ${{ runner.os }}-turbo-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-turbo-
+
       - name: Install npm dependencies
         run: npm install
 
@@ -86,7 +94,7 @@ jobs:
         with:
           projectPath: ./apps/studio
           releaseId: ${{ github.event_name == 'release' && github.event.release.id || '' }}
-          tagName: ${{ github.event_name == 'release' && github.event.release.tag_name || '' }}
+          tagName: ${{ github.event_name == 'release' && github.event.release.tag_name || 'app-v__VERSION__' }}
           releaseDraft: ${{ github.event_name == 'release' && github.event.release.draft || true }}
           prerelease: ${{ github.event_name == 'release' && github.event.release.prerelease || true }}
           releaseName: 'Village Kit Studio v__VERSION__'
