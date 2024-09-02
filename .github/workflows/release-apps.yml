@@ -33,6 +33,29 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # git lfs: https://github.com/actions/checkout/issues/165#issuecomment-1639209867
+      - name: Initialize Git LFS
+        run: git lfs install --local
+      - name: Create Git LFS file list
+        run: |
+          git lfs ls-files --long --include "${{ inputs.git-lfs-include }}" | cut -d ' ' -f1 | sort > .git-lfs-assets-id
+          grep -v Entering .git-lfs-assets-id | sort > .temp
+          mv .temp .git-lfs-assets-id
+      - name: Git LFS Cache
+        uses: actions/cache@v3
+        with:
+          path: .git/lfs/objects
+          key: ${{ runner.os }}-git-lfs-${{ hashFiles('.git-lfs-assets-id') }}
+          restore-keys: |
+            ${{ runner.os }}-git-lfs-
+      - name: Git LFS Pull
+        run: |
+          git lfs pull --include "${{ inputs.git-lfs-include }}"
+        env:
+          GIT_TRACE: 1
+      - name: "Cleanup Git LFS Temp"
+        run: rm .git-lfs-assets-id
+
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
