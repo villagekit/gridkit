@@ -45,20 +45,12 @@ export default defineConfig({
           },
         ],
         // typescript/lib/typescript: https://github.com/microsoft/TypeScript/issues/39436
-        // noParse: new RegExp(['node_modules/typescript/lib/typescript.js'].join('|')),
+        // @typescript/vfs/dist/vfs.esm.js: https://github.com/microsoft/TypeScript-Website/pull/3022
         parser: {
           javascript: {
             exprContextCritical: false,
             wrappedContextCritical: false,
           },
-        },
-      },
-      // @typescript/vfs/dist/vfs.esm.js: https://github.com/microsoft/TypeScript-Website/pull/3022
-      //   also have the dep patched with pnpm.
-      resolve: {
-        fallback: {
-          path: false,
-          fs: false,
         },
       },
     },
