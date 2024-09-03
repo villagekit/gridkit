@@ -202,7 +202,7 @@ importers:
         specifier: ^1.5.3
         version: 1.6.0(typescript@5.5.4)
       '@valtown/codemirror-ts':
-        specifier: ^2.1.1
+        specifier: ^2.1.2
         version: 2.1.2(@codemirror/autocomplete@6.18.0(@codemirror/language@6.10.2)(@codemirror/state@6.4.1)(@codemirror/view@6.33.0)(@lezer/common@1.2.1))(@codemirror/lint@6.8.1)(@codemirror/view@6.33.0)
       '@villagekit/design':
         specifier: workspace:*

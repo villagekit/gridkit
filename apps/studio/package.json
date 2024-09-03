@@ -25,7 +25,7 @@
     "@tauri-apps/plugin-dialog": ">=2.0.0-rc.0",
     "@tauri-apps/plugin-shell": ">=2.0.0-rc.0",
     "@typescript/vfs": "^1.5.3",
-    "@valtown/codemirror-ts": "^2.1.1",
+    "@valtown/codemirror-ts": "^2.1.2",
     "@villagekit/design": "workspace:*",
     "@villagekit/math": "workspace:*",
     "@villagekit/parameters": "workspace:*",
