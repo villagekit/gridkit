@@ -1,10 +1,21 @@
 import { defineConfig } from '@rsbuild/core'
+import { pluginReact } from '@rsbuild/plugin-react'
 import { pluginSourceBuild } from '@rsbuild/plugin-source-build'
 
 const host = process.env.TAURI_DEV_HOST
 
 export default defineConfig({
-  plugins: [pluginSourceBuild()],
+  plugins: [
+    pluginReact({
+      swcReactOptions: {
+        refresh: false,
+      },
+      reactRefreshOptions: {
+        exclude: /.*/,
+      },
+    }),
+    pluginSourceBuild(),
+  ],
   dev: {
     hmr: true,
   },
@@ -25,55 +36,11 @@ export default defineConfig({
   tools: {
     rspack: {
       module: {
-        // support ?raw imports
         rules: [
+          // support ?raw imports
           {
             resourceQuery: /raw/,
             type: 'asset/source',
-          },
-          {
-            test: /\.jsx$/,
-            use: {
-              loader: 'builtin:swc-loader',
-              options: {
-                jsc: {
-                  parser: {
-                    syntax: 'ecmascript',
-                    jsx: true,
-                  },
-                  transform: {
-                    react: {
-                      runtime: 'automatic',
-                      throwIfNamespace: true,
-                      useBuiltins: false,
-                    },
-                  },
-                },
-              },
-            },
-            type: 'javascript/auto',
-          },
-          {
-            test: /\.tsx$/,
-            use: {
-              loader: 'builtin:swc-loader',
-              options: {
-                jsc: {
-                  parser: {
-                    syntax: 'typescript',
-                    tsx: true,
-                  },
-                  transform: {
-                    react: {
-                      runtime: 'automatic',
-                      throwIfNamespace: true,
-                      useBuiltins: false,
-                    },
-                  },
-                },
-              },
-            },
-            type: 'javascript/auto',
           },
         ],
         // typescript/lib/typescript: https://github.com/microsoft/TypeScript/issues/39436
@@ -85,6 +52,11 @@ export default defineConfig({
           },
         },
       },
+    },
+    bundlerChain(chain, { CHAIN_ID }) {
+      // also necessary to support ?raw imports
+      //   ref: https://github.com/web-infra-dev/rsbuild/issues/3070#issuecomment-2259846975
+      chain.module.rule(CHAIN_ID.RULE.JS).resourceQuery({ not: /raw/ })
     },
   },
 })
