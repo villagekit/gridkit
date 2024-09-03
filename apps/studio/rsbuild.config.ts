@@ -1,6 +1,7 @@
 import { defineConfig } from '@rsbuild/core'
 import { pluginReact } from '@rsbuild/plugin-react'
 import { pluginSourceBuild } from '@rsbuild/plugin-source-build'
+import type { Compiler, RspackPluginInstance } from '@rspack/core'
 
 const host = process.env.TAURI_DEV_HOST
 
@@ -44,7 +45,13 @@ export default defineConfig({
           },
         ],
         // typescript/lib/typescript: https://github.com/microsoft/TypeScript/issues/39436
-        noParse: new RegExp(['node_modules/typescript/lib/typescript.js'].join('|')),
+        // noParse: new RegExp(['node_modules/typescript/lib/typescript.js'].join('|')),
+        parser: {
+          javascript: {
+            exprContextCritical: false,
+            wrappedContextCritical: false,
+          },
+        },
       },
       // @typescript/vfs/dist/vfs.esm.js: https://github.com/microsoft/TypeScript-Website/pull/3022
       //   also have the dep patched with pnpm.
