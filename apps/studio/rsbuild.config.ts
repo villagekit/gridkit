@@ -1,22 +1,10 @@
 import { defineConfig } from '@rsbuild/core'
-import { pluginReact } from '@rsbuild/plugin-react'
 import { pluginSourceBuild } from '@rsbuild/plugin-source-build'
-import type { Compiler, RspackPluginInstance } from '@rspack/core'
 
 const host = process.env.TAURI_DEV_HOST
 
 export default defineConfig({
-  plugins: [
-    pluginReact({
-      swcReactOptions: {
-        refresh: false,
-      },
-      reactRefreshOptions: {
-        exclude: /.*/,
-      },
-    }),
-    pluginSourceBuild(),
-  ],
+  plugins: [pluginSourceBuild()],
   dev: {
     hmr: true,
   },
@@ -42,6 +30,50 @@ export default defineConfig({
           {
             resourceQuery: /raw/,
             type: 'asset/source',
+          },
+          {
+            test: /\.jsx$/,
+            use: {
+              loader: 'builtin:swc-loader',
+              options: {
+                jsc: {
+                  parser: {
+                    syntax: 'ecmascript',
+                    jsx: true,
+                  },
+                  transform: {
+                    react: {
+                      runtime: 'automatic',
+                      throwIfNamespace: true,
+                      useBuiltins: false,
+                    },
+                  },
+                },
+              },
+            },
+            type: 'javascript/auto',
+          },
+          {
+            test: /\.tsx$/,
+            use: {
+              loader: 'builtin:swc-loader',
+              options: {
+                jsc: {
+                  parser: {
+                    syntax: 'typescript',
+                    tsx: true,
+                  },
+                  transform: {
+                    react: {
+                      runtime: 'automatic',
+                      throwIfNamespace: true,
+                      useBuiltins: false,
+                    },
+                  },
+                },
+              },
+            },
+            type: 'javascript/auto',
           },
         ],
         // typescript/lib/typescript: https://github.com/microsoft/TypeScript/issues/39436

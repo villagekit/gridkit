@@ -15,6 +15,7 @@ Comlink.expose(
       false,
       ts,
     )
+    console.log('hi', (await import('@villagekit/design/type-bundles/kit.d.ts?raw')).default)
     fsMap.set(
       '/node_modules/@villagekit/design/kit.d.ts',
       (await import('@villagekit/design/type-bundles/kit.d.ts?raw')).default,
