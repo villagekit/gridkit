@@ -17,26 +17,19 @@ Comlink.expose(
     )
     fsMap.set(
       '/node_modules/@villagekit/design/kit.d.ts',
-      // @ts-ignore
       (await import('@villagekit/design/type-bundles/kit.d.ts?raw')).default,
     )
     fsMap.set(
       '/node_modules/@villagekit/part-gridbeam/creator.d.ts',
-      // @ts-ignore
-      // NOTE (mw): why?
-      (await import('../../../../../parts/gridbeam/dist-type-bundles/creator.d.ts?raw')).default,
+      (await import('@villagekit/part-gridbeam/type-bundles/creator.d.ts?raw')).default,
     )
     fsMap.set(
       '/node_modules/@villagekit/part-gridpanel/creator.d.ts',
-      // @ts-ignore
-      // NOTE (mw): why?
-      (await import('../../../../../parts/gridpanel/dist-type-bundles/creator.d.ts?raw')).default,
+      (await import('@villagekit/part-gridpanel/type-bundles/creator.d.ts?raw')).default,
     )
     fsMap.set(
       '/node_modules/@villagekit/part-fastener/creator.d.ts',
-      // @ts-ignore
-      // NOTE (mw): why?
-      (await import('../../../../../parts/fastener/dist-type-bundles/creator.d.ts?raw')).default,
+      (await import('@villagekit/part-fastener/type-bundles/creator.d.ts?raw')).default,
     )
     const system = createSystem(fsMap)
     const compilerOpts = {}
