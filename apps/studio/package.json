@@ -6,8 +6,8 @@
   "scripts": {
     "dev:app": "tauri dev",
     "build:app": "tauri build",
-    "js:dev": "vite",
-    "js:build": "tsc && vite build",
+    "js:dev": "rsbuild dev",
+    "js:build": "tsc && rsbuild build",
     "tauri": "tauri",
     "types": "tsc -p ./tsconfig.json --noEmit",
     "lint": "biome check ."
@@ -22,10 +22,10 @@
     "@tanstack/react-query": "^5",
     "@tanstack/react-query-devtools": "^5",
     "@tauri-apps/api": ">=2.0.0-rc.0",
-    "@tauri-apps/plugin-shell": ">=2.0.0-rc.0",
     "@tauri-apps/plugin-dialog": ">=2.0.0-rc.0",
+    "@tauri-apps/plugin-shell": ">=2.0.0-rc.0",
     "@typescript/vfs": "^1.5.3",
-    "@valtown/codemirror-ts": "^2.1.1",
+    "@valtown/codemirror-ts": "^2.1.2",
     "@villagekit/design": "workspace:*",
     "@villagekit/math": "workspace:*",
     "@villagekit/parameters": "workspace:*",
@@ -51,10 +51,13 @@
     "zod": "^3.23.8"
   },
   "devDependencies": {
+    "@rsbuild/core": "1.0.1-rc.2",
+    "@rsbuild/plugin-react": "1.0.1-rc.2",
+    "@rsbuild/plugin-source-build": "^1.0.1",
+    "@rspack/core": "^1.0.0",
     "@tauri-apps/cli": ">=2.0.0-rc.0",
     "@types/react": "^18.2.15",
     "@types/react-dom": "^18.2.7",
-    "typescript": "^5.2.2",
-    "vite": "^5.3.1"
+    "typescript": "^5.5.4"
   }
 }

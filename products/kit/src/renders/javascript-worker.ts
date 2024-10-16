@@ -99,7 +99,6 @@ async function evaluateModule() {
   }
 
   mod = await import(
-    /* @vite-ignore */
     /* webpackIgnore: true */
     modUrl
   )
