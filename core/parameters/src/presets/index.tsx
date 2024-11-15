@@ -8,6 +8,7 @@ import {
   extractValuesSchemaFromParams,
   usePresetId,
   usePresets,
+  useSetShowControls,
   useUpdateParamsValues,
   useUpdatePresetId,
 } from '../index'
@@ -46,6 +47,7 @@ export function PresetControls() {
   const presets = usePresets()
   const updatePresetId = useUpdatePresetId()
   const updateParamsValues = useUpdateParamsValues()
+  const setShowControls = useSetShowControls()
 
   const handlePresetChange = useCallback(
     (ev: ChangeEvent<HTMLSelectElement>) => {
@@ -54,11 +56,12 @@ export function PresetControls() {
         const preset = find(presets, ['id', presetId])
         if (preset == null) return
         updateParamsValues(preset.values)
+        setShowControls(true)
       } else {
         updatePresetId(selectedPresetId)
       }
     },
-    [updatePresetId, updateParamsValues, presets, presetId],
+    [updatePresetId, updateParamsValues, setShowControls, presets, presetId],
   )
 
   if (presets == null) return null
