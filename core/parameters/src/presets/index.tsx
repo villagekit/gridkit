@@ -47,7 +47,6 @@ export function PresetControls() {
   const presets = usePresets()
   const updatePresetId = useUpdatePresetId()
   const updateParamsValues = useUpdateParamsValues()
-  const setShowControls = useSetShowControls()
 
   const handlePresetChange = useCallback(
     (ev: ChangeEvent<HTMLSelectElement>) => {
@@ -56,12 +55,11 @@ export function PresetControls() {
         const preset = find(presets, ['id', presetId])
         if (preset == null) return
         updateParamsValues(preset.values)
-        setShowControls(true)
       } else {
         updatePresetId(selectedPresetId)
       }
     },
-    [updatePresetId, updateParamsValues, setShowControls, presets, presetId],
+    [updatePresetId, updateParamsValues, presets, presetId],
   )
 
   if (presets == null) return null
