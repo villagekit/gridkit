@@ -8,7 +8,6 @@ import {
   extractValuesSchemaFromParams,
   usePresetId,
   usePresets,
-  useSetShowControls,
   useUpdateParamsValues,
   useUpdatePresetId,
 } from '../index'
