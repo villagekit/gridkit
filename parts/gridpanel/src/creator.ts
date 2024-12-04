@@ -1,7 +1,13 @@
 import { changeOfBasisTransform, mirrorTransform } from '@villagekit/math'
 import { BasePartCreator, BasePartSpec, registerSerializer } from '@villagekit/part/creator'
 import { convert, meter } from '@villagekit/units'
-import type { GridPanelFit, GridPanelHoles, GridPanelType, GridPanelVariant } from './types'
+import type {
+  GridPanelFit,
+  GridPanelHoleVariant,
+  GridPanelHoles,
+  GridPanelType,
+  GridPanelVariant,
+} from './types'
 import { gridPanelVariants } from './variants'
 
 const getDefaultVariantId = (): keyof typeof gridPanelVariants =>
@@ -22,16 +28,19 @@ export class GridPanelSpec extends BasePartSpec<GridPanelType> {
   variantId: keyof typeof gridPanelVariants
   sizeInGrids: [number, number]
   holes: GridPanelHoles
+  holeVariant: GridPanelHoleVariant
 
   constructor(
     sizeInGrids: [number, number],
     variantId?: keyof typeof gridPanelVariants,
     holes: GridPanelHoles = true,
+    holeVariant: GridPanelHoleVariant = 'half',
   ) {
     super('gridpanel')
     this.variantId = variantId ?? getDefaultVariantId()
     this.sizeInGrids = sizeInGrids
     this.holes = holes
+    this.holeVariant = holeVariant
   }
 
   id(): string {
@@ -44,7 +53,8 @@ export class GridPanelSpec extends BasePartSpec<GridPanelType> {
       this.variantId === other.variantId &&
       this.sizeInGrids[0] === other.sizeInGrids[0] &&
       this.sizeInGrids[1] === other.sizeInGrids[1] &&
-      holesEquals(this.holes, other.holes)
+      holesEquals(this.holes, other.holes) &&
+      this.holeVariant === other.holeVariant
     )
   }
 
@@ -54,7 +64,7 @@ export class GridPanelSpec extends BasePartSpec<GridPanelType> {
 
   normalize(): this {
     const { variantId } = this
-    let { sizeInGrids, holes } = this
+    let { sizeInGrids, holes, holeVariant } = this
 
     // "rotate" panel so main length is larger side
     if (sizeInGrids[1] > sizeInGrids[0]) {
@@ -67,7 +77,7 @@ export class GridPanelSpec extends BasePartSpec<GridPanelType> {
       holes = holes.slice().sort(compareXYs)
     }
 
-    return new GridPanelSpec(sizeInGrids, variantId, holes) as this
+    return new GridPanelSpec(sizeInGrids, variantId, holes, holeVariant) as this
   }
 }
 
@@ -76,25 +86,35 @@ export type GridPanelSpecSerialized = {
   variantId: keyof typeof gridPanelVariants
   sizeInGrids: [number, number]
   holes: GridPanelHoles
+  holeVariant: GridPanelHoleVariant
 }
 function serializeSpec(instance: GridPanelSpec): GridPanelSpecSerialized {
-  const { variantId, sizeInGrids, holes } = instance
-  return { type: 'gridpanel', variantId, sizeInGrids, holes }
+  const { variantId, sizeInGrids, holes, holeVariant } = instance
+  return { type: 'gridpanel', variantId, sizeInGrids, holes, holeVariant }
 }
 function deserializeSpec(object: GridPanelSpecSerialized): GridPanelSpec {
-  const { variantId, sizeInGrids, holes } = object
-  return new GridPanelSpec(sizeInGrids, variantId, holes)
+  const { variantId, sizeInGrids, holes, holeVariant } = object
+  return new GridPanelSpec(sizeInGrids, variantId, holes, holeVariant)
 }
 
 export class GridPanel extends BasePartCreator<GridPanelSpec> {
   static create(options: GridPanelOptions) {
-    const { id, variantId, sizeInGrids, holes } = options
-    const spec = new GridPanelSpec(sizeInGrids, variantId, holes)
+    const { id, variantId, sizeInGrids, holes, holeVariant } = options
+    const spec = new GridPanelSpec(sizeInGrids, variantId, holes, holeVariant)
     return new GridPanel(spec, id)
   }
 
   static XY(options: GridPanelXYOptions) {
-    const { id, variantId = getDefaultVariantId(), x, y, z, fit = 'bottom', holes } = options
+    const {
+      id,
+      variantId = getDefaultVariantId(),
+      x,
+      y,
+      z,
+      fit = 'bottom',
+      holes,
+      holeVariant,
+    } = options
 
     const variant = getVariant(variantId)
     const gridUnit = getGridLength(variant)
@@ -105,6 +125,7 @@ export class GridPanel extends BasePartCreator<GridPanelSpec> {
       variantId,
       sizeInGrids: [Math.abs(x[0] - x[1]), Math.abs(y[0] - y[1])],
       holes,
+      holeVariant,
     })
 
     if (x[0] > x[1]) {
@@ -129,7 +150,16 @@ export class GridPanel extends BasePartCreator<GridPanelSpec> {
   }
 
   static YZ(options: GridPanelYZOptions) {
-    const { id, variantId = getDefaultVariantId(), x, y, z, fit = 'bottom', holes } = options
+    const {
+      id,
+      variantId = getDefaultVariantId(),
+      x,
+      y,
+      z,
+      fit = 'bottom',
+      holes,
+      holeVariant,
+    } = options
 
     const variant = getVariant(variantId)
     const gridUnit = getGridLength(variant)
@@ -140,6 +170,7 @@ export class GridPanel extends BasePartCreator<GridPanelSpec> {
       variantId,
       sizeInGrids: [Math.abs(y[0] - y[1]), Math.abs(z[0] - z[1])],
       holes,
+      holeVariant,
     }).applyTransform(xyToYZTransform)
 
     if (y[0] > y[1]) {
@@ -164,7 +195,16 @@ export class GridPanel extends BasePartCreator<GridPanelSpec> {
   }
 
   static XZ(options: GridPanelXZOptions) {
-    const { id, variantId = getDefaultVariantId(), x, y, z, fit = 'bottom', holes } = options
+    const {
+      id,
+      variantId = getDefaultVariantId(),
+      x,
+      y,
+      z,
+      fit = 'bottom',
+      holes,
+      holeVariant,
+    } = options
 
     const variant = getVariant(variantId)
     const gridUnit = getGridLength(variant)
@@ -177,6 +217,7 @@ export class GridPanel extends BasePartCreator<GridPanelSpec> {
       variantId,
       sizeInGrids,
       holes,
+      holeVariant,
     }).applyTransform(xyToXZTransform)
 
     if (x[0] > x[1]) {
@@ -204,6 +245,7 @@ export class GridPanel extends BasePartCreator<GridPanelSpec> {
 interface BaseOptions {
   id?: string
   holes?: GridPanelHoles
+  holeVariant?: GridPanelHoleVariant
 }
 
 interface GridPanelOptions extends BaseOptions {

@@ -18,6 +18,7 @@ export interface GridPanelVariant {
 }
 
 export type GridPanelFit = 'top' | 'bottom'
+export type GridPanelHoleVariant = 'through' | 'half'
 export type GridPanelHoles = boolean | Array<[number, number]>
 
 export type GridPanelGlValue = {
@@ -26,6 +27,7 @@ export type GridPanelGlValue = {
   variant: GridPanelVariant
   sizeInGrids: [number, number]
   holes: GridPanelHoles
+  holeVariant: GridPanelHoleVariant
   // variant
   gridLengthInMeters: number
   holeDiameterInMeters: number
