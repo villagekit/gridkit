@@ -245,6 +245,7 @@ function Holes(props: HolesProps) {
       const [mainIndex, crossIndex] = holePosition
       const mIndex = 2 * holePositionIndex
 
+      /*
       // up
       dummy.setRotationFromQuaternion(IDENTITY_QUATERNION)
       dummy.position.set(
@@ -254,6 +255,7 @@ function Holes(props: HolesProps) {
       )
       dummy.updateMatrix()
       m.setMatrixAt(mIndex, dummy.matrix)
+      */
 
       // down
       dummy.setRotationFromQuaternion(FLIP_Z_QUATERNION)
