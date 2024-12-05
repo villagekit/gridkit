@@ -34,7 +34,7 @@ export class GridPanelSpec extends BasePartSpec<GridPanelType> {
     sizeInGrids: [number, number],
     variantId?: keyof typeof gridPanelVariants,
     holes: GridPanelHoles = true,
-    holeVariant: GridPanelHoleVariant = 'half',
+    holeVariant: GridPanelHoleVariant = 'through',
   ) {
     super('gridpanel')
     this.variantId = variantId ?? getDefaultVariantId()
@@ -113,7 +113,7 @@ export class GridPanel extends BasePartCreator<GridPanelSpec> {
       z,
       fit = 'bottom',
       holes,
-      holeVariant,
+      holeVariant = 'bottom',
     } = options
 
     const variant = getVariant(variantId)
@@ -158,7 +158,7 @@ export class GridPanel extends BasePartCreator<GridPanelSpec> {
       z,
       fit = 'bottom',
       holes,
-      holeVariant,
+      holeVariant = 'bottom',
     } = options
 
     const variant = getVariant(variantId)
@@ -203,7 +203,7 @@ export class GridPanel extends BasePartCreator<GridPanelSpec> {
       z,
       fit = 'bottom',
       holes,
-      holeVariant,
+      holeVariant = 'bottom',
     } = options
 
     const variant = getVariant(variantId)
