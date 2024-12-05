@@ -14,7 +14,7 @@ import {
   Vector3,
 } from 'three'
 import { getEveryHolePosition } from './helpers'
-import type { GridPanelGlValue, GridPanelHoleVariant, GridPanelHoles } from './types'
+import type { GridPanelGlValue, GridPanelHoles, GridPanelSpecHoleVariant } from './types'
 
 export function PartsGl(props: PartsGlProps<GridPanelGlValue>) {
   const { parts, ...restProps } = props
@@ -221,7 +221,7 @@ interface HolesProps {
   holeDiameterInMeters: number
   thicknessInMeters: number
   holes: Exclude<GridPanelHoles, false>
-  holeVariant: GridPanelHoleVariant
+  holeVariant: GridPanelSpecHoleVariant
 }
 
 function Holes(props: HolesProps) {
@@ -251,8 +251,6 @@ function Holes(props: HolesProps) {
     const m = new InstancedMesh(geometry, material, numHoleMeshes)
     const dummy = new Object3D()
 
-    console.log('hole variant', holeVariant)
-
     for (
       let holePositionIndex = 0, mIndex = 0;
       holePositionIndex < holePositions.length;
@@ -262,8 +260,8 @@ function Holes(props: HolesProps) {
       if (holePosition === undefined) throw new Error('unexpected: holePosition is undefined')
       const [mainIndex, crossIndex] = holePosition
 
-      if (holeVariant === 'through' || holeVariant === 'top') {
-        // up
+      // up
+      if (holeVariant === 'through') {
         dummy.setRotationFromQuaternion(IDENTITY_QUATERNION)
         dummy.position.set(
           mainIndex * gridLengthInMeters,
@@ -273,17 +271,16 @@ function Holes(props: HolesProps) {
         dummy.updateMatrix()
         m.setMatrixAt(mIndex++, dummy.matrix)
       }
-      if (holeVariant === 'through' || holeVariant === 'bottom') {
-        // down
-        dummy.setRotationFromQuaternion(FLIP_Z_QUATERNION)
-        dummy.position.set(
-          mainIndex * gridLengthInMeters,
-          crossIndex * gridLengthInMeters,
-          -1e-4 - 0.5 * thicknessInMeters,
-        )
-        dummy.updateMatrix()
-        m.setMatrixAt(mIndex++, dummy.matrix)
-      }
+
+      // down
+      dummy.setRotationFromQuaternion(FLIP_Z_QUATERNION)
+      dummy.position.set(
+        mainIndex * gridLengthInMeters,
+        crossIndex * gridLengthInMeters,
+        -1e-4 - 0.5 * thicknessInMeters,
+      )
+      dummy.updateMatrix()
+      m.setMatrixAt(mIndex++, dummy.matrix)
     }
 
     return m

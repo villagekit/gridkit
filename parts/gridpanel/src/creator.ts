@@ -5,6 +5,7 @@ import type {
   GridPanelFit,
   GridPanelHoleVariant,
   GridPanelHoles,
+  GridPanelSpecHoleVariant,
   GridPanelType,
   GridPanelVariant,
 } from './types'
@@ -28,13 +29,13 @@ export class GridPanelSpec extends BasePartSpec<GridPanelType> {
   variantId: keyof typeof gridPanelVariants
   sizeInGrids: [number, number]
   holes: GridPanelHoles
-  holeVariant: GridPanelHoleVariant
+  holeVariant: GridPanelSpecHoleVariant
 
   constructor(
     sizeInGrids: [number, number],
     variantId?: keyof typeof gridPanelVariants,
     holes: GridPanelHoles = true,
-    holeVariant: GridPanelHoleVariant = 'through',
+    holeVariant: GridPanelSpecHoleVariant = 'through',
   ) {
     super('gridpanel')
     this.variantId = variantId ?? getDefaultVariantId()
@@ -86,7 +87,7 @@ export type GridPanelSpecSerialized = {
   variantId: keyof typeof gridPanelVariants
   sizeInGrids: [number, number]
   holes: GridPanelHoles
-  holeVariant: GridPanelHoleVariant
+  holeVariant: GridPanelSpecHoleVariant
 }
 function serializeSpec(instance: GridPanelSpec): GridPanelSpecSerialized {
   const { variantId, sizeInGrids, holes, holeVariant } = instance
@@ -125,7 +126,7 @@ export class GridPanel extends BasePartCreator<GridPanelSpec> {
       variantId,
       sizeInGrids: [Math.abs(x[0] - x[1]), Math.abs(y[0] - y[1])],
       holes,
-      holeVariant,
+      holeVariant: toSpecHoleVariant(holeVariant),
     })
 
     if (x[0] > x[1]) {
@@ -134,7 +135,10 @@ export class GridPanel extends BasePartCreator<GridPanelSpec> {
     if (y[0] > y[1]) {
       panel = panel.applyTransform(mirrorYTransform)
     }
-    if (fit === 'top') {
+    if (
+      (fit === 'top' && holeVariant === 'bottom') ||
+      (fit === 'bottom' && holeVariant === 'top')
+    ) {
       panel = panel.applyTransform(mirrorZTransform)
     }
 
@@ -170,7 +174,7 @@ export class GridPanel extends BasePartCreator<GridPanelSpec> {
       variantId,
       sizeInGrids: [Math.abs(y[0] - y[1]), Math.abs(z[0] - z[1])],
       holes,
-      holeVariant,
+      holeVariant: toSpecHoleVariant(holeVariant),
     }).applyTransform(xyToYZTransform)
 
     if (y[0] > y[1]) {
@@ -179,7 +183,10 @@ export class GridPanel extends BasePartCreator<GridPanelSpec> {
     if (z[0] > z[1]) {
       panel = panel.applyTransform(mirrorZTransform)
     }
-    if (fit === 'top') {
+    if (
+      (fit === 'top' && holeVariant === 'bottom') ||
+      (fit === 'bottom' && holeVariant === 'top')
+    ) {
       panel = panel.applyTransform(mirrorXTransform)
     }
 
@@ -217,7 +224,7 @@ export class GridPanel extends BasePartCreator<GridPanelSpec> {
       variantId,
       sizeInGrids,
       holes,
-      holeVariant,
+      holeVariant: toSpecHoleVariant(holeVariant),
     }).applyTransform(xyToXZTransform)
 
     if (x[0] > x[1]) {
@@ -226,7 +233,10 @@ export class GridPanel extends BasePartCreator<GridPanelSpec> {
     if (z[0] > z[1]) {
       panel = panel.applyTransform(mirrorZTransform)
     }
-    if (fit === 'top') {
+    if (
+      (fit === 'top' && holeVariant === 'bottom') ||
+      (fit === 'bottom' && holeVariant === 'top')
+    ) {
       panel = panel.applyTransform(mirrorYTransform)
     }
 
@@ -245,12 +255,12 @@ export class GridPanel extends BasePartCreator<GridPanelSpec> {
 interface BaseOptions {
   id?: string
   holes?: GridPanelHoles
-  holeVariant?: GridPanelHoleVariant
 }
 
 interface GridPanelOptions extends BaseOptions {
   variantId: keyof typeof gridPanelVariants
   sizeInGrids: [number, number]
+  holeVariant?: GridPanelSpecHoleVariant
 }
 
 interface GridPanelXYOptions extends BaseOptions {
@@ -259,6 +269,7 @@ interface GridPanelXYOptions extends BaseOptions {
   y: [number, number]
   z: number
   fit?: GridPanelFit
+  holeVariant?: GridPanelHoleVariant
 }
 
 interface GridPanelYZOptions extends BaseOptions {
@@ -267,6 +278,7 @@ interface GridPanelYZOptions extends BaseOptions {
   y: [number, number]
   z: [number, number]
   fit?: GridPanelFit
+  holeVariant?: GridPanelHoleVariant
 }
 
 interface GridPanelXZOptions extends BaseOptions {
@@ -275,6 +287,7 @@ interface GridPanelXZOptions extends BaseOptions {
   y: number
   z: [number, number]
   fit?: GridPanelFit
+  holeVariant?: GridPanelHoleVariant
 }
 
 function getVariant(variantId: string): GridPanelVariant {
@@ -325,4 +338,14 @@ function compareXYs(a: XY, b: XY) {
   }
   // otherwise, compare x values
   return a[0] - b[0]
+}
+
+function toSpecHoleVariant(holeVariant: GridPanelHoleVariant) {
+  switch (holeVariant) {
+    case 'through':
+      return 'through'
+    case 'bottom':
+    case 'top':
+      return 'half'
+  }
 }
