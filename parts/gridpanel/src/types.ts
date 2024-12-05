@@ -18,7 +18,7 @@ export interface GridPanelVariant {
 }
 
 export type GridPanelFit = 'top' | 'bottom'
-export type GridPanelHoleVariant = 'through' | 'top' | 'bottom'
+export type GridPanelHoleVariant = 'through' | 'half' | 'half-reverse'
 export type GridPanelSpecHoleVariant = 'through' | 'half'
 export type GridPanelHoles = boolean | Array<[number, number]>
 

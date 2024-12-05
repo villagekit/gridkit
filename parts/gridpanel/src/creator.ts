@@ -114,7 +114,7 @@ export class GridPanel extends BasePartCreator<GridPanelSpec> {
       z,
       fit = 'bottom',
       holes,
-      holeVariant = 'bottom',
+      holeVariant = 'half',
     } = options
 
     const variant = getVariant(variantId)
@@ -135,10 +135,10 @@ export class GridPanel extends BasePartCreator<GridPanelSpec> {
     if (y[0] > y[1]) {
       panel = panel.applyTransform(mirrorYTransform)
     }
-    if (
-      (fit === 'top' && holeVariant === 'bottom') ||
-      (fit === 'bottom' && holeVariant === 'top')
-    ) {
+    if (fit === 'top') {
+      panel = panel.applyTransform(mirrorZTransform)
+    }
+    if (holeVariant === 'half-reverse') {
       panel = panel.applyTransform(mirrorZTransform)
     }
 
@@ -162,7 +162,7 @@ export class GridPanel extends BasePartCreator<GridPanelSpec> {
       z,
       fit = 'bottom',
       holes,
-      holeVariant = 'bottom',
+      holeVariant = 'half',
     } = options
 
     const variant = getVariant(variantId)
@@ -183,10 +183,10 @@ export class GridPanel extends BasePartCreator<GridPanelSpec> {
     if (z[0] > z[1]) {
       panel = panel.applyTransform(mirrorZTransform)
     }
-    if (
-      (fit === 'top' && holeVariant === 'bottom') ||
-      (fit === 'bottom' && holeVariant === 'top')
-    ) {
+    if (fit === 'top') {
+      panel = panel.applyTransform(mirrorXTransform)
+    }
+    if (holeVariant === 'half-reverse') {
       panel = panel.applyTransform(mirrorXTransform)
     }
 
@@ -210,7 +210,7 @@ export class GridPanel extends BasePartCreator<GridPanelSpec> {
       z,
       fit = 'bottom',
       holes,
-      holeVariant = 'bottom',
+      holeVariant = 'half',
     } = options
 
     const variant = getVariant(variantId)
@@ -233,10 +233,10 @@ export class GridPanel extends BasePartCreator<GridPanelSpec> {
     if (z[0] > z[1]) {
       panel = panel.applyTransform(mirrorZTransform)
     }
-    if (
-      (fit === 'top' && holeVariant === 'bottom') ||
-      (fit === 'bottom' && holeVariant === 'top')
-    ) {
+    if (fit === 'top') {
+      panel = panel.applyTransform(mirrorYTransform)
+    }
+    if (holeVariant === 'half-reverse') {
       panel = panel.applyTransform(mirrorYTransform)
     }
 
@@ -344,8 +344,8 @@ function toSpecHoleVariant(holeVariant: GridPanelHoleVariant) {
   switch (holeVariant) {
     case 'through':
       return 'through'
-    case 'bottom':
-    case 'top':
+    case 'half':
+    case 'half-reverse':
       return 'half'
   }
 }
