@@ -33,4 +33,4 @@ For an example workspace of modular products, see [`villagekit/products`](https:
 
 ## License
 
-[Apache-2.0](https://www.tldrlegal.com/license/apache-license-2-0-apache-2-0)
+[European Union Public License (EUPL)](https://choosealicense.com/licenses/eupl-1.2/)
