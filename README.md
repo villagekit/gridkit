@@ -1,8 +1,10 @@
-# Village Kit
+# Grid Kit (Legacy)
 
-_PROTOTYPE_
+_PROOF OF CONCEPT PROTOTYPE_
 
-A code-as-CAD platform to power [Village Kit](https://villagekit.com), the next generation of open source CAD design.
+A code-as-CAD platform for [Village Kit](https://villagekit.com), the next generation of open source CAD design.
+
+This was the code that powered the design system for the original [Grid Kit](https://gridkit-landing-villagekit.vercel.app/designs) catalog, using the [products here](https://github.com/villagekit/gridkit-products).
 
 > Village Kit is a modular system for building physical things with a focus on peer production and circular economies.
 
@@ -25,7 +27,7 @@ To get started with the CAD-as-code modular design app.
 
 Download the [latest app release](https://github.com/villagekit/villagekit/releases).
 
-For an example workspace of modular products, see [`villagekit/products`](https://github.com/villagekit/products).
+For an example workspace of modular products, see [`villagekit/gridkit-products`](https://github.com/villagekit/gridkit-products).
 
 ## Development
 
