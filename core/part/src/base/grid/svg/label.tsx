@@ -54,6 +54,7 @@ interface TextLabelXProps extends Omit<LabelXProps, 'value'> {
 export function TextLabelX(props: TextLabelXProps) {
   const { text, textAnchor = 'middle', color, x } = props
 
+  const { viewWidth } = useSvgContext()
   const { fontSizes } = useTheme()
 
   return (
@@ -61,7 +62,9 @@ export function TextLabelX(props: TextLabelXProps) {
       x={x}
       y={LABEL_Y_OFFSET_Y}
       fill={color}
-      fontSize={fontSizes['3xl']}
+      // NOTE (mw): https://florian.ec/blog/responsive-svg-constant-font-size/
+      // [font size] / ([view width] / [svg viewbox width])
+      fontSize={`calc(${fontSizes['lg']}/ (${viewWidth} / (40 * 62)))`}
       textAnchor={textAnchor}
     >
       {text}

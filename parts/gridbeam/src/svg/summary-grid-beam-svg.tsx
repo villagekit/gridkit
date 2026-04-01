@@ -18,18 +18,16 @@ export function SummaryGridBeamSvg(props: SummaryGridBeamSvgProps) {
 
   return (
     <SvgContextProvider displayUnit={displayUnit}>
-      <Box sx={{ width: '100%' }}>
-        <svg
-          role="img"
-          aria-label={label}
-          width="100%"
-          viewBox={`-4 0 ${62 * GRID_SPACING} ${2 * GRID_SPACING}`}
-          xmlns={'http://www.w3.org/2000/svg'}
-        >
-          <title>{label}</title>
-          <BeamSvg sizeInGrids={lengthInGrids} showSizeMarker showShadow />
-        </svg>
-      </Box>
+      <svg
+        role="img"
+        aria-label={label}
+        width="100%"
+        viewBox={`-4 0 ${62 * GRID_SPACING} ${2 * GRID_SPACING}`}
+        xmlns={'http://www.w3.org/2000/svg'}
+      >
+        <title>{label}</title>
+        <BeamSvg sizeInGrids={lengthInGrids} showSizeMarker showShadow />
+      </svg>
     </SvgContextProvider>
   )
 }
