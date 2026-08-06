@@ -15,6 +15,12 @@
       "import": "./dist/creator.js",
       "default": "./dist/creator.js"
     },
+    "./svg": {
+      "types": "./dist/svg/index.d.ts",
+      "source": "./src/svg/index.tsx",
+      "import": "./dist/svg/index.js",
+      "default": "./dist/svg/index.js"
+    },
     "./bundles/creator": "./dist-bundles/creator.js",
     "./type-bundles/creator.d.ts": "./dist-type-bundles/creator.d.ts",
     "./package.json": "./package.json"
