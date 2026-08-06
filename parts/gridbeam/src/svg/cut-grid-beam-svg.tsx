@@ -20,7 +20,11 @@ export function CutGridBeamSvg(props: CutGridBeamSvgProps) {
   const beamWidth = GRID_SPACING * sizeInGrids
   const beamHeight = GRID_SPACING
   const remainderWidth = GRID_SPACING * remainder
-  const maxBeamWidth = GRID_SPACING * 60
+  // A fixed 60 gu canvas so beams stay comparable down a list — a 30 gu beam draws half as long
+  // as a 60 gu one — but widened for stock past that, which is legal (a cutting planner can be
+  // given custom-length stock) and would otherwise draw off the right edge, taking the remainder
+  // and the total label with it.
+  const maxBeamWidth = GRID_SPACING * Math.max(60, sizeInGrids)
 
   const absoluteCuts = useMemo(() => {
     let sum = 0
@@ -63,8 +67,9 @@ export function CutGridBeamSvg(props: CutGridBeamSvgProps) {
           <title>{label}</title>
 
           {cuts.map((cut, index) => (
-            // biome-ignore lint/correctness/useJsxKeyInIterable:
             <BeamSvg
+              // biome-ignore lint/suspicious/noArrayIndexKey: position in the beam is the identity
+              key={index}
               sizeInGrids={cut}
               x={(absoluteCuts[index - 1] || 0) * GRID_SPACING}
               showSizeMarker
