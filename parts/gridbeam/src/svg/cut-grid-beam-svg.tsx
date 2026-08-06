@@ -7,24 +7,37 @@ import { CutMarker } from './cut-marker'
 
 const GRID_SPACING = 40
 
+const DEFAULT_CANVAS_SIZE_IN_GRIDS = 60
+
 interface CutGridBeamSvgProps {
   sizeInGrids: number
   cuts: Array<number>
   remainder: number
   displayUnit?: 'gu' | 'mm'
+  /**
+   * Grid units the drawing is scaled against, so a beam shorter than the canvas draws
+   * proportionally short. Pass the longest beam in a list to keep the whole list to one scale;
+   * it is only ever widened to fit this beam, never narrowed below it.
+   */
+  canvasSizeInGrids?: number
 }
 
 export function CutGridBeamSvg(props: CutGridBeamSvgProps) {
-  const { cuts, sizeInGrids, remainder, displayUnit = 'gu' } = props
+  const {
+    cuts,
+    sizeInGrids,
+    remainder,
+    displayUnit = 'gu',
+    canvasSizeInGrids = DEFAULT_CANVAS_SIZE_IN_GRIDS,
+  } = props
 
   const beamWidth = GRID_SPACING * sizeInGrids
   const beamHeight = GRID_SPACING
   const remainderWidth = GRID_SPACING * remainder
-  // A fixed 60 gu canvas so beams stay comparable down a list — a 30 gu beam draws half as long
-  // as a 60 gu one — but widened for stock past that, which is legal (a cutting planner can be
-  // given custom-length stock) and would otherwise draw off the right edge, taking the remainder
+  // Never narrower than the beam: stock longer than the canvas is legal — a cutting planner can be
+  // given custom-length stock — and would otherwise draw off the right edge, taking the remainder
   // and the total label with it.
-  const maxBeamWidth = GRID_SPACING * Math.max(60, sizeInGrids)
+  const maxBeamWidth = GRID_SPACING * Math.max(canvasSizeInGrids, sizeInGrids)
 
   const absoluteCuts = useMemo(() => {
     let sum = 0
@@ -91,8 +104,9 @@ export function CutGridBeamSvg(props: CutGridBeamSvgProps) {
             />
           )}
 
-          {absoluteCuts.map((cut) => (
-            <CutMarker key={cut} cut={cut} />
+          {absoluteCuts.map((cut, index) => (
+            // biome-ignore lint/suspicious/noArrayIndexKey: a zero-length cut repeats the position
+            <CutMarker key={index} cut={cut} />
           ))}
 
           <g transform={`translate(0, ${GRID_SPACING})`}>
