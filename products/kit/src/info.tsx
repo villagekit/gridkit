@@ -61,6 +61,7 @@ export function ProductKitInfo(props: ProductKitInfoProps) {
           }
           pointerTimeout={3000}
           portalProps={{ containerRef: containerRef }}
+          css={{ fontSize: 'sm', padding: 4 }}
         />
       </HStack>
     </HStack>
