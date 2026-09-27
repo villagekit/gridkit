@@ -168,8 +168,19 @@ export function SandboxControls(props: SandboxControlsProps) {
             onClick={onToggleAutoRotate}
             // The off color is the variable the toolbar variant reads in place of `color`: a `color`
             // style prop beats the variant's hover, press and focus colors, since Chakra v3 emits it
-            // outside the `recipes` cascade layer whatever the variant's specificity.
-            css={shouldAutoRotate ? {} : { _focus: {}, '--toolbar-color': 'colors.gray.400' }}
+            // outside the `recipes` cascade layer whatever the variant's specificity. The focus
+            // variable keeps the off color while the button is focused, as v2's `_focus: {}` did by
+            // erasing the variant's focus mapping; in v3 an empty `_focus` emits no rule, and the
+            // line is kept as legacy's.
+            css={
+              shouldAutoRotate
+                ? {}
+                : {
+                    _focus: {},
+                    '--toolbar-color': 'colors.gray.400',
+                    '--toolbar-focus-color': 'colors.gray.400',
+                  }
+            }
           />
 
           <IconButton
@@ -178,7 +189,15 @@ export function SandboxControls(props: SandboxControlsProps) {
             size="sm"
             title="Toggle grid"
             onClick={onToggleDisplayGrid}
-            css={shouldDisplayGrid ? {} : { _focus: {}, '--toolbar-color': 'colors.gray.400' }}
+            css={
+              shouldDisplayGrid
+                ? {}
+                : {
+                    _focus: {},
+                    '--toolbar-color': 'colors.gray.400',
+                    '--toolbar-focus-color': 'colors.gray.400',
+                  }
+            }
           />
 
           <IconButton
