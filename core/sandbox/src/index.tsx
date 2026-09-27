@@ -79,8 +79,13 @@ export function Sandbox(props: React.PropsWithChildren<SandboxProps>) {
       aria-label={label}
       ref={containerRef}
       css={{
-        ':hover, :focus-within': {
-          '.sandbox-controls': {
+        // Chakra v3's `css` reads a key as a selector only when it holds `&`, starts with `@` or
+        // `_`, or names a condition; a bare `:hover` or `.sandbox-controls` is flattened into a
+        // property, which styles nothing and logs a kebab-case error in development. The raw
+        // selector, not the `_hover` condition, so the rule carries no `@media (hover: hover)`
+        // guard and matches a touch screen's sticky hover as Chakra v2's rule did.
+        '&:hover, &:focus-within': {
+          '& .sandbox-controls': {
             opacity: 1,
           },
         },
