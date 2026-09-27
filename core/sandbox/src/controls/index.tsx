@@ -166,7 +166,10 @@ export function SandboxControls(props: SandboxControlsProps) {
             size="sm"
             title="Toggle auto-rotate"
             onClick={onToggleAutoRotate}
-            css={shouldAutoRotate ? {} : { _focus: {}, color: 'gray.400' }}
+            // The off color is the variable the toolbar variant reads in place of `color`: a `color`
+            // style prop beats the variant's hover, press and focus colors, since Chakra v3 emits it
+            // outside the `recipes` cascade layer whatever the variant's specificity.
+            css={shouldAutoRotate ? {} : { _focus: {}, '--toolbar-color': 'colors.gray.400' }}
           />
 
           <IconButton
@@ -175,7 +178,7 @@ export function SandboxControls(props: SandboxControlsProps) {
             size="sm"
             title="Toggle grid"
             onClick={onToggleDisplayGrid}
-            css={shouldDisplayGrid ? {} : { _focus: {}, color: 'gray.400' }}
+            css={shouldDisplayGrid ? {} : { _focus: {}, '--toolbar-color': 'colors.gray.400' }}
           />
 
           <IconButton
