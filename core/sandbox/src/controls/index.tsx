@@ -213,6 +213,7 @@ export function SandboxControls(props: SandboxControlsProps) {
               <Tooltip
                 label="Rotate the screen to landscape to view the design controls"
                 open={showTooltip}
+                portalProps={{ containerRef: containerRef }}
               >
                 <Box onPointerEnter={onPointerEnterTooltip} onPointerLeave={onPointerLeaveTooltip}>
                   <IconButton

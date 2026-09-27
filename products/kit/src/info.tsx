@@ -9,7 +9,9 @@ interface ProductKitInfoProps {
   containerRef?: React.RefObject<HTMLElement | null>
 }
 
-export function ProductKitInfo(_props: ProductKitInfoProps) {
+export function ProductKitInfo(props: ProductKitInfoProps) {
+  const { containerRef } = props
+
   const { boundingBox } = useProductKitContext()
 
   const dimensionsInMillimeters = useMemo(
@@ -58,6 +60,7 @@ export function ProductKitInfo(_props: ProductKitInfoProps) {
             </VStack>
           }
           pointerTimeout={3000}
+          portalProps={{ containerRef: containerRef }}
         />
       </HStack>
     </HStack>

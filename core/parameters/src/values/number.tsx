@@ -3,6 +3,7 @@ import { useCallback } from 'react'
 import * as SerializeQueryParams from 'serialize-query-params'
 import { z } from 'zod'
 import { Label } from '../components/label'
+import { useParamControlsInternalContext } from '../internal-context'
 import { type BaseProps, baseParamSchema } from './base'
 
 const { NumberParam: NumberQueryParam } = SerializeQueryParams
@@ -27,6 +28,8 @@ export function Number(props: NumberProps) {
   const { id, onChange, value, label, description, min, max, step = 1 } = props
 
   const { onPointerEnterTooltip, onPointerLeaveTooltip, showTooltip } = useMobileFriendlyTooltip()
+
+  const { containerRef } = useParamControlsInternalContext()
 
   const handleValueChange = useCallback(
     (details: { value: number[] }) => {
@@ -53,7 +56,11 @@ export function Number(props: NumberProps) {
             <Slider.Range />
           </Slider.Track>
 
-          <Tooltip label={`${value * 40}mm`} open={showTooltip}>
+          <Tooltip
+            label={`${value * 40}mm`}
+            open={showTooltip}
+            portalProps={{ containerRef: containerRef }}
+          >
             <Slider.Thumb
               index={0}
               onPointerEnter={onPointerEnterTooltip}
