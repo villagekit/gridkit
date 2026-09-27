@@ -59,8 +59,10 @@ export function TextLabelX(props: TextLabelXProps) {
   const system = useTheme()
   const fontSize = system.token('fontSizes.3xl')
 
+  // The size is an inline style, not the fontSize attribute: Chakra v3's preflight
+  // `* { font: inherit }` is a stylesheet rule, which beats an SVG presentation attribute.
   return (
-    <text x={x} y={LABEL_Y_OFFSET_Y} fill={color} fontSize={fontSize} textAnchor={textAnchor}>
+    <text x={x} y={LABEL_Y_OFFSET_Y} fill={color} style={{ fontSize }} textAnchor={textAnchor}>
       {text}
     </text>
   )
@@ -82,7 +84,7 @@ export function TextLabelY(props: TextLabelYProps) {
       x={LABEL_X_OFFSET_X}
       y={y + LABEL_X_OFFSET_Y}
       fill={color}
-      fontSize={fontSize}
+      style={{ fontSize }}
       textAnchor={textAnchor}
     >
       {text}
